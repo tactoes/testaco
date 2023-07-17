@@ -9,7 +9,7 @@ object Columns {
     private val COLUMN_COMPARATOR = ColumnComparator()
     private val EMPTY_COLUMNS = listOf<Column>()
 
-    fun getColumns(columnNames: List<String>, columns: List<Column>, tableName: String): List<Column> {
+    fun getColumns(columnNames: List<String>, columns: List<Column>): List<Column> {
         if (columnNames.size == 0) {
             return EMPTY_COLUMNS
         }
@@ -18,16 +18,9 @@ object Columns {
 
     fun findColumnsByName(
         columnNames: List<String>,
-        tableMetaData: ITableMetaData
+        tableMetaData: ITableMetaData,
     ): List<Column> {
         return columnNames.map { name: String -> tableMetaData.columns[tableMetaData.getColumnIndex(name)] }
-    }
-
-    fun findColumnsByName(
-        columns: List<Column>,
-        tableMetaData: ITableMetaData
-    ): List<Column> {
-        return findColumnsByName(columns.map { it.columnName }, tableMetaData)
     }
 
     fun getColumn(columnName: String, columns: List<Column>): Column? {
@@ -35,8 +28,9 @@ object Columns {
     }
 
     fun getColumns(
-        tableName: String, columns: Array<Column>,
-        columnFilter: IColumnFilter
+        tableName: String,
+        columns: List<Column>,
+        columnFilter: IColumnFilter,
     ): Collection<Column> {
         return columns.filter { column: Column -> columnFilter.accept(tableName, column) }
     }
@@ -55,12 +49,12 @@ object Columns {
 
     fun mergeColumnsByName(referenceColumns: List<Column>, columnsToMerge: List<Column>): List<Column> {
         val referenceNames = referenceColumns.map { it.columnName }
-        return referenceColumns.plus(columnsToMerge.filterNot { column: Column -> referenceNames.contains(column.columnName)  })
+        return referenceColumns.plus(columnsToMerge.filterNot { column: Column -> referenceNames.contains(column.columnName) })
     }
 
     fun getColumnDiff(
         expectedMetaData: ITableMetaData,
-        actualMetaData: ITableMetaData
+        actualMetaData: ITableMetaData,
     ): ColumnDiff {
         return ColumnDiff(expectedMetaData, actualMetaData)
     }
@@ -69,11 +63,11 @@ object Columns {
         override fun compare(column1: Column, column2: Column): Int {
             return column1.columnName.compareTo(column2.columnName, ignoreCase = true)
         }
-   }
+    }
 
     data class ColumnDiff(
         val expectedMetaData: ITableMetaData,
-        val actualMetaData: ITableMetaData
+        val actualMetaData: ITableMetaData,
     ) {
         fun expected(): List<Column> = expectedMetaData.columns.minus(actualMetaData.columns)
         fun actual(): List<Column> = actualMetaData.columns.minus(expectedMetaData.columns)
@@ -89,7 +83,7 @@ object Columns {
                 val message: String
                 message = if (expectedMetaData.columns.size != actualMetaData.columns.size) {
                     "column count (table=" + expectedMetaData.tableName + ", " +
-                            "expectedColCount=" + expectedMetaData.columns.size + ", actualColCount=" + actualMetaData.columns.size + ")"
+                        "expectedColCount=" + expectedMetaData.columns.size + ", actualColCount=" + actualMetaData.columns.size + ")"
                 } else {
                     "column mismatch (table=${expectedMetaData.tableName})"
                 }
@@ -98,7 +92,6 @@ object Columns {
         }
 
         override fun toString(): String =
-            """[expected=${expectedMetaData.columns.toString()}, actual=${actualMetaData.columns.toString()}]"""
-
+            """[expected=${expectedMetaData.columns}, actual=${actualMetaData.columns}]"""
     }
 }

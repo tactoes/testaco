@@ -10,9 +10,9 @@ import java.sql.SQLException
 class DoubleDataType internal constructor(name: String, sqlType: Int) :
     AbstractDataType<Double>(name, sqlType, Double::class, true, false) {
 
-    fun typeCast(value: Any?): Any? {
+    override fun typeCast(value: Any): Any? {
         logger.debug("typeCast(value={}) - start", value)
-        if (value == null || value === ITable.NO_VALUE) {
+        if (value == null) {
             return null
         }
         return if (value is Number) {

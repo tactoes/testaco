@@ -5,33 +5,23 @@ import java.util.*
 class DefaultTableMetaData : AbstractTableMetaData {
 
     override val tableName: String
-    override val columns: Array<Column>
-    override val primaryKeys: Array<Column>
+    override val columns: List<Column>
+    override val primaryKeys: List<Column>
 
     @JvmOverloads
     constructor(
-        tableName: String, columns: Array<Column>,
-        primaryKeys: Array<String?>? = arrayOfNulls(0)
-    ) //throws DataSetException
-    {
+        tableName: String,
+        columns: List<Column>,
+        primaryKeys: List<String> = listOf(),
+    ) {
         this.tableName = tableName
         this.columns = columns
         this.primaryKeys = Columns.getColumns(primaryKeys, columns)
     }
 
-    constructor(
-        tableName: String, columns: Array<Column>,
-        primaryKeys: Array<Column>
-    ) //throws DataSetException
-    {
-        this.tableName = tableName
-        this.columns = columns
-        this.primaryKeys = primaryKeys
-    }
-
     override fun toString(): String {
         return "tableName=" + tableName +
-                ", columns=" + Arrays.asList(*columns) +
-                ", keys=" + Arrays.asList(*primaryKeys) + ""
+            ", columns=" + columns.map { c -> c.toString() }.joinToString(", ") +
+            ", keys=" + primaryKeys.map { pk -> pk.toString() }.joinToString { ", " }
     }
 }

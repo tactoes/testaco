@@ -1,12 +1,8 @@
 package org.testaco.ext.postgresql
 
-import org.slf4j.LoggerFactory
 import org.testaco.dataset.datatype.DataType
-import org.testaco.dataset.datatype.DataTypeException
 import org.testaco.dataset.datatype.DefaultDataTypeFactory
-import java.lang.RuntimeException
 import java.sql.Types
-import java.util.*
 
 open class PostgresqlDataTypeFactory : DefaultDataTypeFactory() {
 

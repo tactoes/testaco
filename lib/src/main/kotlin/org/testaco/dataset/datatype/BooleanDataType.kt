@@ -1,6 +1,5 @@
 package org.testaco.dataset.datatype
 
-import org.testaco.dataset.ITable
 import org.slf4j.LoggerFactory
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -10,11 +9,8 @@ import java.sql.Types
 open class BooleanDataType @JvmOverloads internal constructor(name: String = "BOOLEAN", sqlType: Int = Types.BOOLEAN) :
     AbstractDataType<Boolean>(name, sqlType, Boolean::class, false, false) {
 
-    fun typeCast(value: Any?): Any? {
+    override fun typeCast(value: Any): Any? {
         logger.debug("typeCast(value={}) - start", value)
-        if (value == null || value === ITable.NO_VALUE) {
-            return null
-        }
         if (value is Boolean) {
             return value
         }
@@ -22,11 +18,10 @@ open class BooleanDataType @JvmOverloads internal constructor(name: String = "BO
             return if (value.toInt() == 0) java.lang.Boolean.FALSE else java.lang.Boolean.TRUE
         }
         if (value is String) {
-            val string = value
-            return if (string.equals("true", ignoreCase = true) || string.equals("false", ignoreCase = true)) {
-                java.lang.Boolean.valueOf(string)
+            return if (value.equals("true", ignoreCase = true) || value.equals("false", ignoreCase = true)) {
+                java.lang.Boolean.valueOf(value)
             } else {
-                typeCast(DataType.INTEGER.typeCast(string))
+                typeCast(DataType.INTEGER.typeCast(value)!!)
             }
         }
         throw TypeCastException(value, this)
@@ -52,10 +47,12 @@ open class BooleanDataType @JvmOverloads internal constructor(name: String = "BO
 
     @Throws(SQLException::class)
     override fun setSqlValue(value: Any, column: Int, statement: PreparedStatement) {
-        if (logger.isDebugEnabled) logger.debug(
-            "setSqlValue(value={}, column={}, statement={}) - start",
-            *arrayOf(value, column, statement)
-        )
+        if (logger.isDebugEnabled) {
+            logger.debug(
+                "setSqlValue(value={}, column={}, statement={}) - start",
+                *arrayOf(value, column, statement),
+            )
+        }
         val castValue = typeCast(value) as Boolean?
         if (castValue == null) {
             statement.setNull(column, Types.BOOLEAN)

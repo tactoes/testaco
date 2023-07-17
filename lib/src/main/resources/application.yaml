@@ -1,0 +1,13 @@
+spring:
+  application.name: cruncher
+  datasource:
+    jdbc-url: jdbc:postgresql:15.3:///test
+    username: test
+    password: test
+  flyway:
+    locations: classpath:/db/migrations
+    validate-migration-naming: true
+server:
+  port: 9000
+logging:
+  config: classpath:logback.xml

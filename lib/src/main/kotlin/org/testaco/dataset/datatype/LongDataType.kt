@@ -10,9 +10,9 @@ import java.sql.Types
 
 class LongDataType internal constructor() : AbstractDataType<Long>("BIGINT", Types.BIGINT, Long::class, true, false) {
 
-    fun typeCast(value: Any?): Any? {
+    override fun typeCast(value: Any): Any? {
         logger.debug("typeCast(value={}) - start", value)
-        if (value == null || value === ITable.NO_VALUE) {
+        if (value == null) {
             return null
         }
         return if (value is Number) {

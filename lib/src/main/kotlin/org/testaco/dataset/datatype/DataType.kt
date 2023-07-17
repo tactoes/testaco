@@ -125,7 +125,7 @@ interface DataType<T : Any> {
         @Throws(TypeCastException::class)
         fun asString(value: Any?): String? {
             logger.debug("asString(value={}) - start", value)
-            return VARCHAR.typeCast(value) as String?
+            return VARCHAR.typeCast(value!!) as String?
         }
 
         /**

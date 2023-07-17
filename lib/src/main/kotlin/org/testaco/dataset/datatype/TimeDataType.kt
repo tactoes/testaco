@@ -11,9 +11,9 @@ import java.util.Date
 class TimeDataType internal constructor() :
     AbstractDataType<Time>("TIME", Types.TIME, Time::class, false, true) {
 
-    fun typeCast(value: Any?): Any? {
+    override fun typeCast(value: Any): Any? {
         logger.debug("typeCast(value={}) - start", value)
-        if (value == null || value === ITable.NO_VALUE) {
+        if (value == null) {
             return null
         }
         if (value is Time) {

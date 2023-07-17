@@ -1,6 +1,5 @@
 package org.testaco.dataset.datatype
 
-import org.testaco.dataset.ITable
 import org.slf4j.LoggerFactory
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -11,9 +10,8 @@ import java.sql.Types
 
 class BigIntegerDataType : AbstractDataType<BigInteger>("BIGINT", Types.BIGINT, BigInteger::class, true, false) {
 
-    fun typeCast(value: Any?): Any? {
-        logger.debug("typeCast(value={}) - start", value)
-        if (value == null || value === ITable.NO_VALUE) {
+    override fun typeCast(value: Any): Any? {
+        if (value == null) {
             return null
         }
         when (value) {
@@ -57,7 +55,7 @@ class BigIntegerDataType : AbstractDataType<BigInteger>("BIGINT", Types.BIGINT, 
         if (logger.isDebugEnabled) {
             logger.debug(
                 "setSqlValue(value={}, column={}, statement={}) - start",
-                *arrayOf(value, column, statement)
+                *arrayOf(value, column, statement),
             )
         }
         val valueBigDecimal = (typeCast(value) as BigInteger?)?.let { BigDecimal(it) }

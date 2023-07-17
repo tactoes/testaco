@@ -10,9 +10,9 @@ import java.sql.SQLException
 class IntegerDataType internal constructor(name: String, sqlType: Int) :
     AbstractDataType<Int>(name, sqlType, Int::class, true, false) {
 
-    fun typeCast(value: Any?): Any? {
+    override fun typeCast(value: Any): Any? {
         logger.debug("typeCast(value={}) - start", value)
-        if (value == null || value === ITable.NO_VALUE) {
+        if (value == null) {
             return null
         }
         if (value is Number) {

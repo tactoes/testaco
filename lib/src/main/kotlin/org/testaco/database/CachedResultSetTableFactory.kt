@@ -15,11 +15,21 @@ class CachedResultSetTableFactory : IResultSetTableFactory {
             "createTable(tableName={}, selectStatement={}, connection={}) - start",
             *arrayOf(tableName, selectStatement, connection)
         )
-        return CachedResultSetTable(
+/*        return CachedResultSetTable(
             ForwardOnlyResultSetTable(
                 tableName, selectStatement, connection
             )
-        )
+        )*/
+        return object: IResultSetTable {
+            override fun close() {
+                TODO("Not yet implemented")
+            }
+
+            override val tableMetaData: ITableMetaData
+                get() = TODO("Not yet implemented")
+            override val rowCount: Int
+                get() = TODO("Not yet implemented")
+        }
     }
 
     @Throws(SQLException::class)
@@ -28,8 +38,18 @@ class CachedResultSetTableFactory : IResultSetTableFactory {
         connection: IDatabaseConnection
     ): IResultSetTable {
         logger.trace("createTable(metaData={}, connection={}) - start", metaData, connection)
-        val resultSetTable = ForwardOnlyResultSetTable(metaData, connection)
-        return CachedResultSetTable(resultSetTable)
+        //val resultSetTable = ForwardOnlyResultSetTable(metaData, connection)
+        //return CachedResultSetTable(resultSetTable)
+        return object: IResultSetTable {
+            override fun close() {
+                TODO("Not yet implemented")
+            }
+
+            override val tableMetaData: ITableMetaData
+                get() = TODO("Not yet implemented")
+            override val rowCount: Int
+                get() = TODO("Not yet implemented")
+        }
     }
 
     @Throws(SQLException::class)
@@ -43,9 +63,19 @@ class CachedResultSetTableFactory : IResultSetTableFactory {
         )
 
         // Reuse method from ForwardOnly factory
-        val table: ForwardOnlyResultSetTable = ForwardOnlyResultSetTableFactory()
-            .createForwardOnlyResultSetTable(tableName, preparedStatement, connection)
-        return CachedResultSetTable(table)
+        //val table: ForwardOnlyResultSetTable = ForwardOnlyResultSetTableFactory()
+        //    .createForwardOnlyResultSetTable(tableName, preparedStatement, connection)
+        //return CachedResultSetTable(table)
+        return object: IResultSetTable {
+            override fun close() {
+                TODO("Not yet implemented")
+            }
+
+            override val tableMetaData: ITableMetaData
+                get() = TODO("Not yet implemented")
+            override val rowCount: Int
+                get() = TODO("Not yet implemented")
+        }
     }
 
     companion object {

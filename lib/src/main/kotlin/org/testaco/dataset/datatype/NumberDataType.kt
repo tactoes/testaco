@@ -15,9 +15,9 @@ import java.sql.SQLException
 open class NumberDataType internal constructor(name: String, sqlType: Int) :
     AbstractDataType<BigDecimal>(name, sqlType, BigDecimal::class, true, false) {
 
-    fun typeCast(value: Any?): Any? {
+    override fun typeCast(value: Any): Any? {
         logger.debug("typeCast(value={}) - start", value)
-        if (value == null || value === ITable.NO_VALUE) {
+        if (value == null) {
             return null
         }
         if (value is BigDecimal) {

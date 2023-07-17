@@ -18,9 +18,9 @@ open class StringDataType(name: String, sqlType: Int) :
 
     @OptIn(ExperimentalEncodingApi::class)
     @Throws(TypeCastException::class)
-    fun typeCast(value: Any?): Any? {
+    override fun typeCast(value: Any): Any? {
         logger.debug("typeCast(value={}) - start", value)
-        if (value == null || value === ITable.NO_VALUE) {
+        if (value == null) {
             return null
         }
         if (value is String) {

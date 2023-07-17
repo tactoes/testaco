@@ -1,8 +1,8 @@
 package org.testaco.ext.postgresql
 
+import org.postgresql.util.PGobject
 import org.testaco.dataset.datatype.AbstractDataType
 import org.testaco.dataset.datatype.TypeCastException
-import java.lang.reflect.InvocationTargetException
 import java.sql.*
 
 class UuidType : AbstractDataType<String>("uuid", Types.OTHER, String::class, false, false) {
@@ -21,7 +21,7 @@ class UuidType : AbstractDataType<String>("uuid", Types.OTHER, String::class, fa
         value: Any, column: Int,
         statement: PreparedStatement
     ) {
-        statement.setObject(column, getUUID(value, statement.connection))
+        statement.setObject(column, getUUID(value))
     }
 
     @Throws(TypeCastException::class)
@@ -29,36 +29,12 @@ class UuidType : AbstractDataType<String>("uuid", Types.OTHER, String::class, fa
         return value.toString()
     }
 
-    @Throws(TypeCastException::class)
-    private fun getUUID(value: Any, connection: Connection): Any? {
-        val tempUUID: Any?
-        try {
-            val aPGObjectClass = super.loadClass("org.postgresql.util.PGobject", connection)
-            val ct = aPGObjectClass.getConstructor(null)
-            tempUUID = ct.newInstance(null)
-            val setTypeMethod = aPGObjectClass.getMethod(
-                "setType", *arrayOf<Class<*>>(
-                    String::class.java
-                )
-            )
-            setTypeMethod.invoke(tempUUID, *arrayOf<Any>("uuid"))
-            val setValueMethod = aPGObjectClass.getMethod(
-                "setValue", *arrayOf<Class<*>>(
-                    String::class.java
-                )
-            )
-            setValueMethod.invoke(tempUUID, *arrayOf<Any>(value.toString()))
-        } catch (e: ClassNotFoundException) {
-            throw TypeCastException(value, this, e)
-        } catch (e: InvocationTargetException) {
-            throw TypeCastException(value, this, e)
-        } catch (e: NoSuchMethodException) {
-            throw TypeCastException(value, this, e)
-        } catch (e: IllegalAccessException) {
-            throw TypeCastException(value, this, e)
-        } catch (e: InstantiationException) {
-            throw TypeCastException(value, this, e)
+    private fun getUUID(value: Any): Any {
+        return {
+            val pgo = PGobject()
+            pgo.type = "uuid"
+            pgo.value = value.toString()
+            pgo
         }
-        return tempUUID
     }
 }

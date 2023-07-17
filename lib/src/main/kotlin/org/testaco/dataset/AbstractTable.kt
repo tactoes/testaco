@@ -1,14 +1,15 @@
 package org.testaco.dataset
 
 import org.slf4j.LoggerFactory
+import org.testaco.dataset.exceptions.NoSuchColumnException
 import org.testaco.dataset.exceptions.RowOutOfBoundsException
 
 abstract class AbstractTable : ITable {
     protected fun assertValidRowIndex(row: Int) {
         if (logger.isDebugEnabled) {
             logger.debug(
-                "assertValidRowIndex(row={}) - start", Integer
-                    .toString(row)
+                "assertValidRowIndex(row={}) - start",
+                row.toString(),
             )
         }
         assertValidRowIndex(row, rowCount)
@@ -18,7 +19,8 @@ abstract class AbstractTable : ITable {
         if (logger.isDebugEnabled) {
             logger.debug(
                 "assertValidRowIndex(row={}, rowCount={}) - start",
-                Integer.toString(row), Integer.toString(rowCount)
+                row.toString(),
+                rowCount.toString(),
             )
         }
         if (row < 0) {
@@ -29,15 +31,10 @@ abstract class AbstractTable : ITable {
         }
     }
 
-    protected fun assertValidColumn(columnName: String?) {
-        logger.debug("assertValidColumn(columnName={}) - start", columnName)
-        val metaData = tableMetaData!!
-        // Try to find the column in the metadata - if it cannot be found an
-        // exception is thrown
-        Columns.getColumnValidated(
-            columnName, metaData.columns, metaData
-                .tableName
-        )
+    protected fun assertValidColumn(columnName: String) {
+        if (Columns.getColumn(columnName, tableMetaData!!.columns) == null) {
+            throw NoSuchColumnException(tableMetaData!!.tableName, columnName)
+        }
     }
 
     protected fun getColumnIndex(columnName: String?): Int {

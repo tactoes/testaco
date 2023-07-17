@@ -1,7 +1,5 @@
 package org.testaco.database
 
-import org.testaco.database.statement.IStatementFactory
-import org.testaco.dataset.exceptions.DataSetException
 import org.testaco.dataset.IDataSet
 import org.testaco.dataset.ITable
 import java.sql.Connection
@@ -15,7 +13,7 @@ interface IDatabaseConnection {
     /**
      * Returns the database schema name.
      */
-    val schema: String?
+    val schema: String
 
     /**
      * Close this connection.
@@ -30,22 +28,22 @@ interface IDatabaseConnection {
     fun createDataSet(): IDataSet?
 
     @Throws(SQLException::class)
-    fun createDataSet(tableNames: Array<String>): IDataSet?
+    fun createDataSet(tableNames: Array<String>): IDataSet
 
     @Throws(SQLException::class)
-    fun createQueryTable(tableName: String?, sql: String?): ITable?
+    fun createQueryTable(tableName: String, sql: String): ITable
 
     @Throws(SQLException::class)
-    fun createTable(tableName: String?, preparedStatement: PreparedStatement?): ITable?
+    fun createTable(tableName: String, preparedStatement: PreparedStatement): ITable
 
     @Throws(SQLException::class)
-    fun createTable(tableName: String?): ITable?
+    fun createTable(tableName: String): ITable
 
     @Throws(SQLException::class)
-    fun getRowCount(tableName: String?): Int
+    fun getRowCount(tableName: String): Int
 
     @Throws(SQLException::class)
-    fun getRowCount(tableName: String?, whereClause: String?): Int
+    fun getRowCount(tableName: String, whereClause: String): Int
 
     val config: DatabaseConfig
 }

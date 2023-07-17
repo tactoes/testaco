@@ -2,10 +2,21 @@ package org.testaco.database
 
 import org.slf4j.LoggerFactory
 import org.testaco.dataset.AbstractTableMetaData
+import org.testaco.dataset.Column
+import org.testaco.dataset.Columns
+import org.testaco.dataset.datatype.IDataTypeFactory
+import org.testaco.dataset.exceptions.DataSetException
+import org.testaco.dataset.exceptions.NoSuchTableException
+import org.testaco.dataset.filter.IColumnFilter
+import org.testaco.util.QualifiedTableName
+import org.testaco.util.SQLHelper
+import java.sql.DatabaseMetaData
+import java.sql.ResultSet
+import java.sql.SQLException
 import java.util.*
 
 class DatabaseTableMetaData @JvmOverloads internal constructor(
-    tableName: String?,
+    override val tableName: String,
     connection: IDatabaseConnection?,
     validate: Boolean = true,
     caseSensitiveMetaData: Boolean = false
@@ -22,10 +33,9 @@ class DatabaseTableMetaData @JvmOverloads internal constructor(
     //"<CAS.ORDERS ORDER_ID=\"1000\" DEALER_CODE=\"4468\"/>"
     //"</dataset>";
 
-    val tableName: String? = null
     private val _connection: IDatabaseConnection
-    private var _columns: Array<Column>?
-    private var _primaryKeys: Array<Column>?
+    private var _columns: List<Column>? = null
+    private var _primaryKeys: List<Column>? = null
     private val _caseSensitiveMetaData: Boolean
 
     //added by hzhan032
@@ -42,28 +52,17 @@ class DatabaseTableMetaData @JvmOverloads internal constructor(
         _caseSensitiveMetaData = caseSensitiveMetaData
         try {
             val jdbcConnection = connection.connection
-            if (!caseSensitiveMetaData) {
-                this.tableName = SQLHelper.correctCase(tableName, jdbcConnection)
-                SQLHelper.logDebugIfValueChanged(
-                    tableName,
-                    this.tableName,
-                    "Corrected table name:",
-                    DatabaseTableMetaData::class.java
-                )
-            } else {
-                this.tableName = tableName
-            }
 
             // qualified names support - table name and schema is stored here
             _qualifiedTableNameSupport = QualifiedTableName(this.tableName, _connection.schema)
             if (validate) {
-                val schemaName: String = _qualifiedTableNameSupport.getSchema()
-                val plainTableName: String = _qualifiedTableNameSupport.getTable()
+                val schemaName: String = _qualifiedTableNameSupport!!.schema!!
+                val plainTableName: String = _qualifiedTableNameSupport!!.table
                 logger.debug("Validating if table '{}' exists in schema '{}' ...", plainTableName, schemaName)
                 try {
                     val config = connection.config
                     val metadataHandler =
-                        config!!.getProperty(DatabaseConfig.PROPERTY_METADATA_HANDLER) as IMetadataHandler?
+                        config!!.metaDataHandler
                     val databaseMetaData: DatabaseMetaData = jdbcConnection!!.metaData
                     if (!metadataHandler!!.tableExists(databaseMetaData, schemaName, plainTableName)) {
                         throw NoSuchTableException("Did not find table '$plainTableName' in schema '$schemaName'")
@@ -83,87 +82,64 @@ class DatabaseTableMetaData @JvmOverloads internal constructor(
     }
 
     @get:Throws(SQLException::class)
-    private val primaryKeyNames: Array<String?>
+    private val primaryKeyNames: List<String>
         private get() {
             logger.debug("getPrimaryKeyNames() - start")
-            val schemaName: String = _qualifiedTableNameSupport.getSchema()
-            val tableName: String = _qualifiedTableNameSupport.getTable()
+            val schemaName: String = _qualifiedTableNameSupport!!.schema!!
+            val tableName: String = _qualifiedTableNameSupport!!.table
             val connection = _connection.connection
             val databaseMetaData: DatabaseMetaData = connection!!.metaData
             val config = _connection.config
-            val metadataHandler = config!!.getProperty(DatabaseConfig.PROPERTY_METADATA_HANDLER) as IMetadataHandler?
+            val metadataHandler = config!!.metaDataHandler
             val resultSet: ResultSet? = metadataHandler!!.getPrimaryKeys(databaseMetaData, schemaName, tableName)
-            val list: MutableList<*> = ArrayList<Any?>()
+            val list = ArrayList<PrimaryKeyData>()
             try {
-                while (resultSet.next()) {
-                    val name: String = resultSet.getString(4)
-                    val sequence: Int = resultSet.getInt(5)
+                while (resultSet!!.next()) {
+                    val name: String = resultSet!!.getString(4)
+                    val sequence: Int = resultSet!!.getInt(5)
                     list.add(PrimaryKeyData(name, sequence))
                 }
             } finally {
-                resultSet.close()
+                resultSet!!.close()
             }
-            Collections.sort<Comparable<*>>(list)
-            val keys = arrayOfNulls<String>(list.size)
-            for (i in keys.indices) {
-                val data = list[i] as PrimaryKeyData
-                keys[i] = data.getName()
-            }
-            return keys
+            Collections.sort(list)
+            return list.map { it.name }
         }
 
-    private inner class PrimaryKeyData(private val _name: String, index: Int) : Comparable<Any?> {
-        val index: Int
+    private inner class PrimaryKeyData(val name: String, val index: Int) : Comparable<PrimaryKeyData> {
 
-        init {
-            _index = index
-        }
-
-        val name: String
-            get() {
-                logger.debug("getName() - start")
-                return _name
-            }
-
-        ////////////////////////////////////////////////////////////////////////
-        // Comparable interface
-        override fun compareTo(o: Any?): Int {
-            val data = o as PrimaryKeyData?
-            return getIndex() - data.getIndex()
+        //TODO completely bogus implementation
+        override fun compareTo(o: PrimaryKeyData): Int {
+            return index - o.index
         }
     }
 
-    @get:Throws(DataSetException::class)
-    val columns: Array<Any>?
+    override val columns: List<Column>
         get() {
             logger.debug("getColumns() - start")
             if (_columns == null) {
                 _columns = try {
                     // qualified names support
-                    val schemaName: String = _qualifiedTableNameSupport.getSchema()
-                    val tableName: String = _qualifiedTableNameSupport.getTable()
+                    val schemaName: String = _qualifiedTableNameSupport!!.schema!!
+                    val tableName: String = _qualifiedTableNameSupport!!.table
                     val jdbcConnection = _connection.connection
                     val databaseMetaData: DatabaseMetaData = jdbcConnection!!.metaData
                     val config = _connection.config
                     val metadataHandler =
-                        config!!.getProperty(DatabaseConfig.PROPERTY_METADATA_HANDLER) as IMetadataHandler?
+                        config!!.metaDataHandler
                     val resultSet: ResultSet? = metadataHandler!!.getColumns(databaseMetaData, schemaName, tableName)
                     try {
                         val dataTypeFactory: IDataTypeFactory = super.getDataTypeFactory(_connection)
-                        val datatypeWarning: Boolean = config.getFeature(
-                            DatabaseConfig.FEATURE_DATATYPE_WARNING
-                        )
-                        val columnList: MutableList<*> = ArrayList<Any?>()
-                        while (resultSet.next()) {
+                        val datatypeWarning: Boolean = config!!.datatypeWarning
+                        val columnList = ArrayList<Column>()
+                        while (resultSet!!.next()) {
                             // Check for exact table/schema name match because
                             // databaseMetaData.getColumns() uses patterns for the lookup
                             val match =
-                                metadataHandler.matches(resultSet, schemaName, tableName, _caseSensitiveMetaData)
+                                metadataHandler.matches(resultSet, "", schemaName, tableName, column = "", caseSensitive = _caseSensitiveMetaData)
                             if (match) {
-                                val column: Column = SQLHelper.createColumn(resultSet, dataTypeFactory, datatypeWarning)
-                                if (column != null) {
-                                    columnList.add(column)
-                                }
+                                val column: Column = SQLHelper.createColumn(resultSet, dataTypeFactory, datatypeWarning)!!
+                                columnList.add(column)
                             } else {
                                 logger.debug(
                                     "Skipping <schema.table> '" + resultSet.getString(2) + "." +
@@ -177,15 +153,15 @@ class DatabaseTableMetaData @JvmOverloads internal constructor(
                                         "Will return an empty column list"
                             )
                         }
-                        columnList.toArray(arrayOfNulls<Column>(0)) as Array<Column>?
+                        columnList
                     } finally {
-                        resultSet.close()
+                        resultSet!!.close()
                     }
                 } catch (e: SQLException) {
-                    throw DataSetException(e)
+                    throw DataSetException("Caught sql exception: "+e.message, e)
                 }
             }
-            return _columns
+            return _columns!!
         }
 
     private fun primaryKeyFilterChanged(keyFilter: IColumnFilter?): Boolean {
@@ -193,13 +169,11 @@ class DatabaseTableMetaData @JvmOverloads internal constructor(
     }
 
     @get:Throws(DataSetException::class)
-    val primaryKeys: Array<Any>
+    override val primaryKeys: List<Column>
         get() {
             logger.debug("getPrimaryKeys() - start")
             val config = _connection.config
-            val primaryKeysFilter: IColumnFilter? = config!!.getProperty(
-                DatabaseConfig.PROPERTY_PRIMARY_KEY_FILTER
-            ) as IColumnFilter?
+            val primaryKeysFilter: IColumnFilter? = null //TODO: Implement primary key filter
             if (_primaryKeys == null || primaryKeyFilterChanged(primaryKeysFilter)) {
                 try {
                     lastKeyFilter = primaryKeysFilter
@@ -207,23 +181,23 @@ class DatabaseTableMetaData @JvmOverloads internal constructor(
                         Columns.getColumns(
                             tableName, columns,
                             primaryKeysFilter
-                        )
+                        ).toList()
                     } else {
                         val pkNames = primaryKeyNames
                         Columns.getColumns(pkNames, columns)
                     }
                 } catch (e: SQLException) {
-                    throw DataSetException(e)
+                    throw DataSetException("Caught sql exception: "+e.message, e)
                 }
             }
-            return _primaryKeys
+            return _primaryKeys as List<Column>
         }
 
     override fun toString(): String {
         return try {
             val tableName = tableName
-            val columns = Arrays.asList<Array<Column>?>(*columns).toString()
-            val primaryKeys = Arrays.asList<Array<Column>>(*primaryKeys).toString()
+            val columns = _columns.toString()
+            val primaryKeys = _primaryKeys.toString()
             "table=$tableName, cols=$columns, pk=$primaryKeys"
         } catch (e: DataSetException) {
             super.toString()

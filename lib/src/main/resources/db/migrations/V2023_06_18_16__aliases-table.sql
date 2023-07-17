@@ -1,0 +1,5 @@
+CREATE TABLE aliases (
+    id BIGSERIAL PRIMARY KEY,
+    name_id BIGINT NOT NULL REFERENCES names (id) DEFERRABLE,
+    alias VARCHAR NOT NULL
+)

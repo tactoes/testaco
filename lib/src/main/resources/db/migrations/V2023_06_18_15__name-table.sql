@@ -1,0 +1,5 @@
+CREATE TABLE names (
+    id BIGSERIAL PRIMARy KEY,
+    name VARCHAR NOT NULL,
+    created TIMESTAMP NOT NULL DEFAULT now()
+)

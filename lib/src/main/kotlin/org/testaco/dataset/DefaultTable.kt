@@ -1,8 +1,6 @@
 package org.testaco.dataset
 
 import org.slf4j.LoggerFactory
-import org.testaco.dataset.DefaultTable
-import org.testaco.dataset.exceptions.RowOutOfBoundsException
 
 open class DefaultTable : AbstractTable {
 
@@ -10,11 +8,11 @@ open class DefaultTable : AbstractTable {
     private val _rowList: MutableList<Column>?
 
     constructor(tableName: String) {
-        tableMetaData = DefaultTableMetaData(tableName, arrayOf())
+        tableMetaData = DefaultTableMetaData(tableName, listOf())
         _rowList = ArrayList()
     }
 
-    constructor(tableName: String, columns: Array<Column>) {
+    constructor(tableName: String, columns: List<Column>) {
         tableMetaData = DefaultTableMetaData(tableName, columns)
         _rowList = ArrayList()
     }
@@ -29,43 +27,16 @@ open class DefaultTable : AbstractTable {
     }
 
     fun addTableRows(table: ITable) {
-        try {
-            val columns = tableMetaData!!.columns
-            if (columns.size <= 0) {
-                logger.warn("The table '$table' does not have any columns. Cannot add table rows. This should never happen...")
-                return
-            }
-            var i = 0
-            while (true) { //FIXME: Come on, terminating on an exception?!
-                val rowValues = arrayOf<Column>()
-                columns.forEachIndexed { index, column -> rowValues[index] = table.getValue(i, column.columnName) }
-                _rowList!!.add(rowValues)
-                i++
-            }
-        } catch (e: RowOutOfBoundsException) {
-            // end of table
-            // ignore error.
+        val columns = tableMetaData!!.columns
+        if (columns.size <= 0) {
+            logger.warn("The table '$table' does not have any columns. Cannot add table rows. This should never happen...")
+            return
         }
-    }
-
-    fun setValue(row: Int, column: String, value: Any): Any {
-        assertValidRowIndex(row)
-        val rowValues = _rowList!![row] as Array<Any>
-        val columnIndex: Int = getColumnIndex(column)
-        val oldValue = rowValues[columnIndex]
-        rowValues[columnIndex] = value
-        return oldValue
+        columns.mapIndexed { index, column: Column -> _rowList!!.add(column) }
     }
 
     override val rowCount: Int
         get() = _rowList!!.size
-
-    override fun getValue(row: Int, column: String?): Any {
-        if (logger.isDebugEnabled) logger.debug("getValue(row={}, column={}) - start", Integer.toString(row), column)
-        assertValidRowIndex(row)
-        val rowValues = _rowList!![row] as Array<Any>
-        return rowValues[getColumnIndex(column)]
-    }
 
     override fun toString(): String {
         val sb = StringBuffer()

@@ -1,7 +1,6 @@
 package org.testaco.dataset.datatype
 
 import org.slf4j.LoggerFactory
-import org.testaco.dataset.ITable
 import java.io.*
 import java.net.MalformedURLException
 import java.net.URL
@@ -43,9 +42,6 @@ open class BytesDataType(name: String?, sqlType: Int) :
 
     override fun typeCast(value: Any): Any? {
         logger.debug("typeCast(value={}) - start", value)
-        if (value === ITable.NO_VALUE) {
-            return null
-        }
         if (value is ByteArray) {
             return value
         }
