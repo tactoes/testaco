@@ -1,5 +1,14 @@
 package org.testaco
 
-import org.junit.jupiter.api.extension.RegisterExtension
+data class TestacoConfiguration(val databases: List<TestacoDatabase>, val datadir: String = "classpath:/db/testaco")
 
-typealias TestacoConfiguration = Map<String, String>
+data class TestacoDatabase(
+    val dataSource: String, // name of spring bean holding data source
+    val schema: String, //name of schema in database
+)
+
+data class TestacoSchema(val tables: List<TestacoTable>)
+
+data class TestacoTable(val name: String, val columns: List<TestacoColumn>)
+
+data class TestacoColumn(val name: String)

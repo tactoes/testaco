@@ -1,12 +1,13 @@
 spring:
   application.name: cruncher
   datasource:
-    jdbc-url: jdbc:postgresql:15.3:///test
+    jdbc-url: jdbc:postgresql:15.3:///test?currentSchema=test
     username: test
     password: test
   flyway:
     locations: classpath:/db/migrations
     validate-migration-naming: true
+    default-schema: test
 server:
   port: 9000
 logging:

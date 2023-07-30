@@ -1,12 +1,15 @@
 package org.testaco.pgtester
 
+import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
+import org.testaco.TestacoExtension
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
 
 abstract class AbstractEndToEndTest {
+
     companion object {
         val POSTGRES_TEST_IMAGE = DockerImageName.parse("postgres:15.3")
 
@@ -23,5 +26,9 @@ abstract class AbstractEndToEndTest {
                     .applyTo(applicationContext.environment)
             }
         }
+
+        @RegisterExtension
+        @JvmStatic
+        final var testaco = TestacoExtension()
     }
 }
