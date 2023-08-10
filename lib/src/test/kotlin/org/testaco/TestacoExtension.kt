@@ -15,9 +15,10 @@ class TestacoExtension() : BeforeAllCallback {
     val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
 
     override fun beforeAll(context: ExtensionContext?) {
-        val springContext: ApplicationContext = SpringExtension.getApplicationContext(context)
+        assert(context != null, {"The extension needs a contest, panic!"})
+        val springContext: ApplicationContext = SpringExtension.getApplicationContext(context!!)
         val testacoConfiguration = springContext.getBean(TestacoConfiguration::class.java)
-        assert(testacoConfiguration != null, { "No testaco configuration found in spring context" })
+        assert(testacoConfiguration != null, { "No testaco configuration found in spring context, panic!" })
         testacoConfiguration.databases.forEach { tdb ->
             val dataSource = springContext.getBean(tdb.dataSource) as DataSource
             assert(dataSource != null, { "datasource fetched from spring must not be null" })
@@ -33,7 +34,7 @@ class TestacoExtension() : BeforeAllCallback {
                 )
             }
             try {
-                val schema = mapper.readValue(
+                val schema: TestacoSchema = mapper.readValue(
                     schemaResource.getContentAsString(Charset.defaultCharset()),
                     TestacoSchema::class.java,
                 )
@@ -47,7 +48,10 @@ class TestacoExtension() : BeforeAllCallback {
                     val tableName: String? = resultSet.getString("TABLE_NAME")
                     val schema: String? = resultSet.getString("TABLE_SCHEM")
                     val remarks: String? = resultSet.getString("REMARKS")
-                    println("Table: $tableName $schema $remarks")
+                    assert(tableName != null, {"Don't know how to cope if metadata does not return tablename, panic!"})
+                    if (!tdb.tableConfig.contains(IgnoredTable(tableName!!))) {
+                        println("Table: $tableName $schema $remarks")
+                    }
                 }
             }
         }

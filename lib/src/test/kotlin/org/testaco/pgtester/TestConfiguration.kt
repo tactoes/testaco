@@ -2,6 +2,7 @@ package org.testaco.pgtester
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.testaco.IgnoredTable
 import org.testaco.TestacoConfiguration
 import org.testaco.TestacoDatabase
 
@@ -11,7 +12,10 @@ class TestConfiguration {
     fun testacoConfiguration(): TestacoConfiguration =
         TestacoConfiguration(
             listOf(
-                TestacoDatabase("datasource", "test"),
+                TestacoDatabase(
+                    dataSource = "datasource",
+                    schema = "test",
+                    tableConfig = listOf(IgnoredTable("flyway_schema_history"))),
             ),
         )
 }
