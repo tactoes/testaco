@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.jupiter.api.fail
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.nio.charset.Charset
@@ -33,8 +34,8 @@ class TestacoExtension() : BeforeAllCallback {
                     """.trimMargin(),
                 )
             }
-            try {
-                val schema: TestacoSchema = mapper.readValue(
+            val referenceSchema: TestacoSchema = try {
+                 mapper.readValue(
                     schemaResource.getContentAsString(Charset.defaultCharset()),
                     TestacoSchema::class.java,
                 )
@@ -50,6 +51,9 @@ class TestacoExtension() : BeforeAllCallback {
                     val remarks: String? = resultSet.getString("REMARKS")
                     assert(tableName != null, {"Don't know how to cope if metadata does not return tablename, panic!"})
                     if (!tdb.tableConfig.contains(IgnoredTable(tableName!!))) {
+                        val referenceTable = referenceSchema.tables
+                            .find { it.name == tableName }
+                            ?: fail("Reference schema $schemaFileName does not contain a definition for table $tableName")
                         println("Table: $tableName $schema $remarks")
                     }
                 }
