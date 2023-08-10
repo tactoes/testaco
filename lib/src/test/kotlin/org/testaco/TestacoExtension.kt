@@ -16,17 +16,16 @@ class TestacoExtension() : BeforeAllCallback {
     val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
 
     override fun beforeAll(context: ExtensionContext?) {
-        assert(context != null, {"The extension needs a contest, panic!"})
-        val springContext: ApplicationContext = SpringExtension.getApplicationContext(context!!)
+        val springContext: ApplicationContext = SpringExtension.getApplicationContext(context ?: fail("The extension needs a context, panic!"))
         val testacoConfiguration = springContext.getBean(TestacoConfiguration::class.java)
-        assert(testacoConfiguration != null, { "No testaco configuration found in spring context, panic!" })
+            ?: fail("No testaco configuration found in spring context, panic!")
         testacoConfiguration.databases.forEach { tdb ->
-            val dataSource = springContext.getBean(tdb.dataSource) as DataSource
-            assert(dataSource != null, { "datasource fetched from spring must not be null" })
+            val dataSource = (springContext.getBean(tdb.dataSource) as DataSource?)
+                ?: fail("datasource ${tdb.dataSource} fetched from spring must not be null")
             val schemaFileName = "${testacoConfiguration.datadir}/${tdb.dataSource}_schema.json"
             val schemaResource = springContext.getResource(schemaFileName)
             if (!schemaResource.exists() || !schemaResource.isReadable) {
-                throw IllegalStateException(
+                fail(
                     """Testaco expects a readable schema file to exist in its data 
                 |directory. With the current configuration the location would be $schemaFileName.
                 |Please ensure such a file exists, and contains a structure that is compatible with
@@ -46,11 +45,11 @@ class TestacoExtension() : BeforeAllCallback {
             println("Testing metadata")
             databaseMetaData.getTables(null, null, null, arrayOf<String>("TABLE")).use { resultSet ->
                 while (resultSet.next()) {
-                    val tableName: String? = resultSet.getString("TABLE_NAME")
+                    val tableName: String = resultSet.getString("TABLE_NAME")
+                        ?: fail("Don't know how to cope if metadata does not return tablename, panic!")
                     val schema: String? = resultSet.getString("TABLE_SCHEM")
                     val remarks: String? = resultSet.getString("REMARKS")
-                    assert(tableName != null, {"Don't know how to cope if metadata does not return tablename, panic!"})
-                    if (!tdb.tableConfig.contains(IgnoredTable(tableName!!))) {
+                    if (!tdb.tableConfig.contains(IgnoredTable(tableName))) {
                         val referenceTable = referenceSchema.tables
                             .find { it.name == tableName }
                             ?: fail("Reference schema $schemaFileName does not contain a definition for table $tableName")
