@@ -8,8 +8,8 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.fail
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.testaco.database.schema.SchemaVerifier
 import java.nio.charset.Charset
-import java.sql.DatabaseMetaData
 import javax.sql.DataSource
 
 
@@ -43,55 +43,11 @@ class TestacoExtension() : BeforeAllCallback {
                 throw IllegalStateException("Could not parse file $schemaFileName, parser gives reason: ${e.message}", e)
             }
             val databaseMetaData = dataSource.connection.metaData
-            println("Testing metadata")
-            verifySchema(databaseMetaData, referenceSchema, schemaFileName)
+            SchemaVerifier.verifySchema(databaseMetaData, referenceSchema, schemaFileName)
         }
         // TODO: Verify database schema against stored schema.
         // TODO: Verify stored schema against configuration.
         println("Extension goes here")
     }
 
-    private fun verifySchema(
-        databaseMetaData: DatabaseMetaData,
-        referenceSchema: TestacoSchema,
-        schemaFileName: String
-    ) {
-        databaseMetaData.getTables(null, null, null, arrayOf<String>("TABLE")).use { resultSet ->
-            while (resultSet.next()) {
-                val tableName: String = resultSet.getString("TABLE_NAME")
-                    ?: fail("Don't know how to cope if metadata does not return tablename, panic!")
-                val schema: String? = resultSet.getString("TABLE_SCHEM")
-                val remarks: String? = resultSet.getString("REMARKS")
-
-                val referenceTable: TestacoTable? = referenceSchema.tables.find { it.tableName == tableName }
-                when (referenceTable) {
-                    is IgnoredTable -> {} //Do nothing, we need to ignore this
-                    is Table -> println("Table: $tableName $schema $remarks")
-                    else -> {
-                        fail(
-                            """
-                                |Reference schema $schemaFileName does not contain a definition for table $tableName
-                                |Options for declaration are 
-                                |${examples(tableName, databaseMetaData)}
-                                |""".trimMargin()
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    private fun examples(tableName: String, metadata: DatabaseMetaData): String {
-        return """
-            ${ignoredExample(tableName, metadata)}
-            ${tableExample(tableName, metadata)}
-            """.trimIndent()
-    }
-
-    private fun ignoredExample(tableName: String, metadata: DatabaseMetaData): String = mapper.writeValueAsString(
-        IgnoredTable(tableName)
-    )
-    private fun tableExample(tableName: String, metadata: DatabaseMetaData): String = mapper.writeValueAsString(
-        Table(tableName, emptyList())
-    )
 }
