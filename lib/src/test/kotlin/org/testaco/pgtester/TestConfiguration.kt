@@ -14,8 +14,7 @@ class TestConfiguration {
             listOf(
                 TestacoDatabase(
                     dataSource = "datasource",
-                    schema = "test",
-                    tableConfig = listOf(IgnoredTable("flyway_schema_history"))),
+                    schema = "test"),
             ),
         )
 }
