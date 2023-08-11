@@ -67,9 +67,31 @@ class TestacoExtension() : BeforeAllCallback {
                 when (referenceTable) {
                     is IgnoredTable -> {} //Do nothing, we need to ignore this
                     is Table -> println("Table: $tableName $schema $remarks")
-                    else -> fail("Reference schema $schemaFileName does not contain a definition for table $tableName")
+                    else -> {
+                        fail(
+                            """
+                                |Reference schema $schemaFileName does not contain a definition for table $tableName
+                                |Options for declaration are 
+                                |${examples(tableName, databaseMetaData)}
+                                |""".trimMargin()
+                        )
+                    }
                 }
             }
         }
     }
+
+    private fun examples(tableName: String, metadata: DatabaseMetaData): String {
+        return """
+            ${ignoredExample(tableName, metadata)}
+            ${tableExample(tableName, metadata)}
+            """.trimIndent()
+    }
+
+    private fun ignoredExample(tableName: String, metadata: DatabaseMetaData): String = mapper.writeValueAsString(
+        IgnoredTable(tableName)
+    )
+    private fun tableExample(tableName: String, metadata: DatabaseMetaData): String = mapper.writeValueAsString(
+        Table(tableName, emptyList())
+    )
 }

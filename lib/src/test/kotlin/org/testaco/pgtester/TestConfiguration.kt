@@ -7,9 +7,9 @@ import org.testaco.TestacoConfiguration
 import org.testaco.TestacoDatabase
 
 @Configuration
-class TestConfiguration {
+open class TestConfiguration {
     @Bean
-    fun testacoConfiguration(): TestacoConfiguration =
+    open fun testacoConfiguration(): TestacoConfiguration =
         TestacoConfiguration(
             listOf(
                 TestacoDatabase(
