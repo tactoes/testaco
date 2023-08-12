@@ -55,18 +55,20 @@ object SchemaVerifier {
         mapper.writeValueAsString(IgnoredTable(tableName))
     private fun tableExample(tableName: String, metadata: DatabaseMetaData): String {
         val columns: List<TestacoColumn> =
-            metadata.getColumns(null, null, tableName, null).use { columns ->
+            metadata.getColumns(null, null, tableName, null).use { result ->
                 generateSequence {
-                    while (columns.next()) {
-                        val columnName = columns.getString("COLUMN_NAME")
-                        val dataType = columns.getInt("DATA_TYPE")
-                        val dataTypeName = columns.getString("TYPE_NAME")
-                        val isAutoIncrement = columns.getString("IS_AUTOINCREMENT")
-                        val isGeneratedColumn = columns.getString("IS_GENERATEDCOLUMN")
-                        yield TestacoColumn(columnName)
+                    if (result.next()) {
+                        val columnName = result.getString("COLUMN_NAME")
+                        val dataType = result.getInt("DATA_TYPE")
+                        val dataTypeName = result.getString("TYPE_NAME")
+                        val isAutoIncrement = result.getString("IS_AUTOINCREMENT")
+                        val isGeneratedColumn = result.getString("IS_GENERATEDCOLUMN")
+                        TestacoColumn(columnName)
+                    } else {
+                        null
                     }
                 }.toList()
             }
-        return mapper.writeValueAsString(Table(tableName, emptyList()))
+        return mapper.writeValueAsString(Table(tableName, columns))
     }
 }
