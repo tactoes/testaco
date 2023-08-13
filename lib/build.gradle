@@ -13,7 +13,7 @@ plugins {
     // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
 
-    id 'org.springframework.boot' version '3.1.1'
+    id 'org.springframework.boot' version '3.1.2'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'org.jetbrains.kotlin.jvm' version '1.9.0'
     id 'org.jetbrains.kotlin.plugin.spring' version '1.9.0'
@@ -52,6 +52,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation 'org.springframework.boot:spring-boot-starter-test'
     implementation "org.testcontainers:postgresql:1.18.3"
+    implementation "org.yaml:snakeyaml:2.0"
     testImplementation "org.testcontainers:junit-jupiter:1.18.3"
 }
 
