@@ -8,6 +8,7 @@ import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.opentest4j.AssertionFailedError
+import org.testaco.IgnoredTable
 import org.testaco.TestacoSchema
 import org.testaco.util.MockResultSet
 
@@ -41,5 +42,17 @@ class SchemaVerifierTest {
         .trimIndent(),
       message?.trim()
     )
+  }
+
+  @Test
+  fun `ignored tables should not cause failure`() {
+    val tables =
+      MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test")))
+        .buildMock()
+    val columns = MockResultSet(listOf("COLUMN_NAME"), listOf(listOf("id", "alias"))).buildMock()
+    `when`(metadata.getTables(any(), any(), any(), eq(arrayOf("TABLE")))).thenReturn(tables)
+    `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(columns)
+
+    uut.verifySchema(metadata, TestacoSchema(listOf(IgnoredTable("aliases")), ""))
   }
 }
