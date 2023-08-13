@@ -8,6 +8,7 @@ import org.junit.jupiter.api.fail
 import org.testaco.*
 
 const val NOT_DEFERRABLE = 7.toShort()
+const val INITIALLY_DEFERRED = 4.toShort()
 
 object SchemaVerifier {
   private val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())

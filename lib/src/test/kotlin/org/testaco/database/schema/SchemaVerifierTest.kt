@@ -254,8 +254,46 @@ class SchemaVerifierTest {
     """.trimMargin(),
       message?.trim()
     )
-
   }
 
+  @Test
+  fun `do not fail if foreign keys refer to later tables, but is deferrable`() {
+    val tables =
+      MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test"), listOf("names", "test")))
+        .buildMock()
+    val aliasesColumns = MockResultSet(listOf("COLUMN_NAME"), listOf(
+      listOf("id"),
+      listOf("name_id"))).buildMock()
+    val namesColumns = MockResultSet(listOf("COLUMN_NAME"), listOf(
+      listOf("id"),
+      listOf("name"))).buildMock()
+    val aliasesForeignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf(
+      listOf("names", "id", INITIALLY_DEFERRED)
+    )
+    ).buildMock()
+    val namesForeignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf()).buildMock()
+    `when`(metadata.getTables(any(), any(), any(), eq(arrayOf("TABLE")))).thenReturn(tables)
+    `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(aliasesColumns)
+    `when`(metadata.getColumns(any(), any(), eq("names"), any())).thenReturn(namesColumns)
+    `when`(metadata.getImportedKeys(any(), any(), eq("aliases"))).thenReturn(aliasesForeignKeys)
+    `when`(metadata.getImportedKeys(any(), any(), eq("names"))).thenReturn(namesForeignKeys)
+    uut.verifySchema(metadata,
+      TestacoSchema(
+        listOf(
+          Table("aliases",
+            listOf(
+              TestacoColumn("id"),
+              TestacoColumn("name_id")
+            )
+          ),
+          Table("names",
+            listOf(
+              TestacoColumn("id"),
+              TestacoColumn("name")
+            )
+          )
+        ),
+        ""))
+  }
   //TODO: Test for extra table definitions in reference schema
 }
