@@ -19,7 +19,7 @@ class SchemaVerifierTest {
   val metadata: DatabaseMetaData = mock()
 
   @Test
-  fun `fail if reference schema is missing class`() {
+  fun `fail if reference schema is missing table`() {
     val tables =
       MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test")))
         .buildMock()
@@ -41,6 +41,38 @@ class SchemaVerifierTest {
     {"IgnoredTable":{"tableName":"aliases"}}
     {"Table":{"tableName":"aliases","columns":[{"name":"id"}]}}
     """.trimIndent(),
+      message?.trim()
+    )
+  }
+
+  @Test
+  fun `fail if reference schema has extra table`() {
+    val tables =
+      MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test")))
+        .buildMock()
+    val columns = MockResultSet(listOf("COLUMN_NAME"), listOf(listOf("id", "alias"))).buildMock()
+    val foreignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf()).buildMock()
+
+    `when`(metadata.getTables(any(), any(), any(), eq(arrayOf("TABLE")))).thenReturn(tables)
+    `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(columns)
+    `when`(metadata.getImportedKeys(any(), any(), any())).thenReturn(foreignKeys)
+
+    val message =
+      assertThrowsExactly(
+        AssertionFailedError::class.java,
+        { uut.verifySchema(metadata, TestacoSchema(
+          listOf(
+            Table("aliases", listOf(TestacoColumn("id"))),
+            Table("xyzzy", emptyList())
+          ), "")) }
+      )
+        .message
+
+    assertEquals(
+      """
+|Reference schema contains definitions for tables [xyzzy]. 
+|These can not be found in the database, and should be deleted.
+    """.trimMargin(),
       message?.trim()
     )
   }
@@ -227,24 +259,24 @@ class SchemaVerifierTest {
     val message =
       assertThrowsExactly(
         AssertionFailedError::class.java, {
-    uut.verifySchema(metadata,
-      TestacoSchema(
-        listOf(
-          Table("aliases",
-            listOf(
-              TestacoColumn("id"),
-              TestacoColumn("name_id")
-            )
-          ),
-          Table("names",
-            listOf(
-              TestacoColumn("id"),
-              TestacoColumn("name")
-            )
-          )
-        ),
-        ""))
-          }).message
+          uut.verifySchema(metadata,
+            TestacoSchema(
+              listOf(
+                Table("aliases",
+                  listOf(
+                    TestacoColumn("id"),
+                    TestacoColumn("name_id")
+                  )
+                ),
+                Table("names",
+                  listOf(
+                    TestacoColumn("id"),
+                    TestacoColumn("name")
+                  )
+                )
+              ),
+              ""))
+        }).message
 
     assertEquals(
       """
@@ -295,5 +327,4 @@ class SchemaVerifierTest {
         ),
         ""))
   }
-  //TODO: Test for extra table definitions in reference schema
 }
