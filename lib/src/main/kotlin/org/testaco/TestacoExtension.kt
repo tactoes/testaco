@@ -38,12 +38,12 @@ class TestacoExtension() : BeforeAllCallback {
                  mapper.readValue(
                     schemaResource.getContentAsString(Charset.defaultCharset()),
                     TestacoSchema::class.java,
-                )
+                ).copy(filename = schemaFileName)
             } catch (e: JsonMappingException) {
                 throw IllegalStateException("Could not parse file $schemaFileName, parser gives reason: ${e.message}", e)
             }
             val databaseMetaData = dataSource.connection.metaData
-            SchemaVerifier.verifySchema(databaseMetaData, referenceSchema, schemaFileName)
+            SchemaVerifier.verifySchema(databaseMetaData, referenceSchema)
         }
         // TODO: Verify database schema against stored schema.
         // TODO: Verify stored schema against configuration.

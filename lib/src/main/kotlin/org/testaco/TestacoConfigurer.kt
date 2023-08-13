@@ -1,5 +1,6 @@
 package org.testaco
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
@@ -10,7 +11,7 @@ data class TestacoDatabase(
     val schema: String, //name of schema in database
 )
 
-data class TestacoSchema(val tables: List<TestacoTable>)
+data class TestacoSchema(val tables: List<TestacoTable>, @JsonIgnore val filename: String?)
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @JsonSubTypes(*arrayOf( JsonSubTypes.Type(IgnoredTable::class), JsonSubTypes.Type(Table::class)))

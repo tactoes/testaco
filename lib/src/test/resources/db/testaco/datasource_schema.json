@@ -1,3 +1,7 @@
 {
-  "tables": []
+  "tables": [
+    {"IgnoredTable":{"tableName":"flyway_schema_history"}},
+    {"Table":{"tableName":"names","columns":[{"name":"id"},{"name":"name"},{"name":"created"}]}},
+    {"Table":{"tableName":"aliases","columns":[{"name":"id"},{"name":"name_id"},{"name":"alias"}]}}
+  ]
 }
