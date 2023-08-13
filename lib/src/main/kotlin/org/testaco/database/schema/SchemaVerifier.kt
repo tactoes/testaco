@@ -21,7 +21,7 @@ object SchemaVerifier {
           referenceSchema.tables.find { it.tableName == tableName }
         when (referenceTable) {
           is IgnoredTable -> {} // Do nothing, we need to ignore this
-          is Table -> println("Table: $tableName $schema")
+          is Table -> verifyColumns(tableName, databaseMetaData, referenceSchema)
           else -> {
             fail(
               """
@@ -37,6 +37,30 @@ object SchemaVerifier {
     }
   }
 
+  private fun verifyColumns(
+    tableName: String,
+    databaseMetaData: DatabaseMetaData,
+    referenceSchema: TestacoSchema
+  ) {
+    val columns = getColumns(databaseMetaData, tableName).toSet()
+    val table: TestacoTable? = referenceSchema
+      .tables.find { it.tableName == tableName }
+    val referenceColumns = (table as? Table?)
+      ?.columns?.toSet()
+      ?: fail("Concrete table configuration $tableName not found in reference data")
+    if (columns.toSet() != referenceColumns.toSet()) {
+      val missingInReference = columns.minus(referenceColumns)
+      val missingInDb = referenceColumns.minus(columns)
+      fail(
+        """Table $tableName has extra columns $missingInReference in the database, 
+or has extra $missingInDb columns in the testaco configuration.
+A suitable table definition should be
+${tableExample(tableName, databaseMetaData)}"""
+      )
+    }
+    TODO("Not yet implemented")
+  }
+
   private fun examples(tableName: String, metadata: DatabaseMetaData): String {
     return """
             ${ignoredExample(tableName)}
@@ -47,19 +71,23 @@ object SchemaVerifier {
 
   private fun ignoredExample(tableName: String): String =
     mapper.writeValueAsString(IgnoredTable(tableName))
+
   private fun tableExample(tableName: String, metadata: DatabaseMetaData): String {
-    val columns: List<TestacoColumn> =
-      metadata.getColumns(null, null, tableName, null).use { result ->
-        generateSequence {
-            if (result.next()) {
-              val columnName = result.getString("COLUMN_NAME")
-              TestacoColumn(columnName)
-            } else {
-              null
-            }
-          }
-          .toList()
-      }
+    val columns = getColumns(metadata, tableName)
+    System.out.println("columns: $columns $tableName")
     return mapper.writeValueAsString(Table(tableName, columns))
+  }
+
+  private fun getColumns(metadata: DatabaseMetaData, tableName: String): List<TestacoColumn> {
+    return metadata.getColumns(null, null, tableName, null).use { result ->
+      generateSequence {
+        if (result.next()) {
+          val columnName = result.getString("COLUMN_NAME")
+          TestacoColumn(columnName)
+        } else {
+          null
+        }
+      }.toList()
+    }
   }
 }

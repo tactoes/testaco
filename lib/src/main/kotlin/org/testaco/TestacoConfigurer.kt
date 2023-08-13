@@ -21,6 +21,10 @@ interface TestacoTable {
 
 data class Table(override val tableName: String, val columns: List<TestacoColumn>) : TestacoTable
 
-data class TestacoColumn(val name: String)
+data class TestacoColumn(val name: String) {
+    override fun toString(): String {
+        return "$name"
+    }
+}
 
 data class IgnoredTable(override val tableName: String) : TestacoTable

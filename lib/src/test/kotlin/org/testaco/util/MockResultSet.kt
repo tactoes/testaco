@@ -3,6 +3,7 @@ package org.testaco.util
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import org.mockito.invocation.InvocationOnMock
 import java.sql.ResultSet
 import java.sql.ResultSetMetaData
@@ -32,6 +33,11 @@ class MockResultSet(
             val columnIndex = columnIndex(columnName)
             data[rowIndex][columnIndex!!] as String
         }.`when`(rs).getString(ArgumentMatchers.anyString())
+
+        Mockito.doAnswer { invocation: InvocationOnMock ->
+            rowIndex = -1
+            rowIndex
+        }.`when`(rs).close()
 
         Mockito.doReturn(columnNames.size).`when`(rsmd).columnCount
 
