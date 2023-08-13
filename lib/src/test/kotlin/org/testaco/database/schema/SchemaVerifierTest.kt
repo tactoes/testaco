@@ -143,8 +143,11 @@ class SchemaVerifierTest {
     val columns = MockResultSet(listOf("COLUMN_NAME"), listOf(
       listOf("id"),
       listOf("alias"))).buildMock()
+    val aliasesForeignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf()).buildMock()
+
     `when`(metadata.getTables(any(), any(), any(), eq(arrayOf("TABLE")))).thenReturn(tables)
     `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(columns)
+    `when`(metadata.getImportedKeys(any(), any(), eq("aliases"))).thenReturn(aliasesForeignKeys)
 
     uut.verifySchema(metadata,
       TestacoSchema(
@@ -224,7 +227,6 @@ class SchemaVerifierTest {
     val message =
       assertThrowsExactly(
         AssertionFailedError::class.java, {
-
     uut.verifySchema(metadata,
       TestacoSchema(
         listOf(
@@ -242,7 +244,18 @@ class SchemaVerifierTest {
           )
         ),
         ""))
-          })
+          }).message
+
+    assertEquals(
+      """
+|Foreign key not marked as deferrable for table aliases refers to a table names that is defined later in . 
+|This will cause problems when loading data sets unless the foreign key is marked deferrable. Please either
+|mark the foreign key as defferable or move names before aliases in
+    """.trimMargin(),
+      message?.trim()
+    )
+
   }
 
+  //TODO: Test for extra table definitions in reference schema
 }

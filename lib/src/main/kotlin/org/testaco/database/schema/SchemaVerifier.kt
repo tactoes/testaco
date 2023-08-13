@@ -22,6 +22,8 @@ object SchemaVerifier {
         }
       }.toList()
     }
+    val referenceTableList =
+      referenceSchema.tables.filter { it is Table }.map { it.tableName }
     tables.forEach { tableName ->
       val referenceTable: TestacoTable? =
         referenceSchema.tables.find { it.tableName == tableName }
@@ -29,7 +31,7 @@ object SchemaVerifier {
         is IgnoredTable -> {} // Do nothing, we need to ignore this
         is Table -> {
           verifyColumns(tableName, databaseMetaData, referenceSchema)
-          verifyTableOrderComplatibleWithForeignKeys(referenceSchema, databaseMetaData, tableName)
+          verifyTableOrderComplatibleWithForeignKeys(referenceTableList, databaseMetaData, tableName, referenceSchema.filename)
         }
         else -> {
           fail(
@@ -51,12 +53,12 @@ object SchemaVerifier {
   }
 
   private fun verifyTableOrderComplatibleWithForeignKeys(
-    referenceSchema: TestacoSchema,
+    referenceTableList: List<String>,
     databaseMetaData: DatabaseMetaData,
-    tableName: String
+    tableName: String,
+    filename: String?
   ) {
-    val referenceTableList =
-      referenceSchema.tables.filter { it is Table }.map { it.tableName }
+    println("Reference table list: "+referenceTableList)
     println("FK for table $tableName")
     databaseMetaData
       .getImportedKeys(null, null, tableName)
@@ -64,16 +66,19 @@ object SchemaVerifier {
         while (rs.next()) {
           val table = rs.getString("PKTABLE_NAME")
           val column = rs.getString("PKCOLUMN_NAME")
-          val deferrable: Boolean = rs.getShort("DEFERRABILITY") == NOT_DEFERRABLE
+          val nondeferrable: Boolean = rs.getShort("DEFERRABILITY") == NOT_DEFERRABLE
           println("Foreign key for table $tableName -> ($table, $column)")
+          println("Index of tablename "+referenceTableList.indexOf(tableName))
+          println("Index of table "+referenceTableList.indexOf(table))
+          println("Deferrable $nondeferrable")
           if (
-            !deferrable &&
-            referenceTableList.indexOf(tableName) < referenceTableList.indexOf(table)
+            nondeferrable &&
+            (referenceTableList.indexOf(tableName) < referenceTableList.indexOf(table))
           ) {
             fail(
-              """Foreign key not marked as deferrable for table $tableName refers to a table $table that is defined later in ${referenceSchema.filename}. 
+              """Foreign key not marked as deferrable for table $tableName refers to a table $table that is defined later in ${filename}. 
                               |This will cause problems when loading data sets unless the foreign key is marked deferrable. Please either
-                              |mark the foreign key as defferable or move $table before $tableName in ${referenceSchema.filename}"""
+                              |mark the foreign key as defferable or move $table before $tableName in ${filename}"""
                 .trimMargin()
             )
           }
