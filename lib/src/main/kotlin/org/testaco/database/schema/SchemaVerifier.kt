@@ -58,7 +58,6 @@ A suitable table definition should be
 ${tableExample(tableName, databaseMetaData)}"""
       )
     }
-    TODO("Not yet implemented")
   }
 
   private fun examples(tableName: String, metadata: DatabaseMetaData): String {
