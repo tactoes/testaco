@@ -29,9 +29,9 @@ class SchemaVerifierTest {
 
     val message =
       assertThrowsExactly(
-          AssertionFailedError::class.java,
-          { uut.verifySchema(metadata, TestacoSchema(emptyList(), "")) }
-        )
+        AssertionFailedError::class.java,
+        { uut.verifySchema(metadata, TestacoSchema(emptyList(), "")) }
+      )
         .message
 
     assertEquals(
@@ -147,16 +147,102 @@ class SchemaVerifierTest {
     `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(columns)
 
     uut.verifySchema(metadata,
-          TestacoSchema(
+      TestacoSchema(
+        listOf(
+          Table("aliases",
             listOf(
-              Table("aliases",
-                listOf(
-                  TestacoColumn("id"),
-                  TestacoColumn("alias")
-                )
-              )
-            ),
-            ""))
+              TestacoColumn("id"),
+              TestacoColumn("alias")
+            )
+          )
+        ),
+        ""))
+  }
+
+  @Test
+  fun `tables should be able to have foreign keys to earlier defined tables`() {
+    val tables =
+      MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test"), listOf("names", "test")))
+        .buildMock()
+    val aliasesColumns = MockResultSet(listOf("COLUMN_NAME"), listOf(
+      listOf("id"),
+      listOf("name_id"))).buildMock()
+    val namesColumns = MockResultSet(listOf("COLUMN_NAME"), listOf(
+      listOf("id"),
+      listOf("name"))).buildMock()
+    val aliasesForeignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf(
+      listOf("names", "id", NOT_DEFERRABLE)
+    )
+    ).buildMock()
+    val namesForeignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf()).buildMock()
+    `when`(metadata.getTables(any(), any(), any(), eq(arrayOf("TABLE")))).thenReturn(tables)
+    `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(aliasesColumns)
+    `when`(metadata.getColumns(any(), any(), eq("names"), any())).thenReturn(namesColumns)
+    `when`(metadata.getImportedKeys(any(), any(), eq("aliases"))).thenReturn(aliasesForeignKeys)
+    `when`(metadata.getImportedKeys(any(), any(), eq("names"))).thenReturn(namesForeignKeys)
+
+    uut.verifySchema(metadata,
+      TestacoSchema(
+        listOf(
+          Table("names",
+            listOf(
+              TestacoColumn("id"),
+              TestacoColumn("name")
+            )
+          ),
+          Table("aliases",
+            listOf(
+              TestacoColumn("id"),
+              TestacoColumn("name_id")
+            )
+          )
+        ),
+        ""))
+  }
+
+  @Test
+  fun `fail if foreign keys refer to later tables`() {
+    val tables =
+      MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test"), listOf("names", "test")))
+        .buildMock()
+    val aliasesColumns = MockResultSet(listOf("COLUMN_NAME"), listOf(
+      listOf("id"),
+      listOf("name_id"))).buildMock()
+    val namesColumns = MockResultSet(listOf("COLUMN_NAME"), listOf(
+      listOf("id"),
+      listOf("name"))).buildMock()
+    val aliasesForeignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf(
+      listOf("names", "id", NOT_DEFERRABLE)
+    )
+    ).buildMock()
+    val namesForeignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf()).buildMock()
+    `when`(metadata.getTables(any(), any(), any(), eq(arrayOf("TABLE")))).thenReturn(tables)
+    `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(aliasesColumns)
+    `when`(metadata.getColumns(any(), any(), eq("names"), any())).thenReturn(namesColumns)
+    `when`(metadata.getImportedKeys(any(), any(), eq("aliases"))).thenReturn(aliasesForeignKeys)
+    `when`(metadata.getImportedKeys(any(), any(), eq("names"))).thenReturn(namesForeignKeys)
+    val message =
+      assertThrowsExactly(
+        AssertionFailedError::class.java, {
+
+    uut.verifySchema(metadata,
+      TestacoSchema(
+        listOf(
+          Table("aliases",
+            listOf(
+              TestacoColumn("id"),
+              TestacoColumn("name_id")
+            )
+          ),
+          Table("names",
+            listOf(
+              TestacoColumn("id"),
+              TestacoColumn("name")
+            )
+          )
+        ),
+        ""))
+          })
   }
 
 }
