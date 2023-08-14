@@ -23,17 +23,19 @@ object SchemaVerifier {
         }
       }.toList()
     }
-    val referenceTableList =
-      referenceSchema.tables.filter { it is Table }.map { it.tableName }
     tables.forEach { tableName ->
-      val referenceTable: TestacoTable? =
-        referenceSchema.tables.find { it.tableName == tableName }
-      when (referenceTable) {
+      when (referenceSchema.find(tableName)) {
         is IgnoredTable -> {} // Do nothing, we need to ignore this
         is Table -> {
           verifyColumns(tableName, databaseMetaData, referenceSchema)
-          verifyTableOrderComplatibleWithForeignKeys(referenceTableList, databaseMetaData, tableName, referenceSchema.filename)
+          verifyTableOrderComplatibleWithForeignKeys(
+            referenceSchema.referenceTableList,
+            databaseMetaData,
+            tableName,
+            referenceSchema.filename
+          )
         }
+
         else -> {
           fail(
             """
@@ -59,8 +61,6 @@ object SchemaVerifier {
     tableName: String,
     filename: String?
   ) {
-    println("Reference table list: "+referenceTableList)
-    println("FK for table $tableName")
     databaseMetaData
       .getImportedKeys(null, null, tableName)
       .use { rs: ResultSet ->
@@ -68,10 +68,6 @@ object SchemaVerifier {
           val table = rs.getString("PKTABLE_NAME")
           val column = rs.getString("PKCOLUMN_NAME")
           val nondeferrable: Boolean = rs.getShort("DEFERRABILITY") == NOT_DEFERRABLE
-          println("Foreign key for table $tableName -> ($table, $column)")
-          println("Index of tablename "+referenceTableList.indexOf(tableName))
-          println("Index of table "+referenceTableList.indexOf(table))
-          println("Deferrable $nondeferrable")
           if (
             nondeferrable &&
             (referenceTableList.indexOf(tableName) < referenceTableList.indexOf(table))
@@ -79,7 +75,7 @@ object SchemaVerifier {
             fail(
               """Foreign key not marked as deferrable for table $tableName refers to a table $table that is defined later in ${filename}. 
                               |This will cause problems when loading data sets unless the foreign key is marked deferrable. Please either
-                              |mark the foreign key as defferable or move $table before $tableName in ${filename}"""
+                              |mark the foreign key as deferrable or move $table before $tableName in ${filename}"""
                 .trimMargin()
             )
           }
@@ -123,7 +119,6 @@ object SchemaVerifier {
 
   private fun tableExample(tableName: String, metadata: DatabaseMetaData): String {
     val columns = getColumns(metadata, tableName)
-    System.out.println("columns: $columns $tableName")
     return mapper.writeValueAsString(Table(tableName, columns))
   }
 

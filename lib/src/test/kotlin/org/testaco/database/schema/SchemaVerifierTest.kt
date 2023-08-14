@@ -1,7 +1,7 @@
 package org.testaco.database.schema
 
-import java.sql.DatabaseMetaData
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrowsExactly
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
@@ -13,10 +13,11 @@ import org.testaco.Table
 import org.testaco.TestacoColumn
 import org.testaco.TestacoSchema
 import org.testaco.util.MockResultSet
+import java.sql.DatabaseMetaData
 
 class SchemaVerifierTest {
-  val uut = SchemaVerifier
-  val metadata: DatabaseMetaData = mock()
+  private val uut = SchemaVerifier
+  private val metadata: DatabaseMetaData = mock()
 
   @Test
   fun `fail if reference schema is missing table`() {
@@ -29,9 +30,8 @@ class SchemaVerifierTest {
 
     val message =
       assertThrowsExactly(
-        AssertionFailedError::class.java,
-        { uut.verifySchema(metadata, TestacoSchema(emptyList(), "")) }
-      )
+        AssertionFailedError::class.java
+      ) { uut.verifySchema(metadata, TestacoSchema(emptyList(), "")) }
         .message
 
     assertEquals(
@@ -59,13 +59,17 @@ class SchemaVerifierTest {
 
     val message =
       assertThrowsExactly(
-        AssertionFailedError::class.java,
-        { uut.verifySchema(metadata, TestacoSchema(
-          listOf(
-            Table("aliases", listOf(TestacoColumn("id"))),
-            Table("xyzzy", emptyList())
-          ), "")) }
-      )
+        AssertionFailedError::class.java
+      ) {
+        uut.verifySchema(
+          metadata, TestacoSchema(
+            listOf(
+              Table("aliases", listOf(TestacoColumn("id"))),
+              Table("xyzzy", emptyList())
+            ), ""
+          )
+        )
+      }
         .message
 
     assertEquals(
@@ -103,19 +107,24 @@ class SchemaVerifierTest {
 
     val message =
       assertThrowsExactly(
-        AssertionFailedError::class.java,
-        { uut.verifySchema(metadata,
+        AssertionFailedError::class.java
+      ) {
+        uut.verifySchema(
+          metadata,
           TestacoSchema(
             listOf(
-              Table("aliases",
+              Table(
+                "aliases",
                 listOf(
                   TestacoColumn("id"),
                   TestacoColumn("alias")
                 )
               )
             ),
-            "")) }
-      )
+            ""
+          )
+        )
+      }
         .message
 
     assertEquals(
@@ -141,19 +150,24 @@ class SchemaVerifierTest {
 
     val message =
       assertThrowsExactly(
-        AssertionFailedError::class.java,
-        { uut.verifySchema(metadata,
+        AssertionFailedError::class.java
+      ) {
+        uut.verifySchema(
+          metadata,
           TestacoSchema(
             listOf(
-              Table("aliases",
+              Table(
+                "aliases",
                 listOf(
                   TestacoColumn("id"),
                   TestacoColumn("alias")
                 )
               )
             ),
-            "")) }
-      )
+            ""
+          )
+        )
+      }
         .message
 
     assertEquals(
@@ -258,31 +272,37 @@ class SchemaVerifierTest {
     `when`(metadata.getImportedKeys(any(), any(), eq("names"))).thenReturn(namesForeignKeys)
     val message =
       assertThrowsExactly(
-        AssertionFailedError::class.java, {
-          uut.verifySchema(metadata,
-            TestacoSchema(
-              listOf(
-                Table("aliases",
-                  listOf(
-                    TestacoColumn("id"),
-                    TestacoColumn("name_id")
-                  )
-                ),
-                Table("names",
-                  listOf(
-                    TestacoColumn("id"),
-                    TestacoColumn("name")
-                  )
+        AssertionFailedError::class.java
+      ) {
+        uut.verifySchema(
+          metadata,
+          TestacoSchema(
+            listOf(
+              Table(
+                "aliases",
+                listOf(
+                  TestacoColumn("id"),
+                  TestacoColumn("name_id")
                 )
               ),
-              ""))
-        }).message
+              Table(
+                "names",
+                listOf(
+                  TestacoColumn("id"),
+                  TestacoColumn("name")
+                )
+              )
+            ),
+            ""
+          )
+        )
+      }.message
 
     assertEquals(
       """
 |Foreign key not marked as deferrable for table aliases refers to a table names that is defined later in . 
 |This will cause problems when loading data sets unless the foreign key is marked deferrable. Please either
-|mark the foreign key as defferable or move names before aliases in
+|mark the foreign key as deferrable or move names before aliases in
     """.trimMargin(),
       message?.trim()
     )

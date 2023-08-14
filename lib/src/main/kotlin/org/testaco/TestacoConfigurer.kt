@@ -11,7 +11,10 @@ data class TestacoDatabase(
     val schema: String, //name of schema in database
 )
 
-data class TestacoSchema(val tables: List<TestacoTable>, @JsonIgnore val filename: String?)
+data class TestacoSchema(val tables: List<TestacoTable>, @JsonIgnore val filename: String?) {
+    val referenceTableList: List<String> by lazy { tables.filter { it is Table }.map { it.tableName } }
+    fun find(name: String): TestacoTable? = tables.find { it.tableName == name }
+}
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @JsonSubTypes(*arrayOf( JsonSubTypes.Type(IgnoredTable::class), JsonSubTypes.Type(Table::class)))
@@ -23,7 +26,7 @@ data class Table(override val tableName: String, val columns: List<TestacoColumn
 
 data class TestacoColumn(val name: String) {
     override fun toString(): String {
-        return "$name"
+        return name
     }
 }
 
