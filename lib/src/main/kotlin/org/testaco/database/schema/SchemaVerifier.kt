@@ -27,7 +27,7 @@ object SchemaVerifier {
       when (referenceSchema.find(tableName)) {
         is IgnoredTable -> {} // Do nothing, we need to ignore this
         is Table -> {
-          verifyColumns(tableName, databaseMetaData, referenceSchema)
+          verifyColumnsAndStoreMetadata(tableName, databaseMetaData, referenceSchema)
           verifyTableOrderComplatibleWithForeignKeys(
             referenceSchema.referenceTableList,
             databaseMetaData,
@@ -82,7 +82,7 @@ object SchemaVerifier {
       }
   }
 
-  private fun verifyColumns(
+  private fun verifyColumnsAndStoreMetadata(
     tableName: String,
     databaseMetaData: DatabaseMetaData,
     referenceSchema: TestacoSchema
