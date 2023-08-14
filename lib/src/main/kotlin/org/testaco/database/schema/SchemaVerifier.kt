@@ -35,8 +35,7 @@ object SchemaVerifier {
             referenceSchema.filename
           )
         }
-
-        else -> {
+        null -> {
           fail(
             """
               |Reference schema ${referenceSchema.filename} does not contain a definition for table $tableName
@@ -74,8 +73,8 @@ object SchemaVerifier {
           ) {
             fail(
               """Foreign key not marked as deferrable for table $tableName refers to a table $table that is defined later in ${filename}. 
-                              |This will cause problems when loading data sets unless the foreign key is marked deferrable. Please either
-                              |mark the foreign key as deferrable or move $table before $tableName in ${filename}"""
+                |This will cause problems when loading data sets unless the foreign key is marked deferrable. Please either
+                |mark the foreign key as deferrable or move $table before $tableName in ${filename}"""
                 .trimMargin()
             )
           }

@@ -18,7 +18,7 @@ data class TestacoSchema(val tables: List<TestacoTable>, @JsonIgnore val filenam
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
 @JsonSubTypes(*arrayOf( JsonSubTypes.Type(IgnoredTable::class), JsonSubTypes.Type(Table::class)))
-interface TestacoTable {
+sealed interface TestacoTable {
     val tableName: String
 }
 
