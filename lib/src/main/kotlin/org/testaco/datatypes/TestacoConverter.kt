@@ -1,6 +1,6 @@
 package org.testaco.datatypes
 
-import org.testaco.ext.postgresql.*
+import org.testaco.datatypes.postgres.UuidType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
@@ -10,7 +10,7 @@ import java.sql.Types
  *
  * JT: Json type
  */
-sealed interface TestacoConverter<JT> {
+interface TestacoConverter<JT> {
   /**
    * Read a column from the database, return a potentially null string value
    */
@@ -22,9 +22,8 @@ sealed interface TestacoConverter<JT> {
   fun store(value: JT, columnIndex: Int, statement: PreparedStatement)
 
   companion object {
-    override fun createDataType(sqlType: Int, sqlTypeName: String): TestacoConverter<*> {
+    fun createDataType(sqlType: Int, sqlTypeName: String): TestacoConverter<*> {
       if (sqlType == Types.OTHER) {
-        // Treat Postgresql UUID types as VARCHARS
         if ("uuid" == sqlTypeName) {
           return UuidType()
         } else if ("interval" == sqlTypeName) {
@@ -36,7 +35,7 @@ sealed interface TestacoConverter<JT> {
         } else if ("citext" == sqlTypeName) {
           return CitextType()
         } else {
-          throw RuntimeException("Testaco does not support user data types out of the box. Please implement your own data type factory")
+          throw RuntimeException("Testaco does not support user data types out of the box.")
         }
       } else if (sqlType == Types.BIGINT && "oid" == sqlTypeName) {
         return PostgreSQLOidDataType()
@@ -46,7 +45,16 @@ sealed interface TestacoConverter<JT> {
   }
 }
 
-interface TestacoStringConverter: TestacoConverter<String>
+abstract class TestacoStringConverter: TestacoConverter<String> {
+  override fun read(columnName: String, rs: ResultSet): String? {
+    val s = rs.getString(columnName)
+    return if (rs.wasNull()) {
+      null
+    } else {
+      s
+    }
+  }
+}
 interface TestacoNumberConverter: TestacoConverter<Number>
 interface TestacoBooleanConverter: TestacoConverter<Boolean>
 
