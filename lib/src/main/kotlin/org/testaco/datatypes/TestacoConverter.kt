@@ -1,5 +1,6 @@
 package org.testaco.datatypes
 
+import org.testaco.datatypes.postgres.GeometryType
 import org.testaco.datatypes.postgres.InetType
 import org.testaco.datatypes.postgres.IntervalType
 import org.testaco.datatypes.postgres.UuidType
