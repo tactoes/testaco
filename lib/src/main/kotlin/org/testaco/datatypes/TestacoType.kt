@@ -1,0 +1,106 @@
+package org.testaco.datatypes
+
+import junit.framework.TestCase.fail
+import org.testaco.datatypes.postgres.*
+import java.lang.IllegalStateException
+import java.sql.PreparedStatement
+import java.sql.ResultSet
+import java.sql.Types
+import java.sql.Types.*
+
+/**
+ * Core interface, describing how a json type is mapped to a database type
+ *
+ * JT: Json type
+ */
+interface TestacoType<JT> {
+  /**
+   * Read a column from the database, return a potentially null string value
+   */
+  fun read(columnName: String, rs: ResultSet): JT?
+
+  /**
+   * Take a json value, store it in the database
+   */
+  fun store(value: JT, columnIndex: Int, statement: PreparedStatement)
+}
+
+object TestacoConverter {
+    fun createDataType(sqlType: Int, sqlTypeName: String): TestacoType<*> {
+      if (sqlType == Types.OTHER) {
+        if ("uuid" == sqlTypeName) {
+          return UuidType()
+        } else if ("interval" == sqlTypeName) {
+          return IntervalType()
+        } else if ("inet" == sqlTypeName) {
+          return InetType()
+        } else if ("geometry" == sqlTypeName) {
+          return GeometryType()
+        } else if ("citext" == sqlTypeName) {
+          return CitextType()
+        } else {
+          throw RuntimeException("Testaco does not support user data types out of the box.")
+        }
+      } else if (sqlType == Types.BIGINT && "oid" == sqlTypeName) {
+        return PostgreSQLOidDataType()
+      } else {
+        return types[sqlType] ?: throw IllegalStateException("No type found for sql type $sqlType")
+      }
+      return super.createDataType(sqlType, sqlTypeName)
+    }
+  }
+  private val types : Map<Int, TestacoType<*>> = mapOf(
+    BIT to BitType(),
+    TINYINT to TinyIntType(),
+    SMALLINT to SmallIntType(),
+    INTEGER to IntegerType(),
+    BIGINT to BigIntType(),
+    FLOAT to FloatType(),
+    REAL to RealType(),
+    DOUBLE to DoubleType(),
+    NUMERIC to NumericType(),
+    DECIMAL to DecimalType(),
+    CHAR to CharType(),
+    VARCHAR to VarCharType(),
+    LONGVARCHAR to LongVarChar(),
+    DATE to DateType(),
+    TIME to TimeType(),
+    TIMESTAMP to TimestampType(),
+    BINARY to BinaryType(),
+    VARBINARY to VarBinaryType(),
+    LONGVARBINARY to LongVarBinary(),
+    NULL to NullType(),
+    JAVA_OBJECT to JavaObjectType(),
+    DISTINCT to DistinctType(),
+    STRUCT to StructType(),
+    ARRAY to ArrayType(),
+    BLOB to BlobType(),
+    CLOB to ClobType(),
+    REF to RefType(),
+    DATALINK to DataLinkType(),
+    BOOLEAN to BooleanType(),
+    ROWID to RowIdType(),
+    NCHAR to NCharType(),
+    NVARCHAR to NVarCharType(),
+    LONGNVARCHAR to LongNVarCharType(),
+    NCLOB to NClobType(),
+    SQLXML to SqlXmlType(),
+    REF_CURSOR to RefCursorType(),
+    TIME_WITH_TIMEZONE to TimeWithTimezoneType(),
+    TIMESTAMP_WITH_TIMEZONE to TimestampWithTimezoneType(),
+  )
+}
+
+abstract class TestacoStringConverter: TestacoType<String> {
+  override fun read(columnName: String, rs: ResultSet): String? {
+    val s = rs.getString(columnName)
+    return if (rs.wasNull()) {
+      null
+    } else {
+      s
+    }
+  }
+}
+interface TestacoNumberConverter: TestacoType<Number>
+interface TestacoBooleanConverter: TestacoType<Boolean>
+

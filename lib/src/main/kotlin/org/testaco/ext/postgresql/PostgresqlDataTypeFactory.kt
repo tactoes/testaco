@@ -2,10 +2,7 @@ package org.testaco.ext.postgresql
 
 import org.testaco.dataset.datatype.DataType
 import org.testaco.dataset.datatype.DefaultDataTypeFactory
-import org.testaco.datatypes.postgres.CitextType
-import org.testaco.datatypes.postgres.GeometryType
-import org.testaco.datatypes.postgres.InetType
-import org.testaco.datatypes.postgres.IntervalType
+import org.testaco.datatypes.postgres.*
 import java.sql.Types
 
 open class PostgresqlDataTypeFactory : DefaultDataTypeFactory() {

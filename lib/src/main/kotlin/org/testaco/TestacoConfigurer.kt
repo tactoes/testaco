@@ -3,7 +3,7 @@ package org.testaco
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import org.testaco.datatypes.TestacoConverter
+import org.testaco.datatypes.TestacoType
 
 data class TestacoConfiguration(val databases: List<TestacoDatabase>, val datadir: String = "classpath:/db/testaco")
 
@@ -25,7 +25,7 @@ sealed interface TestacoTable {
 
 data class Table(override val tableName: String, val columns: List<TestacoColumn>) : TestacoTable
 
-data class TestacoColumn(val name: String, val converter: TestacoConverter<*>) {
+data class TestacoColumn(val name: String, val converter: TestacoType<*>) {
     override fun toString(): String {
         return name
     }
