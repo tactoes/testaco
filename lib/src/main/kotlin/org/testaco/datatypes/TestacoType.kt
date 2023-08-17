@@ -50,9 +50,9 @@ object TestacoConverter {
   }
   private val types : Map<Int, TestacoType<*>> = mapOf(
     BIT to BitType(),
-    TINYINT to TinyIntType(),
-    SMALLINT to SmallIntType(),
-    INTEGER to IntegerType(),
+    TINYINT to IntType(),
+    SMALLINT to IntType(),
+    INTEGER to IntType(),
     BIGINT to BigIntType(),
     FLOAT to FloatType(),
     REAL to RealType(),
@@ -101,16 +101,6 @@ abstract class TestacoStringType: TestacoType<String?> {
   }
 }
 interface TestacoNumberType: TestacoType<Number?>
-interface TestacoIntegerType: TestacoType<Int?> {
-  override fun read(columnName: String, rs: ResultSet): Int? {
-    val i = rs.getInt(columnName)
-    return if (rs.wasNull()) {
-      null
-    } else {
-      i
-    }
-  }
-}
 interface TestacoBooleanType: TestacoType<Boolean?> {
   override fun read(columnName: String, rs: ResultSet): Boolean? {
     val b = rs.getBoolean(columnName)
