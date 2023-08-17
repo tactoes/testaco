@@ -1,11 +1,10 @@
 package org.testaco.datatypes.postgres
 
 import org.postgresql.util.PGobject
-import org.testaco.dataset.datatype.TypeCastException
-import org.testaco.datatypes.TestacoStringConverter
+import org.testaco.datatypes.TestacoStringType
 import java.sql.*
 
-class InetType : TestacoStringConverter() {
+class InetType : TestacoStringType() {
     override fun store(value: String, columnIndex: Int, statement: PreparedStatement) {
         statement.setObject(columnIndex, {
             val pgo = PGobject()

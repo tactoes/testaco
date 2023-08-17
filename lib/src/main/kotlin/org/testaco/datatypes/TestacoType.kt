@@ -1,6 +1,5 @@
 package org.testaco.datatypes
 
-import junit.framework.TestCase.fail
 import org.testaco.datatypes.postgres.*
 import java.lang.IllegalStateException
 import java.sql.PreparedStatement
@@ -91,7 +90,7 @@ object TestacoConverter {
   )
 }
 
-abstract class TestacoStringConverter: TestacoType<String> {
+abstract class TestacoStringType: TestacoType<String?> {
   override fun read(columnName: String, rs: ResultSet): String? {
     val s = rs.getString(columnName)
     return if (rs.wasNull()) {
@@ -101,6 +100,15 @@ abstract class TestacoStringConverter: TestacoType<String> {
     }
   }
 }
-interface TestacoNumberConverter: TestacoType<Number>
-interface TestacoBooleanConverter: TestacoType<Boolean>
+interface TestacoNumberType: TestacoType<Number?>
+interface TestacoBooleanType: TestacoType<Boolean?> {
+  override fun read(columnName: String, rs: ResultSet): Boolean? {
+    val b = rs.getBoolean(columnName)
+    return if (rs.wasNull()) {
+      null
+    } else {
+      b
+    }
+  }
+}
 
