@@ -101,6 +101,16 @@ abstract class TestacoStringType: TestacoType<String?> {
   }
 }
 interface TestacoNumberType: TestacoType<Number?>
+interface TestacoIntegerType: TestacoType<Int?> {
+  override fun read(columnName: String, rs: ResultSet): Int? {
+    val i = rs.getInt(columnName)
+    return if (rs.wasNull()) {
+      null
+    } else {
+      i
+    }
+  }
+}
 interface TestacoBooleanType: TestacoType<Boolean?> {
   override fun read(columnName: String, rs: ResultSet): Boolean? {
     val b = rs.getBoolean(columnName)
