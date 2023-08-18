@@ -1,6 +1,5 @@
 package org.testaco.datatypes.postgres
 
-import org.testaco.datatypes.TestacoIntegerType
 import org.testaco.datatypes.TestacoType
 import java.sql.PreparedStatement
 import java.sql.ResultSet

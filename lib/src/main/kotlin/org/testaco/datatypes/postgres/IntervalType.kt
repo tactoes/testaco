@@ -5,7 +5,11 @@ import org.testaco.datatypes.TestacoStringType
 import java.sql.*
 
 class IntervalType : TestacoStringType() {
-    override fun store(value: String, columnIndex: Int, statement: PreparedStatement) {
-        statement.setObject(columnIndex, PGInterval(value))
+    override fun store(value: String?, columnIndex: Int, statement: PreparedStatement) {
+        if (value == null) {
+            statement.setNull(columnIndex, Types.OTHER)
+        } else {
+            statement.setObject(columnIndex, PGInterval(value))
+        }
     }
 }

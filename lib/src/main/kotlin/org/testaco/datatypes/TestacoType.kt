@@ -21,7 +21,7 @@ interface TestacoType<JT> {
   /**
    * Take a json value, store it in the database
    */
-  fun store(value: JT, columnIndex: Int, statement: PreparedStatement)
+  fun store(value: JT?, columnIndex: Int, statement: PreparedStatement)
 }
 
 object TestacoConverter {
@@ -53,7 +53,7 @@ object TestacoConverter {
     TINYINT to IntType(),
     SMALLINT to IntType(),
     INTEGER to IntType(),
-    BIGINT to BigIntType(),
+    BIGINT to LongType(),
     FLOAT to FloatType(),
     REAL to RealType(),
     DOUBLE to DoubleType(),
