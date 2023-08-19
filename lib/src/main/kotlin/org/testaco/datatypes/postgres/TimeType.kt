@@ -1,27 +1,24 @@
 package org.testaco.datatypes.postgres
 
 import org.testaco.datatypes.TestacoType
-import java.sql.Date
-import java.sql.PreparedStatement
-import java.sql.ResultSet
-import java.sql.Types
+import java.sql.*
 import java.time.format.DateTimeFormatter
 
-class DateType : TestacoType<String> {
+class TimeType : TestacoType<String> {
   override fun read(columnName: String, rs: ResultSet): String? {
-    val i: Date = rs.getDate(columnName)
+    val i: Time = rs.getTime(columnName)
     return if (rs.wasNull()) {
       null
     } else {
-      DateTimeFormatter.ISO_DATE.format(i.toLocalDate())
+      DateTimeFormatter.ISO_TIME.format(i.toLocalTime())
     }
   }
 
   override fun store(value: String?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
-      statement.setNull(columnIndex, Types.DATE)
+      statement.setNull(columnIndex, Types.TIME)
     } else {
-      statement.setDate(columnIndex, Date.valueOf(value))
+      statement.setTime(columnIndex, Time.valueOf(value))
     }
   }
 }
