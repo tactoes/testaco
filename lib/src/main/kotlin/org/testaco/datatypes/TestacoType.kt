@@ -90,18 +90,6 @@ object TestacoConverter {
   )
 }
 
-abstract class TestacoStringType: TestacoType<String?> {
-  override fun read(columnName: String, rs: ResultSet): String? {
-    val s = rs.getString(columnName)
-    return if (rs.wasNull()) {
-      null
-    } else {
-      s
-    }
-  }
-}
-
-interface TestacoNumberType: TestacoType<Number?>
 interface TestacoBooleanType: TestacoType<Boolean?> {
   override fun read(columnName: String, rs: ResultSet): Boolean? {
     val b = rs.getBoolean(columnName)

@@ -5,7 +5,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
 
-class StringType : TestacoType<String> {
+open class StringType : TestacoType<String> {
   override fun read(columnName: String, rs: ResultSet): String? {
     val i = rs.getString(columnName)
     return if (rs.wasNull()) {

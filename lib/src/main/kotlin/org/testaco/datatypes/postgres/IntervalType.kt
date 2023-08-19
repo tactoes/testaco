@@ -1,10 +1,9 @@
 package org.testaco.datatypes.postgres
 
 import org.postgresql.util.PGInterval
-import org.testaco.datatypes.TestacoStringType
 import java.sql.*
 
-class IntervalType : TestacoStringType() {
+class IntervalType : StringType() {
     override fun store(value: String?, columnIndex: Int, statement: PreparedStatement) {
         if (value == null) {
             statement.setNull(columnIndex, Types.OTHER)
