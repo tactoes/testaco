@@ -55,7 +55,7 @@ object TestacoConverter {
     INTEGER to IntType(),
     BIGINT to LongType(),
     FLOAT to FloatType(),
-    REAL to RealType(),
+    REAL to FloatType(),
     DOUBLE to DoubleType(),
     NUMERIC to NumericType(),
     DECIMAL to DecimalType(),
@@ -100,6 +100,7 @@ abstract class TestacoStringType: TestacoType<String?> {
     }
   }
 }
+
 interface TestacoNumberType: TestacoType<Number?>
 interface TestacoBooleanType: TestacoType<Boolean?> {
   override fun read(columnName: String, rs: ResultSet): Boolean? {
