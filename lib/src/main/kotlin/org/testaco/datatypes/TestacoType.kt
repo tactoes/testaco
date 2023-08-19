@@ -57,7 +57,7 @@ object TestacoConverter {
     FLOAT to FloatType(),
     REAL to FloatType(),
     DOUBLE to DoubleType(),
-    NUMERIC to NumericType(),
+    NUMERIC to BigDecimalType(),
     DECIMAL to DecimalType(),
     CHAR to CharType(),
     VARCHAR to VarCharType(),
