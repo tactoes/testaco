@@ -40,12 +40,9 @@ object TestacoConverter {
         } else {
           throw RuntimeException("Testaco does not support user data types out of the box.")
         }
-      } else if (sqlType == Types.BIGINT && "oid" == sqlTypeName) {
-        return PostgreSQLOidDataType()
       } else {
         return types[sqlType] ?: throw IllegalStateException("No type found for sql type $sqlType")
       }
-      return super.createDataType(sqlType, sqlTypeName)
     }
   }
   private val types : Map<Int, TestacoType<*>> = mapOf(
@@ -73,13 +70,11 @@ object TestacoConverter {
     BLOB to BlobType(),
     CLOB to ClobType(),
     BOOLEAN to BooleanType(),
-    ROWID to RowIdType(),
     NCHAR to NCharType(),
     NVARCHAR to NVarCharType(),
     LONGNVARCHAR to LongNVarCharType(),
     NCLOB to NClobType(),
     SQLXML to SqlXmlType(),
-    REF_CURSOR to RefCursorType(),
     TIME_WITH_TIMEZONE to TimeWithTimezoneType(),
     TIMESTAMP_WITH_TIMEZONE to TimestampWithTimezoneType(),
   )
