@@ -17,7 +17,7 @@ open class StringType : TestacoType<String> {
 
   override fun store(value: String?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
-      statement.setNull(columnIndex, Types.TINYINT)
+      statement.setNull(columnIndex, Types.VARCHAR)
     } else {
       statement.setString(columnIndex, value)
     }

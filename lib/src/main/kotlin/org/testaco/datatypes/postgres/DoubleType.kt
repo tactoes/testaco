@@ -17,7 +17,7 @@ class DoubleType : TestacoType<Double> {
 
   override fun store(value: Double?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
-      statement.setNull(columnIndex, Types.TINYINT)
+      statement.setNull(columnIndex, Types.DOUBLE)
     } else {
       statement.setDouble(columnIndex, value)
     }

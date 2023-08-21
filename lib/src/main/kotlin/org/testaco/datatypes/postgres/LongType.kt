@@ -17,7 +17,7 @@ class LongType : TestacoType<Long> {
 
   override fun store(value: Long?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
-      statement.setNull(columnIndex, Types.TINYINT)
+      statement.setNull(columnIndex, Types.BIGINT)
     } else {
       statement.setLong(columnIndex, value)
     }

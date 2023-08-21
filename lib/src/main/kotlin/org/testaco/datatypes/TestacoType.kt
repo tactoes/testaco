@@ -1,10 +1,8 @@
 package org.testaco.datatypes
 
 import org.testaco.datatypes.postgres.*
-import java.lang.IllegalStateException
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.sql.Types
 import java.sql.Types.*
 
 /**
@@ -25,24 +23,20 @@ interface TestacoType<JT> {
 }
 
 object TestacoConverter {
-    fun createDataType(sqlType: Int, sqlTypeName: String): TestacoType<*> {
-      if (sqlType == Types.OTHER) {
-        if ("uuid" == sqlTypeName) {
-          return UuidType()
-        } else if ("interval" == sqlTypeName) {
-          return IntervalType()
-        } else if ("inet" == sqlTypeName) {
-          return InetType()
-        } else if ("geometry" == sqlTypeName) {
-          return GeometryType()
-        } else if ("citext" == sqlTypeName) {
-          return CitextType()
-        } else {
+  fun createDataType(sqlType: Int, sqlTypeName: String): TestacoType<*> {
+    if (sqlType == OTHER) {
+      return when (sqlTypeName) {
+        "uuid" -> { UuidType() }
+        "interval" -> { IntervalType() }
+        "inet" -> { InetType() }
+        "geometry" -> { GeometryType() }
+        "citext" -> { CitextType() }
+        else -> {
           throw RuntimeException("Testaco does not support user data types out of the box.")
         }
-      } else {
-        return types[sqlType] ?: throw IllegalStateException("No type found for sql type $sqlType")
       }
+    } else {
+      return types[sqlType] ?: throw IllegalStateException("No type found for sql type $sqlType")
     }
   }
   private val types : Map<Int, TestacoType<*>> = mapOf(
@@ -73,10 +67,8 @@ object TestacoConverter {
     NCHAR to StringType(),
     NVARCHAR to StringType(),
     LONGNVARCHAR to StringType(),
-    NCLOB to NClobType(),
-    SQLXML to SqlXmlType(),
-    TIME_WITH_TIMEZONE to TimeWithTimezoneType(),
-    TIMESTAMP_WITH_TIMEZONE to TimestampWithTimezoneType(),
+    TIME_WITH_TIMEZONE to TimeType(),
+    TIMESTAMP_WITH_TIMEZONE to TimestampType(),
   )
 }
 

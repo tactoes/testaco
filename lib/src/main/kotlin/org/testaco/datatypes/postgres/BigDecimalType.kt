@@ -18,7 +18,7 @@ class BigDecimalType : TestacoType<BigDecimal> {
 
   override fun store(value: BigDecimal?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
-      statement.setNull(columnIndex, Types.TINYINT)
+      statement.setNull(columnIndex, Types.NUMERIC)
     } else {
       statement.setBigDecimal(columnIndex, value)
     }

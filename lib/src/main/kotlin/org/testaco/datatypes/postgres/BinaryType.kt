@@ -18,7 +18,7 @@ open class BinaryType : TestacoType<String> {
 
   override fun store(value: String?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
-      statement.setNull(columnIndex, Types.TINYINT)
+      statement.setNull(columnIndex, Types.BINARY)
     } else {
       statement.setBytes(columnIndex, Base64.getDecoder().decode(value))
     }

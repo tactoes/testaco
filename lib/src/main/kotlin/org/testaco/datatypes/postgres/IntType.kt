@@ -17,7 +17,7 @@ class IntType : TestacoType<Int?> {
 
   override fun store(value: Int?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
-      statement.setNull(columnIndex, Types.TINYINT)
+      statement.setNull(columnIndex, Types.INTEGER)
     } else {
       statement.setInt(columnIndex, value)
     }

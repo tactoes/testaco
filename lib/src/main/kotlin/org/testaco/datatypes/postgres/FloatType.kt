@@ -17,7 +17,7 @@ class FloatType : TestacoType<Float> {
 
   override fun store(value: Float?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
-      statement.setNull(columnIndex, Types.TINYINT)
+      statement.setNull(columnIndex, Types.FLOAT)
     } else {
       statement.setFloat(columnIndex, value)
     }
