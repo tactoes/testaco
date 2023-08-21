@@ -10,10 +10,14 @@ import java.sql.Types
 open class ClobType : TestacoType<String?> {
   override fun read(columnName: String, rs: ResultSet): String? {
     val i: Clob = rs.getClob(columnName)
-    return if (rs.wasNull()) {
-      null
-    } else {
-      i.characterStream.readText()
+    return try {
+      if (rs.wasNull()) {
+        null
+      } else {
+        i.characterStream.readText()
+      }
+    } finally {
+      i.free()
     }
   }
 

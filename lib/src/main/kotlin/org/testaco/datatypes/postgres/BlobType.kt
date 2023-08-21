@@ -10,10 +10,14 @@ import java.util.Base64
 open class BlobType : TestacoType<String> {
   override fun read(columnName: String, rs: ResultSet): String? {
     val i: Blob = rs.getBlob(columnName)
-    return if (rs.wasNull()) {
-      null
-    } else {
-      Base64.getEncoder().encodeToString(i.binaryStream.readAllBytes())
+    return try {
+      if (rs.wasNull()) {
+        null
+      } else {
+        Base64.getEncoder().encodeToString(i.binaryStream.readAllBytes())
+      }
+    } finally {
+      i.free()
     }
   }
 

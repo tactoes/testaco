@@ -7,7 +7,7 @@ class ClobDataType : StringDataType("CLOB", Types.CLOB) {
     @Throws(SQLException::class)
     override fun getSqlValue(column: Int, resultSet: ResultSet): String? {
         if (logger.isDebugEnabled) logger.debug("getSqlValue(column={}, resultSet={}) - start", column, resultSet)
-        val value = resultSet.getClob(column)
+        val value: Clob = resultSet.getClob(column)
         return if (resultSet.wasNull()) {
             null
         } else
