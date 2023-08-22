@@ -2,10 +2,11 @@ package org.testaco.database.schema
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import java.sql.DatabaseMetaData
-import java.sql.ResultSet
 import org.junit.jupiter.api.fail
 import org.testaco.*
+import org.testaco.datatypes.TestacoConverter
+import java.sql.DatabaseMetaData
+import java.sql.ResultSet
 
 const val NOT_DEFERRABLE = 7.toShort()
 const val INITIALLY_DEFERRED = 4.toShort()
@@ -126,7 +127,9 @@ object SchemaVerifier {
       generateSequence {
         if (result.next()) {
           val columnName = result.getString("COLUMN_NAME")
-          TestacoColumn(columnName)
+          val dataType = result.getInt("DATA_TYPE")
+          val typeName = result.getString("TYPE_NAME")
+          TestacoColumn(columnName, TestacoConverter.createDataType(dataType, typeName))
         } else {
           null
         }

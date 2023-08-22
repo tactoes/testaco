@@ -12,6 +12,8 @@ import org.testaco.IgnoredTable
 import org.testaco.Table
 import org.testaco.TestacoColumn
 import org.testaco.TestacoSchema
+import org.testaco.datatypes.postgres.LongType
+import org.testaco.datatypes.postgres.StringType
 import org.testaco.util.MockResultSet
 import java.sql.DatabaseMetaData
 
@@ -64,7 +66,7 @@ class SchemaVerifierTest {
         uut.verifySchema(
           metadata, TestacoSchema(
             listOf(
-              Table("aliases", listOf(TestacoColumn("id"))),
+              Table("aliases", listOf(TestacoColumn("id", LongType()))),
               Table("xyzzy", emptyList())
             ), ""
           )
@@ -116,8 +118,8 @@ class SchemaVerifierTest {
               Table(
                 "aliases",
                 listOf(
-                  TestacoColumn("id"),
-                  TestacoColumn("alias")
+                  TestacoColumn("id", LongType()),
+                  TestacoColumn("alias", StringType())
                 )
               )
             ),
@@ -159,8 +161,8 @@ class SchemaVerifierTest {
               Table(
                 "aliases",
                 listOf(
-                  TestacoColumn("id"),
-                  TestacoColumn("alias")
+                  TestacoColumn("id", LongType()),
+                  TestacoColumn("alias", StringType())
                 )
               )
             ),
@@ -200,8 +202,8 @@ class SchemaVerifierTest {
         listOf(
           Table("aliases",
             listOf(
-              TestacoColumn("id"),
-              TestacoColumn("alias")
+              TestacoColumn("id", LongType()),
+              TestacoColumn("alias", StringType())
             )
           )
         ),
@@ -235,14 +237,14 @@ class SchemaVerifierTest {
         listOf(
           Table("names",
             listOf(
-              TestacoColumn("id"),
-              TestacoColumn("name")
+              TestacoColumn("id", LongType()),
+              TestacoColumn("name", StringType())
             )
           ),
           Table("aliases",
             listOf(
-              TestacoColumn("id"),
-              TestacoColumn("name_id")
+              TestacoColumn("id", LongType()),
+              TestacoColumn("name_id", LongType())
             )
           )
         ),
@@ -281,15 +283,15 @@ class SchemaVerifierTest {
               Table(
                 "aliases",
                 listOf(
-                  TestacoColumn("id"),
-                  TestacoColumn("name_id")
+                  TestacoColumn("id", LongType()),
+                  TestacoColumn("name_id", LongType())
                 )
               ),
               Table(
                 "names",
                 listOf(
-                  TestacoColumn("id"),
-                  TestacoColumn("name")
+                  TestacoColumn("id", LongType()),
+                  TestacoColumn("name", StringType())
                 )
               )
             ),
@@ -334,14 +336,14 @@ class SchemaVerifierTest {
         listOf(
           Table("aliases",
             listOf(
-              TestacoColumn("id"),
-              TestacoColumn("name_id")
+              TestacoColumn("id", LongType()),
+              TestacoColumn("name_id", LongType())
             )
           ),
           Table("names",
             listOf(
-              TestacoColumn("id"),
-              TestacoColumn("name")
+              TestacoColumn("id", LongType()),
+              TestacoColumn("name", StringType())
             )
           )
         ),

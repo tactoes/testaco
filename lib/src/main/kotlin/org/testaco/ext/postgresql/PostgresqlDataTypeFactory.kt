@@ -12,7 +12,9 @@ open class PostgresqlDataTypeFactory : DefaultDataTypeFactory() {
             // Treat Postgresql UUID types as VARCHARS
             if ("uuid" == sqlTypeName) {
                 return UuidType()
-            } else if ("interval" == sqlTypeName) {
+            }
+        }
+/*            } else if ("interval" == sqlTypeName) {
                 return IntervalType()
             } else if ("inet" == sqlTypeName) {
                 return InetType()
@@ -26,7 +28,7 @@ open class PostgresqlDataTypeFactory : DefaultDataTypeFactory() {
         } else if (sqlType == Types.BIGINT && "oid" == sqlTypeName) {
             return PostgreSQLOidDataType()
         }
-        return super.createDataType(sqlType, sqlTypeName)
+*/        return super.createDataType(sqlType, sqlTypeName)
     }
 
     override val validDbProducts = listOf("PostgreSQL")

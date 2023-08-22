@@ -25,7 +25,7 @@ sealed interface TestacoTable {
 
 data class Table(override val tableName: String, val columns: List<TestacoColumn>) : TestacoTable
 
-data class TestacoColumn(val name: String, val converter: TestacoType<*>) {
+data class TestacoColumn(val name: String, @JsonIgnore val converter: TestacoType<*>?) {
     override fun toString(): String {
         return name
     }
