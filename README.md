@@ -8,7 +8,21 @@ I wanted to get rid of all the factories, I wanted a tighter integration with Sp
 been using, like it or not), and I wanted to rip out a lot of what I consider technologies I won't use again. I also
 did not want to look another XML file in the face again if I could avoid it. If I could make it so that it is reusable
 and understandable for others, that is good, but the itch I wanted to scratch was mostly my own. If you don't feel your
-needs are met, give me a pull request or use dbunit.
+needs are met, give me a pull request or use dbunit. 
+
+I am unapologetically opinionated on the matter, and as a result, so is the library. I do however feel I have
+reasons for my opinions. These opinions might already be or will become wrong. If you feel you have found an 
+objective argument for why I am wrong I am most willing to listen, more so to people who can back their 
+opinions with objective arguments or pull requests. I do ask that you sit down and sort through how much of 
+your reactions are based in 
+
+- not actually wanting to spend more time on testing because no effort will improve your situation
+- technologies someone chose, and they are making testing hard
+- the fact that you can't buy support for Testaco
+
+If any of the above applies, this library won't help. You have issues in your technology base and/or your team that
+needs to be sorted out first. If you attempt to add end-to-end testing to the mix before sorting those problems first
+you will end up a worse place. Don't do it.
 
 ## Why the need for this library?
 
