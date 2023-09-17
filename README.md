@@ -26,14 +26,18 @@ you will end up a worse place. Don't do it.
 
 ## Why the need for this library?
 
-Long story. The elevator pitch is basically with the number of vulnerabilities reported we need tests that also cover
-behaviour embedded in libraries. If you use as many libraries you can you can expect about two vulnerability reports a
-week for a system with a front- and backend. A lot of teams handle that by configuring a tool like 
+Long story. The elevator pitch is basically with the number of vulnerabilities reported for libraries in common use 
+we need tests that also cover behaviour embedded in libraries. If you use as many libraries you can you can 
+expect about two vulnerability reports a week for a system with a front- and backend. A lot of teams handle 
+that by configuring a tool like 
 [Dependencytrack](https://dependencytrack.org/), 
 [Nexus Scanner](https://securityboulevard.com/2020/03/nexus-vulnerability-scanner-getting-started-with-vulnerability-analysis/), or
 [DependencyCheck](https://github.com/jeremylong/DependencyCheck), and then promply ignore the results because their
 test strategy is not equipped to handle the problem, which you 
-[shouldn't](docs/supplychainwoes.md).
+[shouldn't](docs/supplychainwoes.md). Some teams try to manage the problem using manual testing and/or scanning logs to
+see if there is a functional regression, with predictable quality issues. Microservices just compound the issue since
+behavioural regressions might not appear until two or three services run in conjunction - this most often happens along
+the app/browser/backend boundary.
 
 You can, of course, decide not to use libraries, but that carries its own bunch of problems, one of the biggest ones
 being that having a piece of code used by a lot of people *will* root out more bugs. How will you configure your 
@@ -41,6 +45,10 @@ code base and teams to ensure that you find the two vulnerabilities per week? Yo
 else's. When it comes to security-sensitive libraries (authentication springs to mind) there are even 
 [recommendations](https://owasp.org/www-project-proactive-controls/v3/en/c2-leverage-security-frameworks-libraries)
 that you don't.
+
+I strongly believe that keeping the libraries your system uses up-to-date should take so little time and require so
+little skill that anyone on the team should be able to keep on top of the problem using the time it takes to drink their
+first coffee of the day.
 
 The long story is [here](docs/longstory-testing.md).
 
