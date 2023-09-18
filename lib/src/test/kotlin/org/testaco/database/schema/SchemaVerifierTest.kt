@@ -10,25 +10,26 @@ import org.mockito.Mockito.`when`
 import org.opentest4j.AssertionFailedError
 import org.testaco.IgnoredTable
 import org.testaco.Table
-import org.testaco.TestacoColumn
 import org.testaco.TestacoSchema
-import org.testaco.datatypes.postgres.LongType
-import org.testaco.datatypes.postgres.StringType
+import org.testaco.datatypes.LongType
+import org.testaco.datatypes.StringType
 import org.testaco.util.MockResultSet
 import java.sql.DatabaseMetaData
 
 class SchemaVerifierTest {
   private val uut = SchemaVerifier
   private val metadata: DatabaseMetaData = mock()
+  private val namesColumns = MockResultSet(listOf("COLUMN_NAME", "DATA_TYPE", "TYPE_NAME"),
+    listOf(listOf("id", -5, "BIGINT"),
+      listOf("alias", 12, "VARCHAR"))).buildMock()
 
   @Test
   fun `fail if reference schema is missing table`() {
     val tables =
       MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test")))
         .buildMock()
-    val columns = MockResultSet(listOf("COLUMN_NAME"), listOf(listOf("id", "alias"))).buildMock()
     `when`(metadata.getTables(any(), any(), any(), eq(arrayOf("TABLE")))).thenReturn(tables)
-    `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(columns)
+    `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(namesColumns)
 
     val message =
       assertThrowsExactly(
@@ -40,8 +41,8 @@ class SchemaVerifierTest {
       """
     Reference schema  does not contain a definition for table aliases
     Options for declaration are 
-    {"IgnoredTable":{"tableName":"aliases"}}
-    {"Table":{"tableName":"aliases","columns":[{"name":"id"}]}}
+    {"type":"IgnoredTable","tableName":"aliases"}
+    {"type":"Table","tableName":"aliases","columns":[{"name":"id","type":"LongType"},{"name":"alias","type":"StringType"}]}
     """.trimIndent(),
       message?.trim()
     )
@@ -52,7 +53,8 @@ class SchemaVerifierTest {
     val tables =
       MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test")))
         .buildMock()
-    val columns = MockResultSet(listOf("COLUMN_NAME"), listOf(listOf("id", "alias"))).buildMock()
+    val columns = MockResultSet(listOf("COLUMN_NAME", "DATA_TYPE", "TYPE_NAME"),
+      listOf(listOf("id", -5, "BIGINT"))).buildMock()
     val foreignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf()).buildMock()
 
     `when`(metadata.getTables(any(), any(), any(), eq(arrayOf("TABLE")))).thenReturn(tables)
@@ -66,7 +68,7 @@ class SchemaVerifierTest {
         uut.verifySchema(
           metadata, TestacoSchema(
             listOf(
-              Table("aliases", listOf(TestacoColumn("id", LongType()))),
+              Table("aliases", listOf(LongType("id"))),
               Table("xyzzy", emptyList())
             ), ""
           )
@@ -100,10 +102,10 @@ class SchemaVerifierTest {
     val tables =
       MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test")))
         .buildMock()
-    val columns = MockResultSet(listOf("COLUMN_NAME"), listOf(
-      listOf("id"),
-      listOf("alias"),
-      listOf("sploink"))).buildMock()
+    val columns = MockResultSet(listOf("COLUMN_NAME", "DATA_TYPE", "TYPE_NAME"), listOf(
+      listOf("id", -5, "BIGINT"),
+      listOf("alias", 12, "VARCHAR"),
+      listOf("sploink", 12, "VARCHAR"))).buildMock()
     `when`(metadata.getTables(any(), any(), any(), eq(arrayOf("TABLE")))).thenReturn(tables)
     `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(columns)
 
@@ -118,8 +120,8 @@ class SchemaVerifierTest {
               Table(
                 "aliases",
                 listOf(
-                  TestacoColumn("id", LongType()),
-                  TestacoColumn("alias", StringType())
+                  LongType("id"),
+                  LongType("alias")
                 )
               )
             ),
@@ -134,7 +136,7 @@ class SchemaVerifierTest {
     Table aliases has extra columns [sploink] in the database, 
     or has extra [] columns in the testaco configuration.
     A suitable table definition should be
-    {"Table":{"tableName":"aliases","columns":[{"name":"id"},{"name":"alias"},{"name":"sploink"}]}}
+    {"type":"Table","tableName":"aliases","columns":[{"name":"id","type":"LongType"},{"name":"alias","type":"StringType"},{"name":"sploink","type":"StringType"}]}
     """.trimIndent(),
       message?.trim()
     )
@@ -145,8 +147,8 @@ class SchemaVerifierTest {
     val tables =
       MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test")))
         .buildMock()
-    val columns = MockResultSet(listOf("COLUMN_NAME"), listOf(
-      listOf("id"))).buildMock()
+    val columns = MockResultSet(listOf("COLUMN_NAME", "DATA_TYPE", "TYPE_NAME"), listOf(
+      listOf("id", -5, "BIGINT"))).buildMock()
     `when`(metadata.getTables(any(), any(), any(), eq(arrayOf("TABLE")))).thenReturn(tables)
     `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(columns)
 
@@ -161,8 +163,8 @@ class SchemaVerifierTest {
               Table(
                 "aliases",
                 listOf(
-                  TestacoColumn("id", LongType()),
-                  TestacoColumn("alias", StringType())
+                  LongType("id"),
+                  LongType("alias")
                 )
               )
             ),
@@ -177,7 +179,7 @@ class SchemaVerifierTest {
     Table aliases has extra columns [] in the database, 
     or has extra [alias] columns in the testaco configuration.
     A suitable table definition should be
-    {"Table":{"tableName":"aliases","columns":[{"name":"id"}]}}
+    {"type":"Table","tableName":"aliases","columns":[{"name":"id","type":"LongType"}]}
     """.trimIndent(),
       message?.trim()
     )
@@ -188,13 +190,10 @@ class SchemaVerifierTest {
     val tables =
       MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test")))
         .buildMock()
-    val columns = MockResultSet(listOf("COLUMN_NAME"), listOf(
-      listOf("id"),
-      listOf("alias"))).buildMock()
     val aliasesForeignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf()).buildMock()
 
     `when`(metadata.getTables(any(), any(), any(), eq(arrayOf("TABLE")))).thenReturn(tables)
-    `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(columns)
+    `when`(metadata.getColumns(any(), any(), eq("aliases"), any())).thenReturn(namesColumns)
     `when`(metadata.getImportedKeys(any(), any(), eq("aliases"))).thenReturn(aliasesForeignKeys)
 
     uut.verifySchema(metadata,
@@ -202,8 +201,8 @@ class SchemaVerifierTest {
         listOf(
           Table("aliases",
             listOf(
-              TestacoColumn("id", LongType()),
-              TestacoColumn("alias", StringType())
+              LongType("id"),
+              LongType("alias")
             )
           )
         ),
@@ -215,12 +214,9 @@ class SchemaVerifierTest {
     val tables =
       MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test"), listOf("names", "test")))
         .buildMock()
-    val aliasesColumns = MockResultSet(listOf("COLUMN_NAME"), listOf(
-      listOf("id"),
-      listOf("name_id"))).buildMock()
-    val namesColumns = MockResultSet(listOf("COLUMN_NAME"), listOf(
-      listOf("id"),
-      listOf("name"))).buildMock()
+    val aliasesColumns = MockResultSet(listOf("COLUMN_NAME", "DATA_TYPE", "TYPE_NAME"), listOf(
+      listOf("id", -5, "BIGINT"),
+      listOf("name_id", -5, "BIGINT"))).buildMock()
     val aliasesForeignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf(
       listOf("names", "id", NOT_DEFERRABLE)
     )
@@ -237,14 +233,14 @@ class SchemaVerifierTest {
         listOf(
           Table("names",
             listOf(
-              TestacoColumn("id", LongType()),
-              TestacoColumn("name", StringType())
+              LongType("id"),
+              StringType("alias")
             )
           ),
           Table("aliases",
             listOf(
-              TestacoColumn("id", LongType()),
-              TestacoColumn("name_id", LongType())
+              LongType("id"),
+              LongType("name_id")
             )
           )
         ),
@@ -256,12 +252,9 @@ class SchemaVerifierTest {
     val tables =
       MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test"), listOf("names", "test")))
         .buildMock()
-    val aliasesColumns = MockResultSet(listOf("COLUMN_NAME"), listOf(
-      listOf("id"),
-      listOf("name_id"))).buildMock()
-    val namesColumns = MockResultSet(listOf("COLUMN_NAME"), listOf(
-      listOf("id"),
-      listOf("name"))).buildMock()
+    val aliasesColumns = MockResultSet(listOf("COLUMN_NAME", "DATA_TYPE", "TYPE_NAME"), listOf(
+      listOf("id", -5, "BIGINT"),
+      listOf("name_id", -5, "BIGINT"))).buildMock()
     val aliasesForeignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf(
       listOf("names", "id", NOT_DEFERRABLE)
     )
@@ -283,15 +276,15 @@ class SchemaVerifierTest {
               Table(
                 "aliases",
                 listOf(
-                  TestacoColumn("id", LongType()),
-                  TestacoColumn("name_id", LongType())
+                  LongType("id"),
+                  LongType("name_id")
                 )
               ),
               Table(
                 "names",
                 listOf(
-                  TestacoColumn("id", LongType()),
-                  TestacoColumn("name", StringType())
+                  LongType("id"),
+                  StringType("name")
                 )
               )
             ),
@@ -315,12 +308,9 @@ class SchemaVerifierTest {
     val tables =
       MockResultSet(listOf("TABLE_NAME", "TABLE_SCHEM"), listOf(listOf("aliases", "test"), listOf("names", "test")))
         .buildMock()
-    val aliasesColumns = MockResultSet(listOf("COLUMN_NAME"), listOf(
-      listOf("id"),
-      listOf("name_id"))).buildMock()
-    val namesColumns = MockResultSet(listOf("COLUMN_NAME"), listOf(
-      listOf("id"),
-      listOf("name"))).buildMock()
+    val aliasesColumns = MockResultSet(listOf("COLUMN_NAME", "DATA_TYPE", "TYPE_NAME"), listOf(
+      listOf("id", -5, "BIGINT"),
+      listOf("name_id", -5, "BIGINT"))).buildMock()
     val aliasesForeignKeys = MockResultSet(listOf("PKTABLE_NAME", "PKCOLUMN_NAME", "DEFERRABILITY"), listOf(
       listOf("names", "id", INITIALLY_DEFERRED)
     )
@@ -336,14 +326,14 @@ class SchemaVerifierTest {
         listOf(
           Table("aliases",
             listOf(
-              TestacoColumn("id", LongType()),
-              TestacoColumn("name_id", LongType())
+              LongType("id"),
+              LongType("name_id")
             )
           ),
           Table("names",
             listOf(
-              TestacoColumn("id", LongType()),
-              TestacoColumn("name", StringType())
+              LongType("id"),
+              StringType("alias")
             )
           )
         ),

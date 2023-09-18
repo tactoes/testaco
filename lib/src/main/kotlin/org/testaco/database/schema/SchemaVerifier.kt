@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.junit.jupiter.api.fail
 import org.testaco.*
 import org.testaco.datatypes.TestacoConverter
+import org.testaco.datatypes.TestacoType
 import java.sql.DatabaseMetaData
 import java.sql.ResultSet
 
@@ -88,10 +89,10 @@ object SchemaVerifier {
     databaseMetaData: DatabaseMetaData,
     referenceSchema: TestacoSchema
   ) {
-    val columns = getColumns(databaseMetaData, tableName).toSet()
+    val columns = getColumns(databaseMetaData, tableName).map{ it.name }.toSet()
     val table: TestacoTable? = referenceSchema.tables.find { it.tableName == tableName }
     val referenceColumns =
-      (table as? Table?)?.columns?.toSet()
+      (table as? Table?)?.columns?.map{ it.name }?.toSet()
         ?: fail("Concrete table configuration $tableName not found in reference data")
     if (columns.toSet() != referenceColumns.toSet()) {
       val missingInReference = columns.minus(referenceColumns)
@@ -122,14 +123,14 @@ object SchemaVerifier {
     return mapper.writeValueAsString(Table(tableName, columns))
   }
 
-  private fun getColumns(metadata: DatabaseMetaData, tableName: String): List<TestacoColumn> {
+  private fun getColumns(metadata: DatabaseMetaData, tableName: String): List<TestacoType<*>> {
     return metadata.getColumns(null, null, tableName, null).use { result ->
       generateSequence {
         if (result.next()) {
           val columnName = result.getString("COLUMN_NAME")
           val dataType = result.getInt("DATA_TYPE")
           val typeName = result.getString("TYPE_NAME")
-          TestacoColumn(columnName, TestacoConverter.createDataType(dataType, typeName))
+          TestacoConverter.createDataType(dataType, typeName, columnName)
         } else {
           null
         }

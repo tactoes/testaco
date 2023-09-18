@@ -1,11 +1,11 @@
-package org.testaco.datatypes.postgres
+package org.testaco.datatypes
 
 import org.testaco.datatypes.TestacoType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
 
-class LongType : TestacoType<Long> {
+data class LongType(override val name: String) : TestacoType<Long>(name) {
   override fun read(columnName: String, rs: ResultSet): Long? {
     val i = rs.getLong(columnName)
     return if (rs.wasNull()) {

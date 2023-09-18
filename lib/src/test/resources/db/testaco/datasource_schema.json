@@ -1,7 +1,15 @@
 {
   "tables": [
-    {"IgnoredTable":{"tableName":"flyway_schema_history"}},
-    {"Table":{"tableName":"names","columns":[{"name":"id"},{"name":"name"},{"name":"created"}]}},
-    {"Table":{"tableName":"aliases","columns":[{"name":"id"},{"name":"name_id"},{"name":"alias"}]}}
+    {"tableName":"flyway_schema_history", "type":"IgnoredTable"},
+    {"tableName":"names",
+      "type": "Table",
+      "columns": [
+        {"name":"id", "type":"LongType"},
+        {"name":"name", "type":"LongType"},
+        {"name":"created", "type":"TimestampType"}]},
+    {"tableName":"aliases", "type": "Table","columns":[
+      {"name":"id", "type":"LongType"},
+      {"name":"name_id", "type":"LongType"},
+      {"name":"alias", "type":"StringType"}]}
   ]
 }

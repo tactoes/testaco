@@ -17,18 +17,12 @@ data class TestacoSchema(val tables: List<TestacoTable>, @JsonIgnore val filenam
     fun find(name: String): TestacoTable? = tables.find { it.tableName == name }
 }
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.WRAPPER_OBJECT)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes(*arrayOf( JsonSubTypes.Type(IgnoredTable::class), JsonSubTypes.Type(Table::class)))
 sealed interface TestacoTable {
     val tableName: String
 }
 
-data class Table(override val tableName: String, val columns: List<TestacoColumn>) : TestacoTable
-
-data class TestacoColumn(val name: String, @JsonIgnore val converter: TestacoType<*>?) {
-    override fun toString(): String {
-        return name
-    }
-}
+data class Table(override val tableName: String, val columns: List<TestacoType<*>>) : TestacoTable
 
 data class IgnoredTable(override val tableName: String) : TestacoTable

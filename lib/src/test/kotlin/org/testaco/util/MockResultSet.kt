@@ -3,7 +3,10 @@ package org.testaco.util
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito
 import org.mockito.Mockito.mock
+import org.mockito.Mockito.withSettings
+import org.mockito.internal.creation.MockSettingsImpl
 import org.mockito.invocation.InvocationOnMock
+import org.mockito.quality.Strictness
 import java.sql.ResultSet
 import java.sql.ResultSetMetaData
 import java.sql.SQLException
@@ -18,7 +21,7 @@ class MockResultSet(
 
     @Throws(SQLException::class)
     fun buildMock(): ResultSet {
-        val rs = mock(ResultSet::class.java)
+        val rs = mock(ResultSet::class.java, withSettings().defaultAnswer { throw IllegalStateException("Unmocked call") })
         val rsmd = mock(ResultSetMetaData::class.java)
         // mock rs.next()
         Mockito.doAnswer { invocation: InvocationOnMock? ->
@@ -39,6 +42,13 @@ class MockResultSet(
             val columnIndex = columnIndex(columnName)
             data[rowIndex][columnIndex] as Short
         }.`when`(rs).getShort(ArgumentMatchers.anyString())
+
+        // mock rs.getInt(columnName)
+        Mockito.doAnswer { invocation: InvocationOnMock ->
+            val columnName = invocation.getArgument(0, String::class.java)
+            val columnIndex = columnIndex(columnName)
+            data[rowIndex][columnIndex] as Int
+        }.`when`(rs).getInt(ArgumentMatchers.anyString())
 
         Mockito.doAnswer { invocation: InvocationOnMock ->
             rowIndex = -1

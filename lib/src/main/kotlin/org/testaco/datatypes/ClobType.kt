@@ -1,13 +1,12 @@
-package org.testaco.datatypes.postgres
+package org.testaco.datatypes
 
-import org.testaco.datatypes.TestacoType
 import java.io.StringReader
 import java.sql.Clob
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
 
-open class ClobType : TestacoType<String?> {
+data class ClobType(override val name: String) : TestacoType<String?>(name) {
   override fun read(columnName: String, rs: ResultSet): String? {
     val i: Clob = rs.getClob(columnName)
     return try {

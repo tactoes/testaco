@@ -1,11 +1,11 @@
-package org.testaco.datatypes.postgres
+package org.testaco.datatypes
 
 import org.testaco.datatypes.TestacoType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
 
-class FloatType : TestacoType<Float> {
+data class FloatType(override val name: String) : TestacoType<Float>(name) {
   override fun read(columnName: String, rs: ResultSet): Float? {
     val i = rs.getFloat(columnName)
     return if (rs.wasNull()) {

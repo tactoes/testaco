@@ -1,4 +1,4 @@
-package org.testaco.datatypes.postgres
+package org.testaco.datatypes
 
 import org.testaco.datatypes.TestacoType
 import java.math.BigDecimal
@@ -6,7 +6,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
 
-class BigDecimalType : TestacoType<BigDecimal> {
+data class BigDecimalType(override val name: String) : TestacoType<BigDecimal>(name) {
   override fun read(columnName: String, rs: ResultSet): BigDecimal? {
     val i = rs.getBigDecimal(columnName)
     return if (rs.wasNull()) {

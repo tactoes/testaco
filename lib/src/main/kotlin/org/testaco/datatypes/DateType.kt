@@ -1,26 +1,27 @@
-package org.testaco.datatypes.postgres
+package org.testaco.datatypes
 
 import org.testaco.datatypes.TestacoType
+import java.sql.Date
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
-import java.util.Base64
+import java.time.format.DateTimeFormatter
 
-open class BinaryType : TestacoType<String> {
+data class DateType(override val name: String) : TestacoType<String>(name) {
   override fun read(columnName: String, rs: ResultSet): String? {
-    val i = rs.getBytes(columnName)
+    val i: Date = rs.getDate(columnName)
     return if (rs.wasNull()) {
       null
     } else {
-      Base64.getEncoder().encodeToString(i)
+      DateTimeFormatter.ISO_DATE.format(i.toLocalDate())
     }
   }
 
   override fun store(value: String?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
-      statement.setNull(columnIndex, Types.BINARY)
+      statement.setNull(columnIndex, Types.DATE)
     } else {
-      statement.setBytes(columnIndex, Base64.getDecoder().decode(value))
+      statement.setDate(columnIndex, Date.valueOf(value))
     }
   }
 }

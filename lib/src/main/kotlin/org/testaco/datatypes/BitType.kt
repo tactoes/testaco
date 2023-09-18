@@ -1,10 +1,10 @@
-package org.testaco.datatypes.postgres
+package org.testaco.datatypes
 
 import org.testaco.datatypes.TestacoBooleanType
 import java.sql.PreparedStatement
 import java.sql.Types
 
-class BitType : TestacoBooleanType {
+data class BitType(override val name: String) : TestacoBooleanType(name) {
   override fun store(value: Boolean?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
       statement.setNull(columnIndex, Types.BIT)

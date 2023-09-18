@@ -1,12 +1,9 @@
-package org.testaco.datatypes.postgres
+package org.testaco.datatypes
 
-import org.testaco.datatypes.TestacoType
-import java.lang.IllegalStateException
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.sql.Types
 
-open class NullType : TestacoType<String> {
+data class NullType(override val name: String) : TestacoType<String>(name) {
   override fun read(columnName: String, rs: ResultSet): String? {
     throw IllegalStateException("Don't know how to handle null types. Please raise a request with your actual use case.")
   }

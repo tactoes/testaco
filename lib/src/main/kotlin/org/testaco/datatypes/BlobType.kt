@@ -1,13 +1,12 @@
-package org.testaco.datatypes.postgres
+package org.testaco.datatypes
 
-import org.testaco.datatypes.TestacoType
 import java.sql.Blob
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
 import java.util.Base64
 
-open class BlobType : TestacoType<String> {
+data class BlobType(override val name: String) : TestacoType<String>(name) {
   override fun read(columnName: String, rs: ResultSet): String? {
     val i: Blob = rs.getBlob(columnName)
     return try {

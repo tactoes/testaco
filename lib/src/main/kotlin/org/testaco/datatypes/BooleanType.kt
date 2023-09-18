@@ -1,11 +1,11 @@
-package org.testaco.datatypes.postgres
+package org.testaco.datatypes
 
 import org.testaco.datatypes.TestacoType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
 
-open class BooleanType : TestacoType<Boolean?> {
+data class BooleanType(override val name: String) : TestacoType<Boolean?>(name) {
   override fun read(columnName: String, rs: ResultSet): Boolean? {
     val i = rs.getBoolean(columnName)
     return if (rs.wasNull()) {

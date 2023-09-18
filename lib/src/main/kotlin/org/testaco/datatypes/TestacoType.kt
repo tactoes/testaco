@@ -1,6 +1,6 @@
 package org.testaco.datatypes
 
-import org.testaco.datatypes.postgres.*
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types.*
@@ -10,69 +10,77 @@ import java.sql.Types.*
  *
  * JT: Json type
  */
-interface TestacoType<JT> {
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+sealed class TestacoType<JT>(open val name: String) {
+  val type = this::class.java.simpleName
   /**
    * Read a column from the database, return a potentially null string value
    */
-  fun read(columnName: String, rs: ResultSet): JT?
+  abstract fun read(columnName: String, rs: ResultSet): JT?
 
   /**
    * Take a json value, store it in the database
    */
-  fun store(value: JT?, columnIndex: Int, statement: PreparedStatement)
+  abstract fun store(value: JT?, columnIndex: Int, statement: PreparedStatement)
+
+  override fun toString(): String {
+    return name
+  }
 }
 
 object TestacoConverter {
-  fun createDataType(sqlType: Int, sqlTypeName: String): TestacoType<*> {
-    if (sqlType == OTHER) {
-      return when (sqlTypeName) {
-        "uuid" -> { UuidType() }
-        "interval" -> { IntervalType() }
-        "inet" -> { InetType() }
-        "geometry" -> { GeometryType() }
-        "citext" -> { CitextType() }
-        else -> {
+  fun createDataType(sqlType: Int, sqlTypeName: String, columnName: String): TestacoType<*> {
+    return if (sqlType == OTHER) {
+      when (sqlTypeName) {
+        "uuid" -> UuidType(columnName)
+        "interval" -> IntervalType(columnName)
+        "inet" -> InetType(columnName)
+        "geometry" -> GeometryType(columnName)
+        "citext" -> CitextType(columnName)
+        else ->
           throw RuntimeException("Testaco does not support user data types out of the box.")
-        }
       }
     } else {
-      return types[sqlType] ?: throw IllegalStateException("No type found for sql type $sqlType")
+      println("sqltype is $sqlType")
+      types(sqlType, columnName) ?: throw IllegalStateException("No type found for sql type $sqlType")
     }
   }
-  private val types : Map<Int, TestacoType<*>> = mapOf(
-    BIT to BitType(),
-    TINYINT to IntType(),
-    SMALLINT to IntType(),
-    INTEGER to IntType(),
-    BIGINT to LongType(),
-    FLOAT to FloatType(),
-    REAL to FloatType(),
-    DOUBLE to DoubleType(),
-    NUMERIC to BigDecimalType(),
-    DECIMAL to BigDecimalType(),
-    CHAR to StringType(),
-    VARCHAR to StringType(),
-    LONGVARCHAR to StringType(),
-    DATE to DateType(),
-    TIME to TimeType(),
-    TIMESTAMP to TimestampType(),
-    BINARY to BinaryType(),
-    VARBINARY to BinaryType(),
-    LONGVARBINARY to BinaryType(),
-    NULL to NullType(),
-    JAVA_OBJECT to JavaObjectType(),
-    BLOB to BlobType(),
-    CLOB to ClobType(),
-    BOOLEAN to BooleanType(),
-    NCHAR to StringType(),
-    NVARCHAR to StringType(),
-    LONGNVARCHAR to StringType(),
-    TIME_WITH_TIMEZONE to TimeType(),
-    TIMESTAMP_WITH_TIMEZONE to TimestampType(),
-  )
+  private fun types(sqlType: Int, columnName: String): TestacoType<*>? =
+    when(sqlType) {
+      BIT ->  BitType(columnName)
+      TINYINT ->  IntType(columnName)
+      SMALLINT ->  IntType(columnName)
+      INTEGER ->  IntType(columnName)
+      BIGINT ->  LongType(columnName)
+      FLOAT ->  FloatType(columnName)
+      REAL ->  FloatType(columnName)
+      DOUBLE ->  DoubleType(columnName)
+      NUMERIC ->  BigDecimalType(columnName)
+      DECIMAL ->  BigDecimalType(columnName)
+      CHAR ->  StringType(columnName)
+      VARCHAR ->  StringType(columnName)
+      LONGVARCHAR ->  StringType(columnName)
+      DATE ->  DateType(columnName)
+      TIME ->  TimeType(columnName)
+      TIMESTAMP ->  TimestampType(columnName)
+      BINARY ->  BinaryType(columnName)
+      VARBINARY ->  BinaryType(columnName)
+      LONGVARBINARY ->  BinaryType(columnName)
+      NULL ->  NullType(columnName)
+      JAVA_OBJECT ->  JavaObjectType(columnName)
+      BLOB ->  BlobType(columnName)
+      CLOB ->  ClobType(columnName)
+      BOOLEAN ->  BooleanType(columnName)
+      NCHAR ->  StringType(columnName)
+      NVARCHAR ->  StringType(columnName)
+      LONGNVARCHAR ->  StringType(columnName)
+      TIME_WITH_TIMEZONE ->  TimeType(columnName)
+      TIMESTAMP_WITH_TIMEZONE ->  TimestampType(columnName)
+      else -> null
+    }
 }
 
-interface TestacoBooleanType: TestacoType<Boolean?> {
+abstract class TestacoBooleanType(name: String) : TestacoType<Boolean?>(name) {
   override fun read(columnName: String, rs: ResultSet): Boolean? {
     val b = rs.getBoolean(columnName)
     return if (rs.wasNull()) {
