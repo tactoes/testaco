@@ -29,6 +29,8 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
 
     @Test
     fun `can load a data set`() {
-        testaco.loadDataSet("datasource", "start.json")
+        with(testaco) {
+            loadDataSet("datasource", "start.json")
+        }
     }
 }

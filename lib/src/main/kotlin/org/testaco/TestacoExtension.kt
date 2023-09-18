@@ -1,6 +1,7 @@
 package org.testaco
 
 import com.fasterxml.jackson.databind.JsonMappingException
+import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.junit.jupiter.api.extension.BeforeAllCallback
@@ -47,6 +48,7 @@ class TestacoExtension() : BeforeAllCallback {
       }
       val databaseMetaData = dataSource.connection.metaData
       SchemaVerifier.verifySchema(databaseMetaData, referenceSchema)
+      referenceSchemas.put(tdb.dataSource, referenceSchema)
     }
     // TODO: Verify database schema against stored schema.
     // TODO: Verify stored schema against configuration.
@@ -62,23 +64,44 @@ class TestacoExtension() : BeforeAllCallback {
 
   fun loadDataSet(dataSourceName: String, dataFile: String) {
     println("Starts")
-    testacoConfiguration!!.databases.find { it.dataSource == dataSourceName } ?: throw IllegalStateException("Datasource $dataSourceName could not be found in the testaco configuration")
+    assert(referenceSchemas.contains(dataSourceName), {"Database $dataSourceName not known to testaco. It needs to be defined in the testaco configuration, along with a reference schema file"})
+    val referenceSchema = referenceSchemas.get(dataSourceName)!!
+    val localPath = "$dataSourceName/$dataFile"
+    val dataset: JsonNode = readDataSet(dataSourceName, localPath)
+    assert(dataset.isObject == true, {"Data set does not contain an object as its root node"})
+
+    val tables = dataset.properties().map{ it.key }
+    val missingtables = tables.minus(referenceSchema.referenceTableList)
+    assert(missingtables.isEmpty(), {"Data set $localPath contains tables that do not exist in reference schema, aborting. Extraneous tables are $missingtables"})
+    referenceSchema.referenceTableList.containsAll(tables)
+    println("Ends")
+  }
+
+  private fun readDataSet(dataSourceName: String, localPath: String): JsonNode {
     val dataSource = (springContext?.getBean(dataSourceName) as DataSource?)
       ?: fail("datasource ${dataSourceName} fetched from spring must not be null")
-    val dataFileName = "${testacoConfiguration?.datadir}/$dataSourceName/${dataFile}"
+    val dataFileName = "${testacoConfiguration?.datadir}/$localPath"
     val dataFileResource = springContext!!.getResource(dataFileName)
     if (!dataFileResource.exists() || !dataFileResource.isReadable) {
       fail(
-        """Testaco expects $dataFile to exist in its data 
-          |directory. With the current configuration the location would be $dataFileName.
-          |Please ensure such a file exists.""".trimMargin(),
+        """Testaco expects $localPath to exist in its data 
+            |directory. With the current configuration the location would be $dataFileName.
+            |Please ensure such a file exists.""".trimMargin(),
       )
     }
-    println("Ends")
+    val dataset: JsonNode = try {
+      mapper.readTree(
+        dataFileResource.getContentAsString(Charset.defaultCharset())
+      )
+    } catch (e: JsonMappingException) {
+      fail("Could not parse file $dataFileName, parser gives reason: ${e.message}", e)
+    }
+    return dataset
   }
 
   companion object {
     var springContext: ApplicationContext? = null
     var testacoConfiguration: TestacoConfiguration? = null
+    val referenceSchemas: MutableMap<String, TestacoSchema> = mutableMapOf()
   }
 }
