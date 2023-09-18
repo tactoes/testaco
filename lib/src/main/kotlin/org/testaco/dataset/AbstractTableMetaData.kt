@@ -1,6 +1,7 @@
 package org.testaco.dataset
 
 import org.testaco.database.IDatabaseConnection
+import org.testaco.dataset.datatype.DefaultDataTypeFactory
 import org.testaco.dataset.datatype.IDataTypeFactory
 import org.testaco.dataset.exceptions.DataSetException
 import java.sql.DatabaseMetaData
@@ -15,7 +16,7 @@ abstract class AbstractTableMetaData: ITableMetaData {
     @Throws(SQLException::class)
     fun getDataTypeFactory(connection: IDatabaseConnection): IDataTypeFactory {
         val metaData: DatabaseMetaData = connection.connection!!.metaData
-        val dataTypeFactory = connection.config.dataTypeFactory
+        val dataTypeFactory = DefaultDataTypeFactory()
 
         val databaseProductName: String = metaData.databaseProductName
         if (dataTypeFactory.validDbProducts.isNotEmpty() && !dataTypeFactory.validDbProducts.contains(

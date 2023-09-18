@@ -61,8 +61,7 @@ class DatabaseTableMetaData @JvmOverloads internal constructor(
                 logger.debug("Validating if table '{}' exists in schema '{}' ...", plainTableName, schemaName)
                 try {
                     val config = connection.config
-                    val metadataHandler =
-                        config!!.metaDataHandler
+                    val metadataHandler = DefaultMetadataHandler()
                     val databaseMetaData: DatabaseMetaData = jdbcConnection!!.metaData
                     if (!metadataHandler!!.tableExists(databaseMetaData, schemaName, plainTableName)) {
                         throw NoSuchTableException("Did not find table '$plainTableName' in schema '$schemaName'")
@@ -90,7 +89,7 @@ class DatabaseTableMetaData @JvmOverloads internal constructor(
             val connection = _connection.connection
             val databaseMetaData: DatabaseMetaData = connection!!.metaData
             val config = _connection.config
-            val metadataHandler = config!!.metaDataHandler
+            val metadataHandler = DefaultMetadataHandler()
             val resultSet: ResultSet? = metadataHandler!!.getPrimaryKeys(databaseMetaData, schemaName, tableName)
             val list = ArrayList<PrimaryKeyData>()
             try {
@@ -126,11 +125,11 @@ class DatabaseTableMetaData @JvmOverloads internal constructor(
                     val databaseMetaData: DatabaseMetaData = jdbcConnection!!.metaData
                     val config = _connection.config
                     val metadataHandler =
-                        config!!.metaDataHandler
+                        DefaultMetadataHandler()
                     val resultSet: ResultSet? = metadataHandler!!.getColumns(databaseMetaData, schemaName, tableName)
                     try {
                         val dataTypeFactory: IDataTypeFactory = super.getDataTypeFactory(_connection)
-                        val datatypeWarning: Boolean = config!!.datatypeWarning
+                        val datatypeWarning: Boolean = false
                         val columnList = ArrayList<Column>()
                         while (resultSet!!.next()) {
                             // Check for exact table/schema name match because

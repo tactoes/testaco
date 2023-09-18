@@ -26,4 +26,9 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
         println("resultset size "+statement.resultSet.getInt(1))
         assert(statement.resultSet.getInt(1) == 3, { "Should have applied two schema changes, plus schema creation" })
     }
+
+    @Test
+    fun `can load a data set`() {
+        testaco.loadDataSet("datasource", "start.json")
+    }
 }

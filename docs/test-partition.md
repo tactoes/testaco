@@ -83,12 +83,17 @@ and then use something like Testaco to verify what ends up in the database is wh
 
 If your json library starts serializing stuff differently, you will notice, which is the whole point.
 
-This will buy new problems, to do with the maintenance of the data sets. Testaco is built to run with a minimal,
+This will buy new problems, to do with the maintenance of the data sets. Testaco is built to start off loading a minimal,
 static data set (this is where the configuration for your system goes), and then a test-specific data set containing a handful
-of rows representing the interaction with the user. This in turn makes the data sets automatically maintainable 
-(see the database refactoring web site for the strategies used).
+of rows representing the interaction with the user. This handful of rows starts out empty, you as the developer push
+the GUI buttons on behalf of the user, run the test, and Testaco will spit out the dataset it sees for your
+manual inspection. Once you are happy with the data, just put it into the reference data set for the test, and you are done.
 
-Likewise interaction 4-5 in the above sequence diagram would get its own test, and so would interaction 6-7.
+Likewise interaction 4-5 in the above sequence diagram would get its own test, and so would interaction 6-7. These tests
+will often run off data created in tests created by the user-inputs-data-tests.
+
+Maintenance of the data sets as the database schema changes over time is automated. Testaco will tell you how when
+the database schema changes.
 
 ## What just happened to the system?
 

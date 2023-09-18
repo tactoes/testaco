@@ -2,6 +2,7 @@ package org.testaco.database
 
 import org.slf4j.LoggerFactory
 import org.testaco.DatabaseUnitRuntimeException
+import org.testaco.database.statement.AbstractStatementFactory
 import org.testaco.database.statement.IStatementFactory
 import org.testaco.dataset.IDataSet
 import org.testaco.dataset.ITable
@@ -13,6 +14,8 @@ import org.testaco.util.SQLHelper
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.SQLException
+
+data class DatabaseConfig(val statementFactory: AbstractStatementFactory, val resultsetFactory: IResultSetTableFactory)
 
 abstract class AbstractDatabaseConnection(override val config: DatabaseConfig) : IDatabaseConnection {
     private var _dataSet: IDataSet? = null

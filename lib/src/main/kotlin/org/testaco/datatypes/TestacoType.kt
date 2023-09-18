@@ -41,7 +41,6 @@ object TestacoConverter {
           throw RuntimeException("Testaco does not support user data types out of the box.")
       }
     } else {
-      println("sqltype is $sqlType")
       types(sqlType, columnName) ?: throw IllegalStateException("No type found for sql type $sqlType")
     }
   }

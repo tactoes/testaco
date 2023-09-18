@@ -20,6 +20,6 @@ class PreparedStatementFactory : AbstractStatementFactory() {
         } else {
             SimplePreparedStatement(sql, connection.connection)
         }
-        return AutomaticPreparedBatchStatement(statement, connection.config.batchSize)
+        return AutomaticPreparedBatchStatement(statement, 50)
     }
 }
