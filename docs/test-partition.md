@@ -11,17 +11,17 @@ processing going on between the user and the data store.
     The underlying goal is to reduce system or maintenance complexity, not add to it.
 
 ```mermaid
-sequenceDiagram
-actor U as User
-participant F as Browser/App
-participant B as Backend
-participant DB
-U->>F
-F->>B
-B->>DB
-DB->>B
-B->>DB
-DB->>B
-B->>F
-F--U
+sequenceDiagram;
+actor U as User;
+participant F as Browser/App;
+participant B as Backend;
+participant DB;
+U->>F;
+F->>B;
+B->>DB;
+DB->>B;
+B->>DB;
+DB->>B;
+B->>F;
+F->>U;
 ```
