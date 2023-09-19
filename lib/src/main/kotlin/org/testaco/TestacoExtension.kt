@@ -68,12 +68,15 @@ class TestacoExtension() : BeforeAllCallback {
     val referenceSchema = referenceSchemas.get(dataSourceName)!!
     val localPath = "$dataSourceName/$dataFile"
     val dataset: JsonNode = readDataSet(dataSourceName, localPath)
+
     assert(dataset.isObject == true, {"Data set does not contain an object as its root node"})
 
     val tables = dataset.properties().map{ it.key }
     val missingtables = tables.minus(referenceSchema.referenceTableList)
     assert(missingtables.isEmpty(), {"Data set $localPath contains tables that do not exist in reference schema, aborting. Extraneous tables are $missingtables"})
-    referenceSchema.referenceTableList.containsAll(tables)
+
+
+
     println("Ends")
   }
 

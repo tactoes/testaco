@@ -27,13 +27,13 @@ you will end up a worse place. Don't do it.
 ## Why the need for this library?
 
 Long story. The elevator pitch is basically with the number of vulnerabilities reported for libraries in common use 
-we need tests that also cover behaviour embedded in libraries. If you use as many libraries you can you can 
+we need tests that also cover behaviour embedded in libraries. If you use as many libraries as possible you can 
 expect about two vulnerability reports a week for a system with a front- and backend. A lot of teams handle 
 that by configuring a tool like 
 [Dependencytrack](https://dependencytrack.org/), 
 [Nexus Scanner](https://securityboulevard.com/2020/03/nexus-vulnerability-scanner-getting-started-with-vulnerability-analysis/), or
 [DependencyCheck](https://github.com/jeremylong/DependencyCheck), and then promply ignore the results because their
-test strategy is not equipped to handle the problem, which you 
+test strategy is not equipped to handle the workload, which you 
 [shouldn't](docs/supplychainwoes.md). Some teams try to manage the problem using manual testing and/or scanning logs to
 see if there is a functional regression, with predictable quality issues. Microservices just compound the issue since
 behavioural regressions might not appear until two or three services run in conjunction - this most often happens along
@@ -56,7 +56,8 @@ The long story is [here](docs/longstory-testing.md).
 
 Testaco forms the database checking part of an end-to-end testing framework that allows for 
 [database refactoring](https://en.wikipedia.org/wiki/Database_refactoring). Being able to efficiently mutate the data
-model of the system is a core concern if you want to have end-to-end tests, and failure to reach this goal is
+model of the system is a core concern if you want to have end-to-end tests and maintain them without great pain, 
+and failure to reach this goal is
 probably the biggest reason why people don't test nonfunctional aspects of their systems, which they 
 [should](docs/whynonfunctionaltests.md).
 
