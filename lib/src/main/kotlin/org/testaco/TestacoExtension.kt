@@ -75,7 +75,14 @@ class TestacoExtension() : BeforeAllCallback {
     val missingtables = tables.minus(referenceSchema.referenceTableList)
     assert(missingtables.isEmpty(), {"Data set $localPath contains tables that do not exist in reference schema, aborting. Extraneous tables are $missingtables"})
 
-
+    dataset.fields().asSequence().forEach { tableFromSet: MutableMap.MutableEntry<String, JsonNode>? ->
+      if (tableFromSet == null) { fail("How? What? This should not have been null?") }
+      val table: TestacoTable = referenceSchema.tables.find { it.tableName == tableFromSet.key} ?: fail("Table ${tableFromSet.key} not found in reference data schema")
+      when (table) {
+        is IgnoredTable -> fail("Dataset $dataFile contains data for ignored table ${tableFromSet.key}")
+        is Table -> ???
+      }
+    }
 
     println("Ends")
   }
