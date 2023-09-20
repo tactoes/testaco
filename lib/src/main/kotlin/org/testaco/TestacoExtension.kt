@@ -67,7 +67,7 @@ class TestacoExtension() : BeforeAllCallback {
     assert(referenceSchemas.contains(dataSourceName), {"Database $dataSourceName not known to testaco. It needs to be defined in the testaco configuration, along with a reference schema file"})
     val referenceSchema = referenceSchemas.get(dataSourceName)!!
     val localPath = "$dataSourceName/$dataFile"
-    val dataset: JsonNode = readDataSet(dataSourceName, localPath)
+    val dataset: JsonNode = readDataSet(localPath)
 
     assert(dataset.isObject == true, {"Data set does not contain an object as its root node"})
 
@@ -87,9 +87,7 @@ class TestacoExtension() : BeforeAllCallback {
     println("Ends")
   }
 
-  private fun readDataSet(dataSourceName: String, localPath: String): JsonNode {
-    val dataSource = (springContext?.getBean(dataSourceName) as DataSource?)
-      ?: fail("datasource ${dataSourceName} fetched from spring must not be null")
+  private fun readDataSet(localPath: String): JsonNode {
     val dataFileName = "${testacoConfiguration?.datadir}/$localPath"
     val dataFileResource = springContext!!.getResource(dataFileName)
     if (!dataFileResource.exists() || !dataFileResource.isReadable) {
