@@ -15,6 +15,7 @@ import org.testaco.datatypes.LongType
 import org.testaco.datatypes.StringType
 import org.testaco.util.MockResultSet
 import java.sql.DatabaseMetaData
+import java.sql.SQLType
 
 class SchemaVerifierTest {
   private val uut = SchemaVerifier
@@ -42,7 +43,7 @@ class SchemaVerifierTest {
     Reference schema  does not contain a definition for table aliases
     Options for declaration are 
     {"type":"IgnoredTable","tableName":"aliases"}
-    {"type":"Table","tableName":"aliases","columns":[{"name":"id","type":"LongType"},{"name":"alias","type":"StringType"}]}
+    {"type":"Table","tableName":"aliases","columns":[{"name":"id","sqlType":-5,"sqlTypeName":"BIGINT","type":"LongType"},{"name":"alias","sqlType":12,"sqlTypeName":"VARCHAR","type":"StringType"}]}
     """.trimIndent(),
       message?.trim()
     )
@@ -68,7 +69,7 @@ class SchemaVerifierTest {
         uut.verifySchema(
           metadata, TestacoSchema(
             listOf(
-              Table("aliases", listOf(LongType("id"))),
+              Table("aliases", listOf(LongType("id", java.sql.Types.BIGINT, ""))),
               Table("xyzzy", emptyList())
             ), ""
           )
@@ -120,8 +121,8 @@ class SchemaVerifierTest {
               Table(
                 "aliases",
                 listOf(
-                  LongType("id"),
-                  LongType("alias")
+                  LongType("id", java.sql.Types.BIGINT, ""),
+                  LongType("alias", java.sql.Types.VARCHAR, "")
                 )
               )
             ),
@@ -136,7 +137,7 @@ class SchemaVerifierTest {
     Table aliases has extra columns [sploink] in the database, 
     or has extra [] columns in the testaco configuration.
     A suitable table definition should be
-    {"type":"Table","tableName":"aliases","columns":[{"name":"id","type":"LongType"},{"name":"alias","type":"StringType"},{"name":"sploink","type":"StringType"}]}
+    {"type":"Table","tableName":"aliases","columns":[{"name":"id","sqlType":-5,"sqlTypeName":"BIGINT","type":"LongType"},{"name":"alias","sqlType":12,"sqlTypeName":"VARCHAR","type":"StringType"},{"name":"sploink","sqlType":12,"sqlTypeName":"VARCHAR","type":"StringType"}]}
     """.trimIndent(),
       message?.trim()
     )
@@ -163,8 +164,8 @@ class SchemaVerifierTest {
               Table(
                 "aliases",
                 listOf(
-                  LongType("id"),
-                  LongType("alias")
+                  LongType("id", java.sql.Types.BIGINT, ""),
+                  LongType("alias", java.sql.Types.VARCHAR, "")
                 )
               )
             ),
@@ -179,7 +180,7 @@ class SchemaVerifierTest {
     Table aliases has extra columns [] in the database, 
     or has extra [alias] columns in the testaco configuration.
     A suitable table definition should be
-    {"type":"Table","tableName":"aliases","columns":[{"name":"id","type":"LongType"}]}
+    {"type":"Table","tableName":"aliases","columns":[{"name":"id","sqlType":-5,"sqlTypeName":"BIGINT","type":"LongType"}]}
     """.trimIndent(),
       message?.trim()
     )
@@ -201,8 +202,8 @@ class SchemaVerifierTest {
         listOf(
           Table("aliases",
             listOf(
-              LongType("id"),
-              LongType("alias")
+              LongType("id", java.sql.Types.BIGINT, ""),
+              LongType("alias", java.sql.Types.VARCHAR, "")
             )
           )
         ),
@@ -233,14 +234,14 @@ class SchemaVerifierTest {
         listOf(
           Table("names",
             listOf(
-              LongType("id"),
-              StringType("alias")
+              LongType("id", java.sql.Types.BIGINT, ""),
+              StringType("alias", java.sql.Types.VARCHAR, "")
             )
           ),
           Table("aliases",
             listOf(
-              LongType("id"),
-              LongType("name_id")
+              LongType("id", java.sql.Types.BIGINT, ""),
+              LongType("name_id", java.sql.Types.VARCHAR, "")
             )
           )
         ),
@@ -276,15 +277,15 @@ class SchemaVerifierTest {
               Table(
                 "aliases",
                 listOf(
-                  LongType("id"),
-                  LongType("name_id")
+                  LongType("id", java.sql.Types.BIGINT, ""),
+                  LongType("name_id", java.sql.Types.VARCHAR, "")
                 )
               ),
               Table(
                 "names",
                 listOf(
-                  LongType("id"),
-                  StringType("name")
+                  LongType("id", java.sql.Types.BIGINT, ""),
+                  StringType("name", java.sql.Types.VARCHAR, "")
                 )
               )
             ),
@@ -326,14 +327,14 @@ class SchemaVerifierTest {
         listOf(
           Table("aliases",
             listOf(
-              LongType("id"),
-              LongType("name_id")
+              LongType("id", java.sql.Types.BIGINT, ""),
+              LongType("name_id", java.sql.Types.VARCHAR, "")
             )
           ),
           Table("names",
             listOf(
-              LongType("id"),
-              StringType("alias")
+              LongType("id", java.sql.Types.BIGINT, ""),
+              StringType("alias", java.sql.Types.VARCHAR, "")
             )
           )
         ),

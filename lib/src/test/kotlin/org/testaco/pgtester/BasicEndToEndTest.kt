@@ -7,11 +7,11 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.testaco.TestacoExtension
 import org.testcontainers.junit.jupiter.Testcontainers
 
 @Testcontainers
 @SpringBootTest
-@ExtendWith(SpringExtension::class)
 @ContextConfiguration(initializers = [AbstractEndToEndTest.Companion.Initializer::class])
 class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) : AbstractEndToEndTest() {
 
@@ -29,7 +29,7 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
 
     @Test
     fun `can load a data set`() {
-        with(testaco) {
+        with (testaco) {
             loadDataSet("datasource", "start.json")
         }
     }

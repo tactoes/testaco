@@ -1,8 +1,10 @@
 package org.testaco
 
+import arrow.core.Either
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.node.*
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -10,7 +12,10 @@ import org.junit.jupiter.api.fail
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.testaco.database.schema.SchemaVerifier
+import org.testaco.datatypes.TestacoType
+import java.io.ByteArrayInputStream
 import java.nio.charset.Charset
+import java.sql.PreparedStatement
 import javax.sql.DataSource
 
 
@@ -65,46 +70,57 @@ class TestacoExtension() : BeforeAllCallback {
   fun loadDataSet(dataSourceName: String, dataFile: String) {
     println("Starts")
     assert(referenceSchemas.contains(dataSourceName), {"Database $dataSourceName not known to testaco. It needs to be defined in the testaco configuration, along with a reference schema file"})
+    val dataSource = (springContext!!.getBean(dataSourceName) as DataSource?)
+      ?: fail("datasource ${dataSourceName} fetched from spring must not be null")
     val referenceSchema = referenceSchemas.get(dataSourceName)!!
     val localPath = "$dataSourceName/$dataFile"
-    val dataset: JsonNode = readDataSet(localPath)
 
-    assert(dataset.isObject == true, {"Data set does not contain an object as its root node"})
+    val dataset: DataSet = DataSetHandler.readDataSet(localPath, referenceSchema, )
 
-    val tables = dataset.properties().map{ it.key }
-    val missingtables = tables.minus(referenceSchema.referenceTableList)
-    assert(missingtables.isEmpty(), {"Data set $localPath contains tables that do not exist in reference schema, aborting. Extraneous tables are $missingtables"})
-
-    dataset.fields().asSequence().forEach { tableFromSet: MutableMap.MutableEntry<String, JsonNode>? ->
-      if (tableFromSet == null) { fail("How? What? This should not have been null?") }
-      val table: TestacoTable = referenceSchema.tables.find { it.tableName == tableFromSet.key} ?: fail("Table ${tableFromSet.key} not found in reference data schema")
-      when (table) {
-        is IgnoredTable -> fail("Dataset $dataFile contains data for ignored table ${tableFromSet.key}")
-        is Table -> ???
-      }
-    }
+    importDataSet(dataSourceName, dataset, dataSource)
 
     println("Ends")
   }
 
-  private fun readDataSet(localPath: String): JsonNode {
-    val dataFileName = "${testacoConfiguration?.datadir}/$localPath"
-    val dataFileResource = springContext!!.getResource(dataFileName)
-    if (!dataFileResource.exists() || !dataFileResource.isReadable) {
-      fail(
-        """Testaco expects $localPath to exist in its data 
-            |directory. With the current configuration the location would be $dataFileName.
-            |Please ensure such a file exists.""".trimMargin(),
-      )
+  private fun importDataSet(dataSourceName: String, dataset: DataSet, dataSource: DataSource) {
+    dataset.tables.forEach { table: TTable ->
+      println("Handling table ${table.name}")
+      table.rows.forEach { row: Row ->
+        print("  Row ")
+        row.columns.forEach { column: Column ->
+          print(" ${column.name}:${column.value}")
+        }
+        println()
+        val sql = """INSERT INTO ${table.name} 
+          |(${row.columns.map { it.name }.joinToString(", ")})
+          | VALUES 
+          | (${List(row.columns.count()) {"?"}.joinToString(", ")})""".trimMargin()
+        val st = dataSource.getConnection().prepareStatement(sql)
+        row.columns.mapIndexed { index, column ->
+          try {
+            setValue(dataSourceName, table.name, column.name, index + 1, column.value, st)
+          } catch (e: IllegalStateException) {
+            throw IllegalStateException("Could not insert column ${column.name} in table ${table.name} with value ${column.value} because ${e.message}", e)
+          }
+        }
+        st.execute()
+      }
     }
-    val dataset: JsonNode = try {
-      mapper.readTree(
-        dataFileResource.getContentAsString(Charset.defaultCharset())
-      )
-    } catch (e: JsonMappingException) {
-      fail("Could not parse file $dataFileName, parser gives reason: ${e.message}", e)
+  }
+
+  //TODO: Support for timestamp, date, datetime
+  private fun setValue(dataSourceName: String, tableName: String, columnName: String, index: Int, value: JsonNode?, st: PreparedStatement) {
+    val testacoType: TestacoType<*> = findTestacoType(dataSourceName, tableName, columnName)
+    if (!(value?.isValueNode ?: false)) {
+      throw IllegalStateException("Encountered a non-value node json fragment from data set: "+value)
     }
-    return dataset
+    testacoType.store(value, index, st)
+  }
+
+  private fun findTestacoType(dataSourceName: String, tableName: String, columnName: String): TestacoType<*> {
+    val table: TestacoTable = referenceSchemas.get(dataSourceName)?.find(tableName) ?: throw IllegalStateException("Could not find table $tableName in schema $dataSourceName")
+    val column: TestacoType<*> = (table as Table).columns.find { it.name == columnName } ?: throw IllegalStateException("Could not find column $columnName in table $tableName in schema $dataSourceName")
+    return column
   }
 
   companion object {

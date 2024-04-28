@@ -1,11 +1,12 @@
 package org.testaco.datatypes
 
-import org.testaco.datatypes.TestacoType
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.TextNode
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
 
-data class StringType(override val name: String) : TestacoType<String>(name) {
+data class StringType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
   override fun read(columnName: String, rs: ResultSet): String? {
     val i = rs.getString(columnName)
     return if (rs.wasNull()) {
@@ -15,11 +16,14 @@ data class StringType(override val name: String) : TestacoType<String>(name) {
     }
   }
 
-  override fun store(value: String?, columnIndex: Int, statement: PreparedStatement) {
+  override fun store(value: JsonNode?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
       statement.setNull(columnIndex, Types.VARCHAR)
     } else {
-      statement.setString(columnIndex, value)
+      when (value) {
+        is TextNode -> statement.setString(columnIndex, value.textValue())
+        else -> throw IllegalStateException("String database types require json data sets to store values as TextNodes")
+      }
     }
   }
 }

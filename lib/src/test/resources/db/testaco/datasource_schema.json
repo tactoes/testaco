@@ -1,15 +1,39 @@
 {
   "tables": [
     {"tableName":"flyway_schema_history", "type":"IgnoredTable"},
+    {"tableName":"aliases", "type": "Table","columns":[
+      {"name": "id",
+        "type": "LongType",
+        "sqlType": -4,
+        "sqlTypeName": ""
+      },
+      {"name": "name_id",
+        "type": "LongType",
+        "sqlType": -4,
+        "sqlTypeName": ""
+      },
+      {"name":"alias",
+        "type": "StringType",
+        "sqlType": 12,
+        "sqlTypeName": ""
+      }]},
     {"tableName":"names",
       "type": "Table",
       "columns": [
-        {"name":"id", "type":"LongType"},
-        {"name":"name", "type":"LongType"},
-        {"name":"created", "type":"TimestampType"}]},
-    {"tableName":"aliases", "type": "Table","columns":[
-      {"name":"id", "type":"LongType"},
-      {"name":"name_id", "type":"LongType"},
-      {"name":"alias", "type":"StringType"}]}
+        {"name":"id",
+          "type": "LongType",
+          "sqlType": -4,
+          "sqlTypeName": ""
+        },
+        {"name":"name",
+          "type": "StringType",
+          "sqlType": 12,
+          "sqlTypeName": ""
+        },
+        {"name": "created",
+          "type": "TimestampType",
+          "sqlType": 93,
+          "sqlTypeName": ""
+        }]}
   ]
 }

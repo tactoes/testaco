@@ -1,12 +1,16 @@
 package org.testaco.datatypes
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.TextNode
+import java.io.ByteArrayInputStream
 import java.io.StringReader
 import java.sql.Clob
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
+import java.util.*
 
-data class ClobType(override val name: String) : TestacoType<String?>(name) {
+data class ClobType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String?>(name, sqlType, sqlTypeName) {
   override fun read(columnName: String, rs: ResultSet): String? {
     val i: Clob = rs.getClob(columnName)
     return try {
@@ -20,11 +24,18 @@ data class ClobType(override val name: String) : TestacoType<String?>(name) {
     }
   }
 
-  override fun store(value: String?, columnIndex: Int, statement: PreparedStatement) {
+  override fun store(value: JsonNode?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
       statement.setNull(columnIndex, Types.CLOB)
     } else {
-      statement.setClob(columnIndex, StringReader(value))
+      when (value) {
+        /*
+        You are not meant to use testaco for non-trivial amounts of data. This is likely to ruin your day if you do.
+         */
+        is TextNode -> statement.setClob(columnIndex, StringReader(value.textValue()))
+        else -> throw IllegalStateException("Clob database types require json data sets to store values as TextNodes")
+      }
     }
   }
+
 }

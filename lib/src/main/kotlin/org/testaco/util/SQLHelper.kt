@@ -2,10 +2,6 @@ package org.testaco.util
 
 import org.slf4j.LoggerFactory
 import org.testaco.DatabaseUnitRuntimeException
-import org.testaco.dataset.Column
-import org.testaco.dataset.datatype.DataType
-import org.testaco.dataset.datatype.DataTypeException
-import org.testaco.dataset.datatype.IDataTypeFactory
 import java.io.PrintStream
 import java.sql.*
 
@@ -190,55 +186,6 @@ object SQLHelper {
     fun isSybaseDb(metaData: DatabaseMetaData): Boolean {
         val dbProductName: String = metaData.getDatabaseProductName()
         return dbProductName == DB_PRODUCT_SYBASE
-    }
-
-    @Throws(SQLException::class, DataTypeException::class)
-    fun createColumn(
-        resultSet: ResultSet,
-        dataTypeFactory: IDataTypeFactory, datatypeWarning: Boolean
-    ): Column? {
-        val tableName: String = resultSet.getString(3)
-        val columnName: String = resultSet.getString(4)
-        var sqlType: Int = resultSet.getInt(5)
-        //If Types.DISTINCT like SQL DOMAIN, then get Source Date Type of SQL-DOMAIN
-        if (sqlType == Types.DISTINCT) {
-            sqlType = resultSet.getInt("SOURCE_DATA_TYPE")
-        }
-        val sqlTypeName: String = resultSet.getString(6)
-        //        int columnSize = resultSet.getInt(7);
-        val nullable: Int = resultSet.getInt(11)
-        val remarks: String = resultSet.getString(12)
-        val columnDefaultValue: String = resultSet.getString(13)
-        // This is only available since Java 5 - so we can try it and if it does not work default it
-        var isAutoIncrement: String = Column.AutoIncrement.NO.key
-        try {
-            isAutoIncrement = resultSet.getString(23)
-        } catch (e: Exception) {
-            // Ignore this one here
-            val msg = ("Could not retrieve the 'isAutoIncrement' property"
-                    + " because not yet running on Java 1.5 -"
-                    + " defaulting to NO. Table={}, Column={}")
-            logger.debug(msg, tableName, columnName, e)
-        }
-
-        // Convert SQL type to DataType
-        val dataType: DataType<*> = dataTypeFactory.createDataType(sqlType, sqlTypeName, tableName, columnName)
-        return if (dataType !== DataType.UNKNOWN) {
-            Column(
-                columnName, dataType,
-                sqlTypeName, Column.nullableValue(nullable), columnDefaultValue, remarks,
-                Column.AutoIncrement.autoIncrementValue(isAutoIncrement)
-            )
-        } else {
-            if (datatypeWarning) logger.warn(
-                tableName + "." + columnName +
-                        " data type (" + sqlType + ", '" + sqlTypeName +
-                        "') not recognized and will be ignored. See FAQ for more information."
-            )
-
-            // datatype unknown - column not created
-            null
-        }
     }
 
     /**

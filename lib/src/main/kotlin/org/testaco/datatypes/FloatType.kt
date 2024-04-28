@@ -1,11 +1,15 @@
 package org.testaco.datatypes
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.DoubleNode
+import com.fasterxml.jackson.databind.node.FloatNode
+import com.fasterxml.jackson.databind.node.TextNode
 import org.testaco.datatypes.TestacoType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
 
-data class FloatType(override val name: String) : TestacoType<Float>(name) {
+data class FloatType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<Float>(name, sqlType, sqlTypeName) {
   override fun read(columnName: String, rs: ResultSet): Float? {
     val i = rs.getFloat(columnName)
     return if (rs.wasNull()) {
@@ -15,11 +19,16 @@ data class FloatType(override val name: String) : TestacoType<Float>(name) {
     }
   }
 
-  override fun store(value: Float?, columnIndex: Int, statement: PreparedStatement) {
+  override fun store(value: JsonNode?, columnIndex: Int, statement: PreparedStatement) {
     if (value == null) {
       statement.setNull(columnIndex, Types.FLOAT)
     } else {
-      statement.setFloat(columnIndex, value)
+      when (value) {
+        is FloatNode -> statement.setFloat(columnIndex, value.floatValue())
+        is TextNode -> statement.setFloat(columnIndex, value.textValue().toFloat())
+        else -> throw IllegalStateException("Float database types require json data sets to store values as Float or TextNodes")
+      }
     }
   }
+
 }
