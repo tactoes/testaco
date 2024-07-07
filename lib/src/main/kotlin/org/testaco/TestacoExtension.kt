@@ -1,10 +1,8 @@
 package org.testaco
 
-import arrow.core.Either
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.node.*
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -13,9 +11,10 @@ import org.springframework.context.ApplicationContext
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.testaco.database.schema.SchemaVerifier
 import org.testaco.datatypes.TestacoType
-import java.io.ByteArrayInputStream
+import java.io.File
 import java.nio.charset.Charset
 import java.sql.PreparedStatement
+import java.sql.ResultSet
 import javax.sql.DataSource
 
 
@@ -67,19 +66,58 @@ class TestacoExtension() : BeforeAllCallback {
       ?: fail("No testaco configuration found in spring context, panic!")
   }
 
+  /**
+   * Load a data file. File is loaded from the classpath.
+   */
   fun loadDataSet(dataSourceName: String, dataFile: String) {
-    println("Starts")
     assert(referenceSchemas.contains(dataSourceName), {"Database $dataSourceName not known to testaco. It needs to be defined in the testaco configuration, along with a reference schema file"})
     val dataSource = (springContext!!.getBean(dataSourceName) as DataSource?)
       ?: fail("datasource ${dataSourceName} fetched from spring must not be null")
     val referenceSchema = referenceSchemas.get(dataSourceName)!!
     val localPath = "$dataSourceName/$dataFile"
 
-    val dataset: DataSet = DataSetHandler.readDataSet(localPath, referenceSchema, )
+    val dataset: DataSet = DataSetHandler.readDataSet(localPath, referenceSchema)
 
     importDataSet(dataSourceName, dataset, dataSource)
+  }
 
-    println("Ends")
+  fun dumpDataSet(dataSourceName: String, dataFile: String) {
+    println("Dump starts")
+    val dataSource = (springContext!!.getBean(dataSourceName) as DataSource?)
+      ?: fail("datasource ${dataSourceName} fetched from spring must not be null")
+    val referenceSchema: TestacoSchema = referenceSchemas.get(dataSourceName) ?: throw IllegalStateException("Database $dataSourceName not known to testaco. It needs to be defined in the testaco configuration, along with a reference schema file")
+
+    val dataset: DataSet = exportDataSet(dataSource, referenceSchema)
+
+    mapper.writerWithDefaultPrettyPrinter().writeValue(File(dataFile), dataset)
+
+    println("Dump ends")
+  }
+
+  private fun exportDataSet(dataSource: DataSource, referenceSchema: TestacoSchema): DataSet = DataSet(
+    referenceSchema.tables.mapNotNull { table ->
+      when (table) {
+        is Table -> TTable(table.tableName, rows = exportRows(dataSource, referenceSchema.find(table.tableName) as Table))
+        is IgnoredTable -> null
+      }
+    }
+  )
+
+  private fun exportRows(dataSource: DataSource, table: Table): List<Row> {
+    println("Exporting table ${table.tableName}")
+    val sql = """SELECT 
+      |${table.columns.map {it.name}.joinToString(", ")}
+      |FROM ${table.tableName}
+    """.trimMargin()
+    println("Sql: $sql")
+    val st = dataSource.getConnection().prepareStatement(sql)
+    val results: ResultSet = st.executeQuery()
+
+    return buildList<Row> {
+      while (results.next()) {
+          add(Row(table.columns.map { Column(it.name, it.read(it.name, results))}))
+      }
+    }
   }
 
   private fun importDataSet(dataSourceName: String, dataset: DataSet, dataSource: DataSource) {
@@ -108,7 +146,6 @@ class TestacoExtension() : BeforeAllCallback {
     }
   }
 
-  //TODO: Support for timestamp, date, datetime
   private fun setValue(dataSourceName: String, tableName: String, columnName: String, index: Int, value: JsonNode?, st: PreparedStatement) {
     val testacoType: TestacoType<*> = findTestacoType(dataSourceName, tableName, columnName)
     if (!(value?.isValueNode ?: false)) {

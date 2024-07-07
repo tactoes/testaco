@@ -2,15 +2,11 @@ package org.testaco.datatypes
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.BinaryNode
 import com.fasterxml.jackson.databind.node.BooleanNode
-import com.fasterxml.jackson.databind.node.TextNode
-import java.io.ByteArrayInputStream
+import com.fasterxml.jackson.databind.node.NullNode
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.sql.Types
 import java.sql.Types.*
-import java.util.*
 
 /**
  * Core interface, describing how a json type is mapped to a database type
@@ -23,7 +19,7 @@ sealed class TestacoType<JT>(open val name: String, open val sqlType: Int, open 
   /**
    * Read a column from the database, return a potentially null string value
    */
-  abstract fun read(columnName: String, rs: ResultSet): JT?
+  abstract fun read(columnName: String, rs: ResultSet): JsonNode
 
   /**
    * Take a json value, store it in the database
@@ -87,12 +83,12 @@ object TestacoConverter {
 }
 
 abstract class TestacoBooleanType(name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<Boolean?>(name, sqlType, sqlTypeName) {
-  override fun read(columnName: String, rs: ResultSet): Boolean? {
+  override fun read(columnName: String, rs: ResultSet): JsonNode {
     val b = rs.getBoolean(columnName)
     return if (rs.wasNull()) {
-      null
+      NullNode.instance
     } else {
-      b
+      BooleanNode.valueOf(b)
     }
   }
 

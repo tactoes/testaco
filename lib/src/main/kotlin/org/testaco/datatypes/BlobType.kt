@@ -2,6 +2,7 @@ package org.testaco.datatypes
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.BinaryNode
+import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
 import java.io.ByteArrayInputStream
 import java.sql.Blob
@@ -11,13 +12,13 @@ import java.sql.Types
 import java.util.Base64
 
 data class BlobType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
-  override fun read(columnName: String, rs: ResultSet): String? {
+  override fun read(columnName: String, rs: ResultSet): JsonNode {
     val i: Blob = rs.getBlob(columnName)
     return try {
       if (rs.wasNull()) {
-        null
+        NullNode.instance
       } else {
-        Base64.getEncoder().encodeToString(i.binaryStream.readAllBytes())
+        TextNode.valueOf(Base64.getEncoder().encodeToString(i.binaryStream.readAllBytes()))
       }
     } finally {
       i.free()

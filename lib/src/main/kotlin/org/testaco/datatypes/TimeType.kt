@@ -1,18 +1,19 @@
 package org.testaco.datatypes
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
 import org.testaco.datatypes.TestacoType
 import java.sql.*
 import java.time.format.DateTimeFormatter
 
 data class TimeType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
-  override fun read(columnName: String, rs: ResultSet): String? {
+  override fun read(columnName: String, rs: ResultSet): JsonNode {
     val i: Time = rs.getTime(columnName)
     return if (rs.wasNull()) {
-      null
+      NullNode.instance
     } else {
-      DateTimeFormatter.ISO_TIME.format(i.toLocalTime())
+      TextNode.valueOf(DateTimeFormatter.ISO_TIME.format(i.toLocalTime()))
     }
   }
 

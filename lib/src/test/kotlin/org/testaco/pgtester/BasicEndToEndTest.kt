@@ -23,14 +23,14 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
 
         statement.execute("select count(*) from test.flyway_schema_history")
         assert(statement.resultSet.next(), { "Should be able to read the flyway migration history" })
-        println("resultset size "+statement.resultSet.getInt(1))
         assert(statement.resultSet.getInt(1) == 3, { "Should have applied two schema changes, plus schema creation" })
     }
 
     @Test
-    fun `can load a data set`() {
+    fun `can load a data set and then dump the database`() {
         with (testaco) {
             loadDataSet("datasource", "start.json")
+            dumpDataSet("datasource", "dumpstart.json")
         }
     }
 }

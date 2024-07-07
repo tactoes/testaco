@@ -1,6 +1,7 @@
 package org.testaco.datatypes
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
 import org.postgresql.util.PGobject
 import java.sql.PreparedStatement
@@ -8,12 +9,12 @@ import java.sql.ResultSet
 import java.sql.Types
 
 data class UuidType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
-  override fun read(columnName: String, rs: ResultSet): String? {
+  override fun read(columnName: String, rs: ResultSet): JsonNode {
     val i = rs.getString(columnName)
     return if (rs.wasNull()) {
-      null
+      NullNode.instance
     } else {
-      i
+      TextNode.valueOf(i)
     }
   }
   override fun store(value: JsonNode?, columnIndex: Int, statement: PreparedStatement) {

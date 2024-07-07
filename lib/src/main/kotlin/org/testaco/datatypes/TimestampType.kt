@@ -1,6 +1,7 @@
 package org.testaco.datatypes
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -9,12 +10,12 @@ import java.sql.Types
 import java.time.format.DateTimeFormatter
 
 data class TimestampType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
-  override fun read(columnName: String, rs: ResultSet): String? {
+  override fun read(columnName: String, rs: ResultSet): JsonNode {
     val i: Timestamp = rs.getTimestamp(columnName)
     return if (rs.wasNull()) {
-      null
+      NullNode.instance
     } else {
-      DateTimeFormatter.ISO_DATE_TIME.format(i.toLocalDateTime())
+      TextNode.valueOf(DateTimeFormatter.ISO_DATE_TIME.format(i.toLocalDateTime()))
     }
   }
 

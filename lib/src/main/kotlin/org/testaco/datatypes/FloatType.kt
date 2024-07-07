@@ -3,6 +3,7 @@ package org.testaco.datatypes
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.DoubleNode
 import com.fasterxml.jackson.databind.node.FloatNode
+import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
 import org.testaco.datatypes.TestacoType
 import java.sql.PreparedStatement
@@ -10,12 +11,12 @@ import java.sql.ResultSet
 import java.sql.Types
 
 data class FloatType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<Float>(name, sqlType, sqlTypeName) {
-  override fun read(columnName: String, rs: ResultSet): Float? {
+  override fun read(columnName: String, rs: ResultSet): JsonNode {
     val i = rs.getFloat(columnName)
     return if (rs.wasNull()) {
-      null
+      NullNode.instance
     } else {
-      i
+      FloatNode.valueOf(i)
     }
   }
 

@@ -10,12 +10,12 @@ import java.sql.Types
 import java.util.Base64
 
 data class BinaryType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
-  override fun read(columnName: String, rs: ResultSet): String? {
+  override fun read(columnName: String, rs: ResultSet): JsonNode {
     val i = rs.getBytes(columnName)
     return if (rs.wasNull()) {
-      null
+      NullNode.instance
     } else {
-      Base64.getEncoder().encodeToString(i)
+      TextNode.valueOf(Base64.getEncoder().encodeToString(i))
     }
   }
 

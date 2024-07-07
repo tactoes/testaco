@@ -1,22 +1,19 @@
 package org.testaco.datatypes
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.BigIntegerNode
-import com.fasterxml.jackson.databind.node.IntNode
-import com.fasterxml.jackson.databind.node.LongNode
-import com.fasterxml.jackson.databind.node.ShortNode
+import com.fasterxml.jackson.databind.node.*
 import java.math.BigDecimal
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
 
 data class BigDecimalType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<BigDecimal>(name, sqlType, sqlTypeName) {
-  override fun read(columnName: String, rs: ResultSet): BigDecimal? {
+  override fun read(columnName: String, rs: ResultSet): JsonNode {
     val i = rs.getBigDecimal(columnName)
     return if (rs.wasNull()) {
-      null
+      NullNode.instance
     } else {
-      i
+      DecimalNode.valueOf(i)
     }
   }
 

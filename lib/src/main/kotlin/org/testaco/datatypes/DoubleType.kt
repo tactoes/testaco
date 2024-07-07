@@ -3,6 +3,7 @@ package org.testaco.datatypes
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.DoubleNode
 import com.fasterxml.jackson.databind.node.FloatNode
+import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
 import org.testaco.datatypes.TestacoType
 import java.io.ByteArrayInputStream
@@ -12,12 +13,12 @@ import java.sql.Types
 import java.util.*
 
 data class DoubleType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<Double>(name, sqlType, sqlTypeName) {
-  override fun read(columnName: String, rs: ResultSet): Double? {
+  override fun read(columnName: String, rs: ResultSet): JsonNode {
     val i = rs.getDouble(columnName)
     return if (rs.wasNull()) {
-      null
+      NullNode.instance
     } else {
-      i
+      DoubleNode.valueOf(i)
     }
   }
 

@@ -1,6 +1,5 @@
 package org.testaco
 
-import arrow.core.Either
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -8,6 +7,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.junit.jupiter.api.fail
 import org.springframework.core.io.Resource
 import java.nio.charset.Charset
+import javax.sql.DataSource
 
 object DataSetHandler {
   private val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
@@ -22,12 +22,12 @@ object DataSetHandler {
             |Please ensure such a file exists.""".trimMargin(),
       )
     }
-    val dataset = buildDataSet(dataFileResource, dataFileName, referenceSchema, localPath)
+    val dataset = buildDataSetFromFile(dataFileResource, dataFileName, referenceSchema, localPath)
 
     return dataset
   }
 
-  private fun buildDataSet(
+  private fun buildDataSetFromFile(
     dataFileResource: Resource,
     dataFileName: String,
     referenceSchema: TestacoSchema,
