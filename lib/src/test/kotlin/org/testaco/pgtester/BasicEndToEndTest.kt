@@ -31,6 +31,7 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
         with (testaco) {
             loadDataSet("datasource", "start.json")
             dumpDataSet("datasource", "dumpstart.json")
+            compareDataSet("datasource", "start.json")
         }
     }
 }

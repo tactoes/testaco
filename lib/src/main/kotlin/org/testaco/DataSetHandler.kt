@@ -63,7 +63,7 @@ object DataSetHandler {
           tableData, referenceTable, tableNameFromSet, localPath
         )
       }
-    }.toList())
+    }.toSet())
   }
 
   private fun extractTable(tableData: JsonNode, referenceTable: Table, tableName: String, localPath: String): TTable {
@@ -76,9 +76,9 @@ object DataSetHandler {
         Row(
           row.fields().asSequence().map { column: MutableMap.MutableEntry<String, JsonNode> ->
             Column(column.key, column.value)
-          }.toList()
+          }.toSet()
         )
-      }.toList()
+      }.toSet()
     )
   }
 

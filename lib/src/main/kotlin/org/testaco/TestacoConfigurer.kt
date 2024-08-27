@@ -20,6 +20,11 @@ data class TestacoSchema(val tables: List<TestacoTable>, @JsonIgnore val filenam
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes(*arrayOf( JsonSubTypes.Type(IgnoredTable::class), JsonSubTypes.Type(Table::class)))
 sealed interface TestacoTable {
+    fun pks(table: TTable): Set<String> {
+        //TODO: Find PK columns algorithmically
+        return table.rows.map { row -> row.columns.find { col -> col.name == "id" } }.map { "${it!!.value}" }.toSet()
+    }
+
     val tableName: String
 }
 

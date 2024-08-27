@@ -3,12 +3,14 @@ package org.testaco
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.fail
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.testaco.comparator.DatasetComparator
 import org.testaco.database.schema.SchemaVerifier
 import org.testaco.datatypes.TestacoType
 import java.io.File
@@ -19,7 +21,11 @@ import javax.sql.DataSource
 
 
 class TestacoExtension() : BeforeAllCallback {
-  val mapper = ObjectMapper().registerModule(KotlinModule.Builder().build())
+  val mapper = ObjectMapper()
+    .registerModule(KotlinModule.Builder().build())
+    .registerModule(SimpleModule().apply {
+      addSerializer(DataSet::class.java, DataSetSerializer())
+    })
 
   override fun beforeAll(context: ExtensionContext?) {
     contexts(context)
@@ -82,16 +88,31 @@ class TestacoExtension() : BeforeAllCallback {
   }
 
   fun dumpDataSet(dataSourceName: String, dataFile: String) {
-    println("Dump starts")
-    val dataSource = (springContext!!.getBean(dataSourceName) as DataSource?)
-      ?: fail("datasource ${dataSourceName} fetched from spring must not be null")
-    val referenceSchema: TestacoSchema = referenceSchemas.get(dataSourceName) ?: throw IllegalStateException("Database $dataSourceName not known to testaco. It needs to be defined in the testaco configuration, along with a reference schema file")
-
-    val dataset: DataSet = exportDataSet(dataSource, referenceSchema)
+    val dataset: DataSet = readDatabaseDataSet(dataSourceName)
 
     mapper.writerWithDefaultPrettyPrinter().writeValue(File(dataFile), dataset)
 
     println("Dump ends")
+  }
+
+  private fun readDatabaseDataSet(dataSourceName: String): DataSet {
+    println("Dump starts")
+    val dataSource = (springContext!!.getBean(dataSourceName) as DataSource?)
+      ?: fail("datasource ${dataSourceName} fetched from spring must not be null")
+    val referenceSchema: TestacoSchema = referenceSchemas.get(dataSourceName)
+      ?: throw IllegalStateException("Database $dataSourceName not known to testaco. It needs to be defined in the testaco configuration, along with a reference schema file")
+
+    val dataset: DataSet = exportDataSet(dataSource, referenceSchema)
+    return dataset
+  }
+
+  fun compareDataSet(dataSourceName: String, dataFile: String) {
+    val databaseDataset: DataSet = readDatabaseDataSet(dataSourceName)
+    val referenceSchema = referenceSchemas.get(dataSourceName)!!
+    val localPath = "$dataSourceName/$dataFile"
+
+    val fileDataset: DataSet = DataSetHandler.readDataSet(localPath, referenceSchema)
+    require(DatasetComparator(referenceSchema).compare(databaseDataset, fileDataset).equals())
   }
 
   private fun exportDataSet(dataSource: DataSource, referenceSchema: TestacoSchema): DataSet = DataSet(
@@ -100,10 +121,10 @@ class TestacoExtension() : BeforeAllCallback {
         is Table -> TTable(table.tableName, rows = exportRows(dataSource, referenceSchema.find(table.tableName) as Table))
         is IgnoredTable -> null
       }
-    }
+    }.toSet()
   )
 
-  private fun exportRows(dataSource: DataSource, table: Table): List<Row> {
+  private fun exportRows(dataSource: DataSource, table: Table): Set<Row> {
     println("Exporting table ${table.tableName}")
     val sql = """SELECT 
       |${table.columns.map {it.name}.joinToString(", ")}
@@ -113,9 +134,9 @@ class TestacoExtension() : BeforeAllCallback {
     val st = dataSource.getConnection().prepareStatement(sql)
     val results: ResultSet = st.executeQuery()
 
-    return buildList<Row> {
+    return buildSet<Row> {
       while (results.next()) {
-          add(Row(table.columns.map { Column(it.name, it.read(it.name, results))}))
+          add(Row(table.columns.map { Column(it.name, it.read(it.name, results))}.toSet()))
       }
     }
   }
