@@ -7,6 +7,7 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import org.junit.jupiter.api.fail
 import org.springframework.core.io.Resource
 import java.nio.charset.Charset
+import java.sql.Connection
 import javax.sql.DataSource
 
 object DataSetHandler {
@@ -80,6 +81,22 @@ object DataSetHandler {
         )
       }.toSet()
     )
+  }
+
+  fun deleteData(dataSourceName: String, dataSource: DataSource) {
+    dataSource.connection.use { connection: Connection? ->
+      val c = connection ?: throw IllegalStateException("Could not get connection for data source $dataSourceName")
+      c.autoCommit = false
+      try {
+        val schema = TestacoExtension.referenceSchemas.get(dataSourceName) ?: throw IllegalStateException("Could not find schema for data source $dataSourceName")
+        schema.tables.forEach { table ->
+          c.prepareStatement("DELETE FROM ${table.tableName}").execute()
+        }
+        c.commit()
+      } catch (e: Exception) {
+        c.rollback()
+      }
+    }
   }
 
 }

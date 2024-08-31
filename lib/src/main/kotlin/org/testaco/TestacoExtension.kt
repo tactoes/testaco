@@ -15,6 +15,7 @@ import org.testaco.database.schema.SchemaVerifier
 import org.testaco.datatypes.TestacoType
 import java.io.File
 import java.nio.charset.Charset
+import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import javax.sql.DataSource
@@ -81,7 +82,7 @@ class TestacoExtension() : BeforeAllCallback {
       ?: fail("datasource ${dataSourceName} fetched from spring must not be null")
     val referenceSchema = referenceSchemas.get(dataSourceName)!!
     val localPath = "$dataSourceName/$dataFile"
-
+    DataSetHandler.deleteData(dataSourceName, dataSource)
     val dataset: DataSet = DataSetHandler.readDataSet(localPath, referenceSchema)
 
     importDataSet(dataSourceName, dataset, dataSource)
@@ -115,23 +116,34 @@ class TestacoExtension() : BeforeAllCallback {
     require(DatasetComparator(referenceSchema).compare(databaseDataset, fileDataset).equals())
   }
 
-  private fun exportDataSet(dataSource: DataSource, referenceSchema: TestacoSchema): DataSet = DataSet(
-    referenceSchema.tables.mapNotNull { table ->
-      when (table) {
-        is Table -> TTable(table.tableName, rows = exportRows(dataSource, referenceSchema.find(table.tableName) as Table))
-        is IgnoredTable -> null
-      }
-    }.toSet()
-  )
+  private fun exportDataSet(dataSource: DataSource, referenceSchema: TestacoSchema): DataSet {
+    val connection: Connection = dataSource.getConnection()
+    connection.autoCommit = false
+    val ds: DataSet = try {
+      DataSet(
+        referenceSchema.tables.mapNotNull { table ->
+          when (table) {
+            is Table -> TTable(table.tableName, rows = exportRows(connection, referenceSchema.find(table.tableName) as Table))
+            is IgnoredTable -> null
+          }
+        }.toSet()
+      )
+    } catch (e: Exception) {
+      connection.rollback()
+      throw e
+    }
+    connection.commit()
+    return ds
+  }
 
-  private fun exportRows(dataSource: DataSource, table: Table): Set<Row> {
+  private fun exportRows(connection: Connection, table: Table): Set<Row> {
     //println("Exporting table ${table.tableName}")
     val sql = """SELECT 
       |${table.columns.map {it.name}.joinToString(", ")}
       |FROM ${table.tableName}
     """.trimMargin()
     //println("Sql: $sql")
-    val st = dataSource.getConnection().prepareStatement(sql)
+    val st = connection.prepareStatement(sql)
     val results: ResultSet = st.executeQuery()
 
     return buildSet<Row> {
@@ -142,28 +154,35 @@ class TestacoExtension() : BeforeAllCallback {
   }
 
   private fun importDataSet(dataSourceName: String, dataset: DataSet, dataSource: DataSource) {
-    dataset.tables.forEach { table: TTable ->
-      //println("Handling table ${table.name}")
-      table.rows.forEach { row: Row ->
-        print("  Row ")
-        row.columns.forEach { column: Column ->
-          print(" ${column.name}:${column.value}")
-        }
-        //println()
-        val sql = """INSERT INTO ${table.name} 
-          |(${row.columns.map { it.name }.joinToString(", ")})
-          | VALUES 
-          | (${List(row.columns.count()) {"?"}.joinToString(", ")})""".trimMargin()
-        val st = dataSource.getConnection().prepareStatement(sql)
-        row.columns.mapIndexed { index, column ->
-          try {
-            setValue(dataSourceName, table.name, column.name, index + 1, column.value, st)
-          } catch (e: IllegalStateException) {
-            throw IllegalStateException("Could not insert column ${column.name} in table ${table.name} with value ${column.value} because ${e.message}", e)
+    val connection = dataSource.getConnection()
+    connection.autoCommit = false
+    try {
+      dataset.tables.forEach { table: TTable ->
+        //println("Handling table ${table.name}")
+        table.rows.forEach { row: Row ->
+          print("  Row ")
+          row.columns.forEach { column: Column ->
+            print(" ${column.name}:${column.value}")
           }
+          //println()
+          val sql = """INSERT INTO ${table.name} 
+            |(${row.columns.map { it.name }.joinToString(", ")})
+            | VALUES 
+            | (${List(row.columns.count()) {"?"}.joinToString(", ")})""".trimMargin()
+          val st = connection.prepareStatement(sql)
+          row.columns.mapIndexed { index, column ->
+            try {
+              setValue(dataSourceName, table.name, column.name, index + 1, column.value, st)
+            } catch (e: IllegalStateException) {
+              throw IllegalStateException("Could not insert column ${column.name} in table ${table.name} with value ${column.value} because ${e.message}", e)
+            }
+          }
+          st.execute()
         }
-        st.execute()
       }
+      connection.commit()
+    } catch (e: Exception) {
+      connection.rollback()
     }
   }
 
