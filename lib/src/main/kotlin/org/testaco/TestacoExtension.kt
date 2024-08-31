@@ -62,7 +62,7 @@ class TestacoExtension() : BeforeAllCallback {
     }
     // TODO: Verify database schema against stored schema.
     // TODO: Verify stored schema against configuration.
-    println("Extension goes here")
+    //println("Extension goes here")
   }
 
   private fun contexts(context: ExtensionContext?) {
@@ -92,11 +92,11 @@ class TestacoExtension() : BeforeAllCallback {
 
     mapper.writerWithDefaultPrettyPrinter().writeValue(File(dataFile), dataset)
 
-    println("Dump ends")
+    //println("Dump ends")
   }
 
   private fun readDatabaseDataSet(dataSourceName: String): DataSet {
-    println("Dump starts")
+    //println("Dump starts")
     val dataSource = (springContext!!.getBean(dataSourceName) as DataSource?)
       ?: fail("datasource ${dataSourceName} fetched from spring must not be null")
     val referenceSchema: TestacoSchema = referenceSchemas.get(dataSourceName)
@@ -125,12 +125,12 @@ class TestacoExtension() : BeforeAllCallback {
   )
 
   private fun exportRows(dataSource: DataSource, table: Table): Set<Row> {
-    println("Exporting table ${table.tableName}")
+    //println("Exporting table ${table.tableName}")
     val sql = """SELECT 
       |${table.columns.map {it.name}.joinToString(", ")}
       |FROM ${table.tableName}
     """.trimMargin()
-    println("Sql: $sql")
+    //println("Sql: $sql")
     val st = dataSource.getConnection().prepareStatement(sql)
     val results: ResultSet = st.executeQuery()
 
@@ -143,13 +143,13 @@ class TestacoExtension() : BeforeAllCallback {
 
   private fun importDataSet(dataSourceName: String, dataset: DataSet, dataSource: DataSource) {
     dataset.tables.forEach { table: TTable ->
-      println("Handling table ${table.name}")
+      //println("Handling table ${table.name}")
       table.rows.forEach { row: Row ->
         print("  Row ")
         row.columns.forEach { column: Column ->
           print(" ${column.name}:${column.value}")
         }
-        println()
+        //println()
         val sql = """INSERT INTO ${table.name} 
           |(${row.columns.map { it.name }.joinToString(", ")})
           | VALUES 

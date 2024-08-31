@@ -1,6 +1,10 @@
 package org.testaco.pgtester
 
+import org.hamcrest.CoreMatchers
+import org.hamcrest.MatcherAssert
+import org.junit.Assert.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -32,6 +36,31 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
             loadDataSet("datasource", "start.json")
             dumpDataSet("datasource", "dumpstart.json")
             compareDataSet("datasource", "start.json")
+        }
+    }
+
+    @Test
+    fun `fails on reference data set with extra column`() {
+        with (testaco) {
+            loadDataSet("datasource", "start.json")
+            MatcherAssert.assertThat(
+                assertThrows<IllegalStateException> {
+                    compareDataSet("datasource", "extracolumn.json")
+                }.message,
+                CoreMatchers.startsWith("Could not find column with name boguscolumn in db")
+            )
+        }
+    }
+    @Test
+    fun `fails on reference data set with missing column`() {
+        with (testaco) {
+            loadDataSet("datasource", "start.json")
+            MatcherAssert.assertThat(
+                assertThrows<IllegalStateException> {
+                    compareDataSet("datasource", "missingcolumn.json")
+                }.message,
+                CoreMatchers.startsWith("Could not find column with name alias in ref")
+            )
         }
     }
 }
