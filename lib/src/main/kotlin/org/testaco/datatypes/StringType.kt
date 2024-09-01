@@ -23,7 +23,7 @@ data class StringType(override val name: String, override val sqlType: Int, over
     } else {
       when (value) {
         is TextNode -> statement.setString(columnIndex, value.textValue())
-        else -> throw IllegalStateException("String database types require json data sets to store values as TextNodes")
+        else -> error("String database types require json data sets to store values as TextNodes")
       }
     }
   }

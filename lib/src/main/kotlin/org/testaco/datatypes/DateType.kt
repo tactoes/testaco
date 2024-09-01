@@ -25,7 +25,7 @@ data class DateType(override val name: String, override val sqlType: Int, overri
     } else {
       when (value) {
         is TextNode -> statement.setDate(columnIndex, Date.valueOf(value.textValue()))
-        else -> throw IllegalStateException("Date database types require json data sets to store values as TextNodes")
+        else -> error("Date database types require json data sets to store values as TextNodes")
       }
     }
   }

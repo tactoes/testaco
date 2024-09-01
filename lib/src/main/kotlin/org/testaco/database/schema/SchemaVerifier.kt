@@ -67,7 +67,7 @@ object SchemaVerifier {
       .use { rs: ResultSet ->
         while (rs.next()) {
           val table = rs.getString("PKTABLE_NAME")
-          val column = rs.getString("PKCOLUMN_NAME")
+          rs.getString("PKCOLUMN_NAME")
           val nondeferrable: Boolean = rs.getShort("DEFERRABILITY") == NOT_DEFERRABLE
           if (
             nondeferrable &&

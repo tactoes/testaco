@@ -80,7 +80,7 @@ class TestacoExtension() : BeforeAllCallback {
     assert(referenceSchemas.contains(dataSourceName), {"Database $dataSourceName not known to testaco. It needs to be defined in the testaco configuration, along with a reference schema file"})
     val dataSource = (springContext!!.getBean(dataSourceName) as DataSource?)
       ?: fail("datasource ${dataSourceName} fetched from spring must not be null")
-    val referenceSchema = referenceSchemas.get(dataSourceName)!!
+    val referenceSchema = referenceSchemas[dataSourceName] ?: fail("datasource $dataSourceName not found in reference schemas")
     val localPath = "$dataSourceName/$dataFile"
     DataSetHandler.deleteData(dataSourceName, dataSource)
     val dataset: DataSet = DataSetHandler.readDataSet(localPath, referenceSchema)
@@ -92,15 +92,12 @@ class TestacoExtension() : BeforeAllCallback {
     val dataset: DataSet = readDatabaseDataSet(dataSourceName)
 
     mapper.writerWithDefaultPrettyPrinter().writeValue(File(dataFile), dataset)
-
-    //println("Dump ends")
   }
 
   private fun readDatabaseDataSet(dataSourceName: String): DataSet {
-    //println("Dump starts")
     val dataSource = (springContext!!.getBean(dataSourceName) as DataSource?)
       ?: fail("datasource ${dataSourceName} fetched from spring must not be null")
-    val referenceSchema: TestacoSchema = referenceSchemas.get(dataSourceName)
+    val referenceSchema: TestacoSchema = referenceSchemas[dataSourceName]
       ?: throw IllegalStateException("Database $dataSourceName not known to testaco. It needs to be defined in the testaco configuration, along with a reference schema file")
 
     val dataset: DataSet = exportDataSet(dataSource, referenceSchema)
@@ -109,7 +106,7 @@ class TestacoExtension() : BeforeAllCallback {
 
   fun compareDataSet(dataSourceName: String, dataFile: String) {
     val databaseDataset: DataSet = readDatabaseDataSet(dataSourceName)
-    val referenceSchema = referenceSchemas.get(dataSourceName)!!
+    val referenceSchema = referenceSchemas[dataSourceName] ?: error("Could not find reference schema for $dataSourceName")
     val localPath = "$dataSourceName/$dataFile"
 
     val fileDataset: DataSet = DataSetHandler.readDataSet(localPath, referenceSchema)
@@ -137,12 +134,10 @@ class TestacoExtension() : BeforeAllCallback {
   }
 
   private fun exportRows(connection: Connection, table: Table): Set<Row> {
-    //println("Exporting table ${table.tableName}")
     val sql = """SELECT 
       |${table.columns.map {it.name}.joinToString(", ")}
       |FROM ${table.tableName}
     """.trimMargin()
-    //println("Sql: $sql")
     val st = connection.prepareStatement(sql)
     val results: ResultSet = st.executeQuery()
 
@@ -158,7 +153,6 @@ class TestacoExtension() : BeforeAllCallback {
     connection.autoCommit = false
     try {
       dataset.tables.forEach { table: TTable ->
-        //println("Handling table ${table.name}")
         table.rows.forEach { row: Row ->
           print("  Row ")
           row.columns.forEach { column: Column ->
@@ -188,14 +182,12 @@ class TestacoExtension() : BeforeAllCallback {
 
   private fun setValue(dataSourceName: String, tableName: String, columnName: String, index: Int, value: JsonNode?, st: PreparedStatement) {
     val testacoType: TestacoType<*> = findTestacoType(dataSourceName, tableName, columnName)
-    if (!(value?.isValueNode ?: false)) {
-      throw IllegalStateException("Encountered a non-value node json fragment from data set: "+value)
-    }
+    check((value?.isValueNode ?: false)) { "Encountered a non-value node json fragment from data set: "+value }
     testacoType.store(value, index, st)
   }
 
   private fun findTestacoType(dataSourceName: String, tableName: String, columnName: String): TestacoType<*> {
-    val table: TestacoTable = referenceSchemas.get(dataSourceName)?.find(tableName) ?: throw IllegalStateException("Could not find table $tableName in schema $dataSourceName")
+    val table: TestacoTable = referenceSchemas[dataSourceName]?.find(tableName) ?: throw IllegalStateException("Could not find table $tableName in schema $dataSourceName")
     val column: TestacoType<*> = (table as Table).columns.find { it.name == columnName } ?: throw IllegalStateException("Could not find column $columnName in table $tableName in schema $dataSourceName")
     return column
   }

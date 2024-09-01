@@ -26,7 +26,7 @@ data class BigDecimalType(override val name: String, override val sqlType: Int, 
         is LongNode -> statement.setBigDecimal(columnIndex, value.longValue().toBigDecimal())
         is IntNode -> statement.setBigDecimal(columnIndex, value.intValue().toBigDecimal())
         is ShortNode -> statement.setBigDecimal(columnIndex, value.shortValue().toInt().toBigDecimal())
-        else -> throw IllegalStateException("Big decimal database types require json data sets to store values as Short, Int, Long, or BigIntegerNodes")
+        else -> error("Big decimal database types require json data sets to store values as Short, Int, Long, or BigIntegerNodes")
       }
     }
   }

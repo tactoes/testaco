@@ -26,7 +26,7 @@ data class InetType(override val name: String, override val sqlType: Int, overri
                     pgo.value = value.textValue()
                     pgo
                 })
-                else -> throw IllegalStateException("Inet database types require json data sets to store values as TextNodes")
+                else -> error("Inet database types require json data sets to store values as TextNodes")
             }
         }
     }

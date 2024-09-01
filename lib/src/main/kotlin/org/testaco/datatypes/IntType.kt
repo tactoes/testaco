@@ -1,8 +1,9 @@
 package org.testaco.datatypes
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.*
-import org.testaco.datatypes.TestacoType
+import com.fasterxml.jackson.databind.node.IntNode
+import com.fasterxml.jackson.databind.node.NullNode
+import com.fasterxml.jackson.databind.node.ShortNode
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
@@ -24,7 +25,7 @@ data class IntType(override val name: String, override val sqlType: Int, overrid
       when (value) {
         is IntNode -> statement.setInt(columnIndex, value.intValue())
         is ShortNode -> statement.setInt(columnIndex, value.shortValue().toInt())
-        else -> throw IllegalStateException("Integer database types require json data sets to store values as Short or IntNodes")
+        else -> error("Integer database types require json data sets to store values as Short or IntNodes")
       }
     }
   }

@@ -1,13 +1,13 @@
 package org.testaco.datatypes
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.*
-import org.testaco.datatypes.TestacoType
+import com.fasterxml.jackson.databind.node.BinaryNode
+import com.fasterxml.jackson.databind.node.NullNode
+import com.fasterxml.jackson.databind.node.TextNode
 import java.io.ByteArrayInputStream
 import java.sql.PreparedStatement
 import java.sql.ResultSet
-import java.sql.Types
-import java.util.Base64
+import java.util.*
 
 data class BinaryType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
   override fun read(columnName: String, rs: ResultSet): JsonNode {
@@ -29,7 +29,7 @@ data class BinaryType(override val name: String, override val sqlType: Int, over
          */
         is BinaryNode -> statement.setBinaryStream(columnIndex, ByteArrayInputStream(value.binaryValue()))
         is TextNode -> statement.setBinaryStream(columnIndex, ByteArrayInputStream(Base64.getDecoder().decode(value.textValue())))
-        else -> throw IllegalStateException("Big decimal database types require json data sets to store values as Binary or TextNodes")
+        else -> error("Big decimal database types require json data sets to store values as Binary or TextNodes")
       }
     }
   }

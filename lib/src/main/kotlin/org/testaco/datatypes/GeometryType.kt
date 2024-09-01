@@ -4,8 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
 import org.postgis.PGgeometry
-import org.postgresql.util.PGobject
-import java.sql.*
+import java.sql.PreparedStatement
+import java.sql.ResultSet
+import java.sql.Types
 
 data class GeometryType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
     override fun read(columnName: String, rs: ResultSet): JsonNode {
@@ -22,7 +23,7 @@ data class GeometryType(override val name: String, override val sqlType: Int, ov
         } else {
             when (value) {
                 is TextNode -> statement.setObject(columnIndex, PGgeometry(value.textValue()))
-                else -> throw IllegalStateException("Geometry database types require json data sets to store values as TextNodes")
+                else -> error("Geometry database types require json data sets to store values as TextNodes")
             }
         }
     }

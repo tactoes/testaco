@@ -28,7 +28,7 @@ data class UuidType(override val name: String, override val sqlType: Int, overri
           pgo.value = value.textValue()
           pgo
         })
-        else -> throw IllegalStateException("Uuid database types require json data sets to store values as TextNodes")
+        else -> error("Uuid database types require json data sets to store values as TextNodes")
       }
     }
   }

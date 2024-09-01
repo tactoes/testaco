@@ -1,13 +1,12 @@
 package org.testaco.datatypes
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.BinaryNode
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
 import org.postgresql.util.PGobject
-import java.io.ByteArrayInputStream
-import java.sql.*
-import java.util.*
+import java.sql.PreparedStatement
+import java.sql.ResultSet
+import java.sql.Types
 
 data class CitextType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
     override fun read(columnName: String, rs: ResultSet): JsonNode {
@@ -29,7 +28,7 @@ data class CitextType(override val name: String, override val sqlType: Int, over
                     pgo.value = value.textValue()
                     pgo
                 })
-                else -> throw IllegalStateException("Citext database types require json data sets to store values as TextNodes")
+                else -> error("Citext database types require json data sets to store values as TextNodes")
             }
         }
     }

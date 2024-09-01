@@ -16,7 +16,7 @@ class NameService @Autowired constructor(val db: NamedParameterJdbcTemplate) {
         val retvalue = db.query(
             INSERT_NAME,
             mapOf("id" to name.name),
-        ) { rs, rowNum -> Name(rs.getLong("id"), rs.getString("name"), listOf()) }.first()
+        ) { rs, _ -> Name(rs.getLong("id"), rs.getString("name"), listOf()) }.first()
         val aliases = name.aliases.flatMap {
             db.query(
                 INSERT_ALIASES,
@@ -35,11 +35,11 @@ class NameService @Autowired constructor(val db: NamedParameterJdbcTemplate) {
         db.query(
             "DELETE FROM aliases WHERE name_id = :id",
             mapOf("id" to nameId),
-        ) { rs, rowNum -> }
+        ) { _, _ -> }
         return db.query(
             "DELETE FROM names WHERE id = :id",
             mapOf("id" to nameId),
-        ) { rs, rowNum -> rowNum }
+        ) { _, rowNum -> rowNum }
             .last()
     }
 }

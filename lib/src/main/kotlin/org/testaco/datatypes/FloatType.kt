@@ -1,11 +1,9 @@
 package org.testaco.datatypes
 
 import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.DoubleNode
 import com.fasterxml.jackson.databind.node.FloatNode
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
-import org.testaco.datatypes.TestacoType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Types
@@ -27,7 +25,7 @@ data class FloatType(override val name: String, override val sqlType: Int, overr
       when (value) {
         is FloatNode -> statement.setFloat(columnIndex, value.floatValue())
         is TextNode -> statement.setFloat(columnIndex, value.textValue().toFloat())
-        else -> throw IllegalStateException("Float database types require json data sets to store values as Float or TextNodes")
+        else -> error("Float database types require json data sets to store values as Float or TextNodes")
       }
     }
   }

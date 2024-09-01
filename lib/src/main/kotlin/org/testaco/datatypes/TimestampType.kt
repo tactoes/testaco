@@ -25,7 +25,7 @@ data class TimestampType(override val name: String, override val sqlType: Int, o
     } else {
       when (value) {
         is TextNode -> statement.setTimestamp(columnIndex, Timestamp.valueOf(value.textValue()))
-        else -> throw IllegalStateException("Timestamp database types require json data sets to store values as TextNodes")
+        else -> error("Timestamp database types require json data sets to store values as TextNodes")
       }
     }
   }

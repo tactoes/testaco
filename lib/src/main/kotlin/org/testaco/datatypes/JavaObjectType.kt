@@ -1,7 +1,6 @@
 package org.testaco.datatypes
 
 import com.fasterxml.jackson.databind.JsonNode
-import org.testaco.datatypes.TestacoType
 import java.sql.PreparedStatement
 import java.sql.ResultSet
 

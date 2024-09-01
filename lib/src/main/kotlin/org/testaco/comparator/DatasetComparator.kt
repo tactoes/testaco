@@ -5,7 +5,7 @@ import org.testaco.comparator.model.*
 
 class DatasetComparator(val schema: TestacoSchema) {
   fun compare(database: DataSet?, reference: DataSet?): CDatasetResult {
-    if (database == null || reference == null) { throw IllegalArgumentException("Datasets can not be null: $database, $reference")}
+    require(!(database == null || reference == null)) { "Datasets can not be null: $database, $reference" }
 
     return compareDataSet(database, reference)
   }
@@ -62,7 +62,7 @@ class DatasetComparator(val schema: TestacoSchema) {
             refCol.value == null -> {
               CColumnResult(tableName, columnName, "Reference data set contains null value, but database contains ${dbCol.value} for primary key $dbPk and column $columnName in table $tableName")
             }
-            !refCol.value.equals(dbCol.value) -> {
+            refCol.value != dbCol.value -> {
               CColumnResult(tableName, columnName, "Database value ${dbCol.value} does not match reference value ${refCol.value} for primary key $dbPk and column $columnName in table $tableName")
             }
             else -> {

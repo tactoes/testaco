@@ -98,7 +98,7 @@ abstract class TestacoBooleanType(name: String, override val sqlType: Int, overr
     } else {
       when (value) {
         is BooleanNode -> statement.setBoolean(columnIndex, value.booleanValue())
-        else -> throw IllegalStateException("Boolean database types require json data sets to store values as BooleanNodes")
+        else -> error("Boolean database types require json data sets to store values as BooleanNodes")
       }
     }
   }

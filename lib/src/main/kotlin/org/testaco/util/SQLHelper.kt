@@ -268,24 +268,20 @@ object SQLHelper {
      * Checks whether two given values are unequal and if so print a log message (level INFO)
      */
     fun logInfoIfValueChanged(oldValue: String?, newValue: String, message: String, source: Class<*>) {
-        if (logger.isInfoEnabled) {
-            if (oldValue != null && oldValue != newValue) logger.info(
-                "{}. {} oldValue={} newValue={}",
-                *arrayOf<Any>(source, message, oldValue, newValue)
-            )
-        }
+        if (logger.isInfoEnabled && oldValue != null && oldValue != newValue) logger.info(
+            "{}. {} oldValue={} newValue={}",
+            *arrayOf<Any>(source, message, oldValue, newValue)
+        )
     }
 
     /**
      * Checks whether two given values are unequal and if so print a log message (level DEBUG)
      */
     fun logDebugIfValueChanged(oldValue: String?, newValue: String, message: String, source: Class<*>) {
-        if (logger.isDebugEnabled) {
-            if (oldValue != null && oldValue != newValue) logger.debug(
-                "{}. {} oldValue={} newValue={}",
-                *arrayOf<Any>(source, message, oldValue, newValue)
-            )
-        }
+        if (logger.isDebugEnabled && oldValue != null && oldValue != newValue) logger.debug(
+            "{}. {} oldValue={} newValue={}",
+            *arrayOf<Any>(source, message, oldValue, newValue)
+        )
     }
 
     private fun isEscaped(tableName: String, dbIdentifierQuoteString: String): Boolean {

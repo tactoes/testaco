@@ -3,7 +3,7 @@ package org.testaco.comparator.model
 /**
  * CResults imply there is a false result somewhere.
  */
-interface CResult {
+fun interface CResult {
   fun equals(): Boolean
 }
 

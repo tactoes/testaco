@@ -23,7 +23,7 @@ data class IntervalType(override val name: String, override val sqlType: Int, ov
         } else {
             when (value) {
                 is TextNode -> statement.setObject(columnIndex, PGInterval(value.textValue()))
-                else -> throw IllegalStateException("Interval database types require json data sets to store values as TextNodes")
+                else -> error("Interval database types require json data sets to store values as TextNodes")
             }
         }
     }

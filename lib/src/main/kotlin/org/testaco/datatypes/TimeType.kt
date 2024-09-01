@@ -3,8 +3,10 @@ package org.testaco.datatypes
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.node.NullNode
 import com.fasterxml.jackson.databind.node.TextNode
-import org.testaco.datatypes.TestacoType
-import java.sql.*
+import java.sql.PreparedStatement
+import java.sql.ResultSet
+import java.sql.Time
+import java.sql.Types
 import java.time.format.DateTimeFormatter
 
 data class TimeType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
@@ -23,7 +25,7 @@ data class TimeType(override val name: String, override val sqlType: Int, overri
     } else {
       when (value) {
         is TextNode -> statement.setTime(columnIndex, Time.valueOf(value.textValue()))
-        else -> throw IllegalStateException("Time database types require json data sets to store values as TextNodes")
+        else -> error("Time database types require json data sets to store values as TextNodes")
       }
     }
   }
