@@ -42,7 +42,7 @@ object DataSetHandler {
       fail("Could not parse file $dataFileName, parser gives reason: ${e.message}", e)
     }
 
-    assert(dataset.isObject(),
+    assert(dataset.isObject,
       { "Data set ${localPath} does not have an object as the top level element" })
 
     val tables = dataset.properties().map { it.key }

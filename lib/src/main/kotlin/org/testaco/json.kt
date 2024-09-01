@@ -24,7 +24,7 @@ data class Row(val columns: Set<Column>) {
 data class TTable(val name: String, val rows: Set<Row>)
 data class DataSet(val tables: Set<TTable>)
 
-public class DataSetSerializer : JsonSerializer<DataSet>() {
+class DataSetSerializer : JsonSerializer<DataSet>() {
   override fun serialize(value: DataSet?, gen: JsonGenerator?, serializers: SerializerProvider?) {
     if (value == null) return
     if (gen == null) return

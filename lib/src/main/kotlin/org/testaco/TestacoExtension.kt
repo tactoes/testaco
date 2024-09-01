@@ -21,7 +21,7 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 
-class TestacoExtension() : BeforeAllCallback {
+class TestacoExtension : BeforeAllCallback {
   val mapper = ObjectMapper()
     .registerModule(KotlinModule.Builder().build())
     .registerModule(SimpleModule().apply {
@@ -114,7 +114,7 @@ class TestacoExtension() : BeforeAllCallback {
   }
 
   private fun exportDataSet(dataSource: DataSource, referenceSchema: TestacoSchema): DataSet {
-    val connection: Connection = dataSource.getConnection()
+    val connection: Connection = dataSource.connection
     connection.autoCommit = false
     val ds: DataSet = try {
       DataSet(
@@ -149,7 +149,7 @@ class TestacoExtension() : BeforeAllCallback {
   }
 
   private fun importDataSet(dataSourceName: String, dataset: DataSet, dataSource: DataSource) {
-    val connection = dataSource.getConnection()
+    val connection = dataSource.connection
     connection.autoCommit = false
     try {
       dataset.tables.forEach { table: TTable ->

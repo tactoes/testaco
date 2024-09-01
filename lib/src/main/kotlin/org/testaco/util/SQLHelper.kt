@@ -47,7 +47,7 @@ object SQLHelper {
     fun schemaExists(connection: Connection, schema: String): Boolean {
         logger.trace("schemaExists(connection={}, schema={}) - start", connection, schema)
         val metaData: DatabaseMetaData = connection.metaData
-        val rs: ResultSet = metaData.getSchemas() //null, schemaPattern);
+        val rs: ResultSet = metaData.schemas //null, schemaPattern);
         return try {
             while (rs.next()) {
                 val foundSchema: String = rs.getString("TABLE_SCHEM")
@@ -74,7 +74,7 @@ object SQLHelper {
             throw NullPointerException("The parameter 'catalog' must not be null")
         }
         val metaData: DatabaseMetaData = connection.metaData
-        val rs: ResultSet = metaData.getCatalogs()
+        val rs: ResultSet = metaData.catalogs
         return try {
             while (rs.next()) {
                 val foundCatalog: String = rs.getString("TABLE_CAT")
@@ -116,56 +116,56 @@ object SQLHelper {
         dbInfo = object : ExceptionWrapper() {
             @Throws(Exception::class)
             override fun wrappedCall(metaData: DatabaseMetaData): String {
-                return metaData.getDatabaseProductName()
+                return metaData.databaseProductName
             }
         }.executeWrappedCall(metaData)
         sb.append("\tdatabase product name=").append(dbInfo).append("\n")
         dbInfo = object : ExceptionWrapper() {
             @Throws(Exception::class)
             override fun wrappedCall(metaData: DatabaseMetaData): String {
-                return metaData.getDatabaseProductVersion()
+                return metaData.databaseProductVersion
             }
         }.executeWrappedCall(metaData)
         sb.append("\tdatabase version=").append(dbInfo).append("\n")
         dbInfo = object : ExceptionWrapper() {
             @Throws(Exception::class)
             override fun wrappedCall(metaData: DatabaseMetaData): String {
-                return metaData.getDatabaseMajorVersion().toString()
+                return metaData.databaseMajorVersion.toString()
             }
         }.executeWrappedCall(metaData)
         sb.append("\tdatabase major version=").append(dbInfo).append("\n")
         dbInfo = object : ExceptionWrapper() {
             @Throws(Exception::class)
             override fun wrappedCall(metaData: DatabaseMetaData): String {
-                return metaData.getDatabaseMinorVersion().toString()
+                return metaData.databaseMinorVersion.toString()
             }
         }.executeWrappedCall(metaData)
         sb.append("\tdatabase minor version=").append(dbInfo).append("\n")
         dbInfo = object : ExceptionWrapper() {
             @Throws(Exception::class)
             override fun wrappedCall(metaData: DatabaseMetaData): String {
-                return metaData.getDriverName()
+                return metaData.driverName
             }
         }.executeWrappedCall(metaData)
         sb.append("\tjdbc driver name=").append(dbInfo).append("\n")
         dbInfo = object : ExceptionWrapper() {
             @Throws(Exception::class)
             override fun wrappedCall(metaData: DatabaseMetaData): String {
-                return metaData.getDriverVersion()
+                return metaData.driverVersion
             }
         }.executeWrappedCall(metaData)
         sb.append("\tjdbc driver version=").append(dbInfo).append("\n")
         dbInfo = object : ExceptionWrapper() {
             @Throws(Exception::class)
             override fun wrappedCall(metaData: DatabaseMetaData): String {
-                return metaData.getDriverMajorVersion().toString()
+                return metaData.driverMajorVersion.toString()
             }
         }.executeWrappedCall(metaData)
         sb.append("\tjdbc driver major version=").append(dbInfo).append("\n")
         dbInfo = object : ExceptionWrapper() {
             @Throws(Exception::class)
             override fun wrappedCall(metaData: DatabaseMetaData): String {
-                return metaData.getDriverMinorVersion().toString()
+                return metaData.driverMinorVersion.toString()
             }
         }.executeWrappedCall(metaData)
         sb.append("\tjdbc driver minor version=").append(dbInfo).append("\n")
@@ -184,7 +184,7 @@ object SQLHelper {
 
     @Throws(SQLException::class)
     fun isSybaseDb(metaData: DatabaseMetaData): Boolean {
-        val dbProductName: String = metaData.getDatabaseProductName()
+        val dbProductName: String = metaData.databaseProductName
         return dbProductName == DB_PRODUCT_SYBASE
     }
 
@@ -240,7 +240,7 @@ object SQLHelper {
         logger.trace("correctCase(tableName={}, databaseMetaData={}) - start", databaseIdentifier, databaseMetaData)
         return try {
             var resultTableName: String = databaseIdentifier
-            val dbIdentifierQuoteString: String = databaseMetaData.getIdentifierQuoteString()
+            val dbIdentifierQuoteString: String = databaseMetaData.identifierQuoteString
             if (!isEscaped(databaseIdentifier, dbIdentifierQuoteString)) {
                 if (databaseMetaData.storesLowerCaseIdentifiers()) {
                     resultTableName = databaseIdentifier.lowercase()
