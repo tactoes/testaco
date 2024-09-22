@@ -12,7 +12,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 
 @Testcontainers
 @SpringBootTest
-@ContextConfiguration(initializers = [AbstractEndToEndTest.Companion.Initializer::class])
+@ContextConfiguration(initializers = [AbstractEndToEndTest.Initializer::class])
 class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) : AbstractEndToEndTest() {
 
     @Test

@@ -7,6 +7,7 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.sql.Timestamp
 import java.sql.Types
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 data class TimestampType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
@@ -24,7 +25,7 @@ data class TimestampType(override val name: String, override val sqlType: Int, o
       statement.setNull(columnIndex, Types.TIMESTAMP)
     } else {
       when (value) {
-        is TextNode -> statement.setTimestamp(columnIndex, Timestamp.valueOf(value.textValue()))
+        is TextNode -> statement.setTimestamp(columnIndex, Timestamp.valueOf(LocalDateTime.from(DateTimeFormatter.ISO_DATE_TIME.parse(value.textValue()))))
         else -> error("Timestamp database types require json data sets to store values as TextNodes")
       }
     }

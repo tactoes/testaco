@@ -110,14 +110,15 @@ class TestacoExtension : BeforeAllCallback {
     val localPath = "$dataSourceName/$dataFile"
 
     val fileDataset: DataSet = DataSetHandler.readDataSet(localPath, referenceSchema)
-    require(DatasetComparator(referenceSchema).compare(databaseDataset, fileDataset).equals())
+    val result = DatasetComparator(referenceSchema).compare(databaseDataset, fileDataset)
+    require(result.equals(), {result.errorMessage()})
   }
 
   private fun exportDataSet(dataSource: DataSource, referenceSchema: TestacoSchema): DataSet {
     val connection: Connection = dataSource.connection
     connection.autoCommit = false
     val ds: DataSet = try {
-      DataSet(
+      val ds = DataSet(
         referenceSchema.tables.mapNotNull { table ->
           when (table) {
             is Table -> TTable(table.tableName, rows = exportRows(connection, referenceSchema.find(table.tableName) as Table))
@@ -125,11 +126,12 @@ class TestacoExtension : BeforeAllCallback {
           }
         }.toSet()
       )
+      connection.commit()
+      ds
     } catch (e: Exception) {
       connection.rollback()
       throw e
     }
-    connection.commit()
     return ds
   }
 
@@ -154,11 +156,10 @@ class TestacoExtension : BeforeAllCallback {
     try {
       dataset.tables.forEach { table: TTable ->
         table.rows.forEach { row: Row ->
-          print("  Row ")
+          print("  Row ${table.name} ")
           row.columns.forEach { column: Column ->
             print(" ${column.name}:${column.value}")
           }
-          //println()
           val sql = """INSERT INTO ${table.name} 
             |(${row.columns.map { it.name }.joinToString(", ")})
             | VALUES 
@@ -172,11 +173,13 @@ class TestacoExtension : BeforeAllCallback {
             }
           }
           st.execute()
+          println("Inserted ${st.updateCount} rows")
         }
       }
       connection.commit()
     } catch (e: Exception) {
       connection.rollback()
+      throw e
     }
   }
 

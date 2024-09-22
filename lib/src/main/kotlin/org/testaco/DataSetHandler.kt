@@ -95,6 +95,7 @@ object DataSetHandler {
         c.commit()
       } catch (e: Exception) {
         c.rollback()
+        throw e
       }
     }
   }

@@ -16,7 +16,7 @@ import kotlin.reflect.full.declaredFunctions
 @Testcontainers
 @SpringBootTest
 @ExtendWith(SpringExtension::class)
-@ContextConfiguration(initializers = [AbstractEndToEndTest.Companion.Initializer::class])
+@ContextConfiguration(initializers = [AbstractEndToEndTest.Initializer::class])
 class PgtesterApplicationTests @Autowired constructor(val context: ApplicationContext) {
 
     @Test
