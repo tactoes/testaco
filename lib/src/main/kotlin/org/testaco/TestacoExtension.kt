@@ -182,6 +182,8 @@ class TestacoExtension : BeforeAllCallback {
     } catch (e: Exception) {
       connection.rollback()
       throw e
+    } finally {
+      connection.close()
     }
   }
 

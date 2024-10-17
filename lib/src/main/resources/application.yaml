@@ -4,6 +4,8 @@ spring:
     jdbc-url: jdbc:postgresql:15.3:///test?currentSchema=test
     username: test
     password: test
+    hikari:
+      auto-commit: false
   flyway:
     locations: classpath:/db/migrations
     validate-migration-naming: true

@@ -96,6 +96,8 @@ object DataSetHandler {
       } catch (e: Exception) {
         c.rollback()
         throw e
+      } finally {
+        c.close()
       }
     }
   }

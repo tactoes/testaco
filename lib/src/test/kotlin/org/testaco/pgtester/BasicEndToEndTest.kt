@@ -17,13 +17,15 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
 
     @Test
     fun `flyway applies schema updates`() {
-        val statement = postgres
-            .createConnection("")
-            .createStatement()
+        val c = postgres.createConnection("")
+        c.autoCommit = false
+        val statement = c.createStatement()
 
         statement.execute("select count(*) from test.flyway_schema_history")
         assert(statement.resultSet.next(), { "Should be able to read the flyway migration history" })
         assert(statement.resultSet.getInt(1) == 3, { "Should have applied two schema changes, plus schema creation" })
+        c.commit()
+        c.close()
     }
 
     @Test
