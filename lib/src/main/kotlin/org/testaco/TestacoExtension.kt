@@ -11,6 +11,7 @@ import org.junit.jupiter.api.fail
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.testaco.comparator.DatasetComparator
+import org.testaco.comparator.model.CDatasetResult
 import org.testaco.database.schema.SchemaVerifier
 import org.testaco.datatypes.TestacoType
 import java.io.File
@@ -110,7 +111,8 @@ class TestacoExtension : BeforeAllCallback {
     val localPath = "$dataSourceName/$dataFile"
 
     val fileDataset: DataSet = DataSetHandler.readDataSet(localPath, referenceSchema)
-    val result = DatasetComparator(referenceSchema).compare(databaseDataset, fileDataset)
+    val result: CDatasetResult = DatasetComparator(referenceSchema).compare(databaseDataset, fileDataset)
+    println("Result: "+result.equals()+" : "+result)
     require(result.equals(), {result.errorMessage()})
   }
 

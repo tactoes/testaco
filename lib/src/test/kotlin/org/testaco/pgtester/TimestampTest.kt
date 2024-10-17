@@ -32,7 +32,7 @@ class TimestampTest @Autowired constructor(val context: ApplicationContext) : Ab
         assertThrows<IllegalArgumentException> {
           compareDataSet("datasource", "brokentimestamp.json")
         }.message,
-        CoreMatchers.containsString("does not match reference value \"20-24-10-21 00:00:00\"")
+        CoreMatchers.containsString("does not match reference value \"20-24-10-21T00:00:00\"")
       )
     }
   }

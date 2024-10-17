@@ -9,7 +9,7 @@ fun interface CResult {
 
 data class CDatasetResult(val tableResults: Set<CTableResult>): CResult {
   override fun equals(): Boolean {
-    return tableResults.all { table: CTableResult -> table.equals()}
+    return tableResults.all { table: CTableResult -> println("Table ${table}:${table.equals()}"); table.equals()}
   }
   fun errorMessage(): String {
     return tableResults.map { it.toString() }.joinToString("\n")
@@ -22,7 +22,7 @@ data class CTableMissingResult(val tableName: String, val message: String): CTab
   override fun equals(): Boolean = false
 }
 data class CTableRowMismatchResult(val table: String, val rowResults: Set<CRowResult>): CTableResult {
-  override fun equals(): Boolean = rowResults.isNotEmpty()
+  override fun equals(): Boolean = rowResults.isEmpty()
 }
 data class CTableOkResult(val tableName: String): CTableResult {
   override fun equals(): Boolean = true
