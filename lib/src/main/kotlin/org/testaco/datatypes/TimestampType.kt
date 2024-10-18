@@ -10,7 +10,9 @@ import java.sql.Types
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-data class TimestampType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
+data class TimestampType(override val name: String, override val sqlType: Int, override val sqlTypeName: String,
+                         override val allowedTimeDiffInSeconds: Int) :
+            DateTimeHandling<String>(name, sqlType, sqlTypeName, allowedTimeDiffInSeconds) {
   override fun read(columnName: String, rs: ResultSet): JsonNode {
     val i: Timestamp = rs.getTimestamp(columnName)
     return if (rs.wasNull()) {
@@ -30,4 +32,5 @@ data class TimestampType(override val name: String, override val sqlType: Int, o
       }
     }
   }
+
 }

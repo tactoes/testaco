@@ -15,6 +15,13 @@ data class TestacoDatabase(
 data class TestacoSchema(val tables: List<TestacoTable>, @JsonIgnore val filename: String?) {
     val referenceTableList: List<String> by lazy { tables.filter { it is Table }.map { it.tableName } }
     fun find(name: String): TestacoTable? = tables.find { it.tableName == name }
+    fun findColumn(tableName: String, columnName: String): TestacoType<*> {
+        return when(val table = find(tableName)) {
+            is IgnoredTable -> throw IllegalStateException("Table $table is ignored, refusing to handle column $columnName")
+            is Table -> table.columns.find { it.name == columnName } ?: throw IllegalStateException("Could not find column $columnName in table $table")
+            null -> throw IllegalStateException("Table $table not found")
+        }
+    }
 }
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")

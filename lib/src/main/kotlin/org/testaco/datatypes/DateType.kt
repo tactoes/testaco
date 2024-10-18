@@ -9,7 +9,9 @@ import java.sql.ResultSet
 import java.sql.Types
 import java.time.format.DateTimeFormatter
 
-data class DateType(override val name: String, override val sqlType: Int, override val sqlTypeName: String) : TestacoType<String>(name, sqlType, sqlTypeName) {
+data class DateType(override val name: String, override val sqlType: Int, override val sqlTypeName: String,
+                    override val allowedTimeDiffInSeconds: Int)
+  : DateTimeHandling<String>(name, sqlType, sqlTypeName, allowedTimeDiffInSeconds) {
   override fun read(columnName: String, rs: ResultSet): JsonNode {
     val i: Date = rs.getDate(columnName)
     return if (rs.wasNull()) {

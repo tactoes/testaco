@@ -41,6 +41,15 @@ class TimestampTest @Autowired constructor(val context: ApplicationContext) : Ab
   fun `it is possible to handle timestamps using the now keyword`() {
     with (testaco) {
       loadDataSet("datasource", "start.json")
+
+      val c = postgres.createConnection("")
+      c.autoCommit = false
+      val statement = c.createStatement()
+
+      statement.execute("update names set created=now() where id=1")
+      c.commit()
+      c.close()
+
       compareDataSet("datasource", "timestampwithnow.json")
     }
   }

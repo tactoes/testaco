@@ -33,7 +33,8 @@
         {"name": "created",
           "type": "TimestampType",
           "sqlType": 93,
-          "sqlTypeName": ""
+          "sqlTypeName": "",
+          "allowedTimeDiffInSeconds": 10
         }]}
   ]
 }

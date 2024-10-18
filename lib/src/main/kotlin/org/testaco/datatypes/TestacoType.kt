@@ -29,6 +29,8 @@ sealed class TestacoType<JT>(open val name: String, open val sqlType: Int, open 
   override fun toString(): String {
     return name
   }
+
+  open fun compare(reference: String, database: String): Boolean = reference.equals(database)
 }
 
 object TestacoConverter {
@@ -62,9 +64,9 @@ object TestacoConverter {
       CHAR ->  StringType(columnName, sqlType, sqlTypeName)
       VARCHAR ->  StringType(columnName, sqlType, sqlTypeName)
       LONGVARCHAR ->  StringType(columnName, sqlType, sqlTypeName)
-      DATE ->  DateType(columnName, sqlType, sqlTypeName)
-      TIME ->  TimeType(columnName, sqlType, sqlTypeName)
-      TIMESTAMP ->  TimestampType(columnName, sqlType, sqlTypeName)
+      DATE ->  DateType(columnName, sqlType, sqlTypeName, 10)
+      TIME ->  TimeType(columnName, sqlType, sqlTypeName, 10)
+      TIMESTAMP ->  TimestampType(columnName, sqlType, sqlTypeName, 10)
       BINARY ->  BinaryType(columnName, sqlType, sqlTypeName)
       VARBINARY ->  BinaryType(columnName, sqlType, sqlTypeName)
       LONGVARBINARY ->  BinaryType(columnName, sqlType, sqlTypeName)
@@ -76,8 +78,8 @@ object TestacoConverter {
       NCHAR ->  StringType(columnName, sqlType, sqlTypeName)
       NVARCHAR ->  StringType(columnName, sqlType, sqlTypeName)
       LONGNVARCHAR ->  StringType(columnName, sqlType, sqlTypeName)
-      TIME_WITH_TIMEZONE ->  TimeType(columnName, sqlType, sqlTypeName)
-      TIMESTAMP_WITH_TIMEZONE ->  TimestampType(columnName, sqlType, sqlTypeName)
+      TIME_WITH_TIMEZONE ->  TimeType(columnName, sqlType, sqlTypeName, 10)
+      TIMESTAMP_WITH_TIMEZONE ->  TimestampType(columnName, sqlType, sqlTypeName, 10)
       else -> null
     }
 }

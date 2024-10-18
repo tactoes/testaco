@@ -2,6 +2,7 @@ package org.testaco.comparator
 
 import org.testaco.*
 import org.testaco.comparator.model.*
+import org.testaco.datatypes.TestacoType
 
 class DatasetComparator(val schema: TestacoSchema) {
   fun compare(database: DataSet?, reference: DataSet?): CDatasetResult {
@@ -57,6 +58,7 @@ class DatasetComparator(val schema: TestacoSchema) {
         val dbCol = dbRow.columns.find { it.name == columnName } ?: throw IllegalStateException("Could not find column with name $columnName in db row $dbRow")
         val refCol = refRow.columns.find { it.name == columnName } ?: throw IllegalStateException("Could not find column with name $columnName in ref row $refRow")
         val dbPk = dbRow.pk().toString()
+        val columnDefinition: TestacoType<*> = schema.findColumn(tableName, columnName)
         //TODO: Proper, typed comparisons
         listOf(
           when {
@@ -69,7 +71,7 @@ class DatasetComparator(val schema: TestacoSchema) {
             refCol.value == null -> {
               CColumnResult(tableName, columnName, "Reference data set contains null value, but database contains ${dbCol.value} for primary key $dbPk and column $columnName in table $tableName")
             }
-            !refCol.value.toString().equals(dbCol.value.toString()) -> {
+            !columnDefinition.compare(refCol.value.toString(), dbCol.value.toString()) -> {
               println("Value check: ${refCol.value} and ${dbCol.value}, ${refCol.value.javaClass}, ${dbCol.value?.javaClass}")
               CColumnResult(tableName, columnName, "Database value ${dbCol.value} does not match reference value ${refCol.value} for primary key $dbPk and column $columnName in table $tableName")
             }
