@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ContextConfiguration
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.time.format.DateTimeParseException
 
 @Testcontainers
 @SpringBootTest
@@ -29,10 +30,10 @@ class TimestampTest @Autowired constructor(val context: ApplicationContext) : Ab
     with (testaco) {
       loadDataSet("datasource", "start.json")
       MatcherAssert.assertThat(
-        assertThrows<IllegalArgumentException> {
+        assertThrows<DateTimeParseException> {
           compareDataSet("datasource", "brokentimestamp.json")
         }.message,
-        CoreMatchers.containsString("does not match reference value \"20-24-10-21T00:00:00\"")
+        CoreMatchers.containsString("Text '20-24-10-21T00:00:00' could not be parsed")
       )
     }
   }

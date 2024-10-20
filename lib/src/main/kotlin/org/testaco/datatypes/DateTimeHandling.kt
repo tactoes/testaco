@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
-abstract class DateTimeHandling<JT>(override val name: String, override val sqlType: Int,
+sealed class DateTimeHandling<JT>(override val name: String, override val sqlType: Int,
                                     override val sqlTypeName: String, open val allowedTimeDiffInSeconds: Int = 10):
   TestacoType<JT>(name, sqlType, sqlTypeName) {
 

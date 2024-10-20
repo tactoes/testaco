@@ -1,5 +1,7 @@
 package org.testaco
 
+import com.fasterxml.jackson.core.JsonFactory
+import com.fasterxml.jackson.core.StreamReadFeature
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -23,7 +25,11 @@ import javax.sql.DataSource
 
 
 class TestacoExtension : BeforeAllCallback {
-  val mapper = ObjectMapper()
+  val mapper = ObjectMapper(
+    JsonFactory.builder()
+      //.enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
+      .build()
+    )
     .registerModule(KotlinModule.Builder().build())
     .registerModule(SimpleModule().apply {
       addSerializer(DataSet::class.java, DataSetSerializer())
