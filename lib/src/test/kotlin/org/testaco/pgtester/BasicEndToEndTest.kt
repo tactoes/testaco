@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ContextConfiguration
+import org.testaco.TestacoExtension.Companion.referenceSchemas
+import org.testaco.datatypes.TestacoType
+import org.testaco.datatypes.TimestampType
 import org.testcontainers.junit.jupiter.Testcontainers
 
 @Testcontainers
@@ -26,6 +29,18 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
         assert(statement.resultSet.getInt(1) == 3, { "Should have applied two schema changes, plus schema creation" })
         c.commit()
         c.close()
+    }
+
+    @Test
+    fun `timestamp allowed time diff is actually read from schema file`() {
+        with (testaco) {
+            val referenceSchema = referenceSchemas["datasource"] ?: error("Could not find reference schema for 'datasource'")
+            val columnDefinition: TestacoType<*> = referenceSchema.findColumn("names", "created")
+            assert(
+                columnDefinition.localConfiguration()["allowedTimeDiffInSeconds"]!! == "15",
+                {"Time diff was columnDefinition.localConfiguration().get(\"allowedTimeDiffInSeconds\"), should be 15"}
+            )
+        }
     }
 
     @Test

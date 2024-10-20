@@ -31,6 +31,9 @@ sealed class TestacoType<JT>(open val name: String, open val sqlType: Int, open 
   }
 
   open fun compare(reference: String, database: String): Boolean = reference.equals(database)
+
+  //For test purposes
+  open fun localConfiguration(): Map<String, String> = mapOf()
 }
 
 object TestacoConverter {

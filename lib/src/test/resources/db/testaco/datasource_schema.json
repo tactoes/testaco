@@ -34,7 +34,7 @@
           "type": "TimestampType",
           "sqlType": 93,
           "sqlTypeName": "",
-          "allowedTimeDiffInSeconds": 10
+          "allowedTimeDiffInSeconds": 15
         }]}
   ]
 }

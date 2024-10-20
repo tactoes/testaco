@@ -19,4 +19,8 @@ sealed class DateTimeHandling<JT>(override val name: String, override val sqlTyp
       LocalDateTime.parse(database.replace("\"",""), DateTimeFormatter.ISO_LOCAL_DATE_TIME)
     ) <= allowedTimeDiffInSeconds
   }
+
+  override fun localConfiguration(): Map<String, String> {
+    return mapOf("allowedTimeDiffInSeconds" to allowedTimeDiffInSeconds.toString())
+  }
 }
