@@ -1,0 +1,16 @@
+{
+  "names" : [
+    {
+      "id" : 1,
+      "name" : "kitty",
+      "created" : "2023-10-21T00:00:00"
+    }
+  ],
+  "aliases" : [
+    {
+      "id" : 1,
+      "name_id": 1,
+      "alias": "zoink"
+    }
+  ]
+}

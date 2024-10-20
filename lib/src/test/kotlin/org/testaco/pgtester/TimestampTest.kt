@@ -31,9 +31,22 @@ class TimestampTest @Autowired constructor(val context: ApplicationContext) : Ab
       loadDataSet("datasource", "start.json")
       MatcherAssert.assertThat(
         assertThrows<DateTimeParseException> {
-          compareDataSet("datasource", "brokentimestamp.json")
+          compareDataSet("datasource", "TimestampTest/brokentimestamp.json")
         }.message,
         CoreMatchers.containsString("Text '20-24-10-21T00:00:00' could not be parsed")
+      )
+    }
+  }
+
+  @Test
+  fun `default reference data file with non-equal timestamp format should fail`() {
+    with (testaco) {
+      loadDataSet("datasource", "start.json")
+      MatcherAssert.assertThat(
+        assertThrows<IllegalArgumentException> {
+          compareDataSet("datasource", "TimestampTest/nonequaltimestamp.json")
+        }.message,
+        CoreMatchers.containsString("Database value \"2024-10-21T00:00:00\" does not match reference value")
       )
     }
   }
@@ -51,7 +64,7 @@ class TimestampTest @Autowired constructor(val context: ApplicationContext) : Ab
       c.commit()
       c.close()
 
-      compareDataSet("datasource", "timestampwithnow.json")
+      compareDataSet("datasource", "TimestampTest/timestampwithnow.json")
     }
   }
 }
