@@ -18,6 +18,8 @@ import org.testaco.database.schema.SchemaVerifier
 import org.testaco.datatypes.TestacoType
 import java.io.File
 import java.nio.charset.Charset
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.sql.Connection
 import java.sql.PreparedStatement
 import java.sql.ResultSet
@@ -117,9 +119,37 @@ class TestacoExtension : BeforeAllCallback {
     val localPath = "$dataSourceName/$dataFile"
 
     val fileDataset: DataSet = DataSetHandler.readDataSet(localPath, referenceSchema)
-    val result: CDatasetResult = DatasetComparator(referenceSchema).compare(databaseDataset, fileDataset)
+    val result: CDatasetResult = try {
+      DatasetComparator(referenceSchema).compare(databaseDataset, fileDataset)
+    } catch (e: Exception) {
+      writeDumpFile(dataSourceName, dataFile, databaseDataset)
+      throw e
+    }
     println("Result: "+result.equals()+" : "+result)
+    if (!result.equals()) {
+      writeDumpFile(dataSourceName, dataFile, databaseDataset)
+    }
     require(result.equals(), {result.errorMessage()})
+  }
+
+  private fun writeDumpFile(dataSourceName: String, dataFile: String, databaseDataset: DataSet) {
+    val resultFileName = getResultFileName(dataSourceName, dataFile)
+    Files.createDirectories(Paths.get(resultFileName.split("/").dropLast(1).joinToString("/")))
+    println("resultFileName: $resultFileName")
+    val writer = mapper.writerWithDefaultPrettyPrinter()
+    writer.writeValue(File(resultFileName), databaseDataset)
+  }
+
+  public fun getResultFileName(dataSourceName: String, dataFile: String): String {
+    val splitFileName: List<String> = dataFile.split(".")
+    return "target/testaco/$dataSourceName/" +
+        if (splitFileName.size > 1) {
+          val temp = splitFileName.takeLast(2)
+          val rewrittenChunks = splitFileName.subList(0, splitFileName.size - 2) + temp.first().plus("_result") + temp.last()
+          rewrittenChunks.joinToString(".")
+        } else {
+          dataFile + "_result"
+        }
   }
 
   private fun exportDataSet(dataSource: DataSource, referenceSchema: TestacoSchema): DataSet {

@@ -6,3 +6,4 @@ build
 
 lib/out
 **/.DS_Store
+lib/target
