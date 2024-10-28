@@ -2,6 +2,8 @@ package org.testaco.pgtester
 
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
+import org.hamcrest.io.FileMatchers
+import org.hamcrest.io.FileMatchers.anExistingFile
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,6 +14,7 @@ import org.testaco.TestacoExtension.Companion.referenceSchemas
 import org.testaco.datatypes.TestacoType
 import org.testaco.datatypes.TimestampType
 import org.testcontainers.junit.jupiter.Testcontainers
+import java.io.File
 
 @Testcontainers
 @SpringBootTest
@@ -65,7 +68,7 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
         }
     }
     @Test
-    fun `fails on reference data set with missing column`() {
+    fun `fails on reference data set with missing column and writes file to file system`() {
         with (testaco) {
             loadDataSet("datasource", "start.json")
             MatcherAssert.assertThat(
@@ -74,6 +77,8 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
                 }.message,
                 CoreMatchers.startsWith("Could not find column with name alias in ref")
             )
+            val datasetDumped = File("target/datasource/missingcolumn_result.json")
+            MatcherAssert.assertThat(datasetDumped, anExistingFile())
         }
     }
 }
