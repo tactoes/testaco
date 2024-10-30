@@ -22,7 +22,12 @@ data class Row(val columns: Set<Column>) {
 }
 
 data class TTable(val name: String, val rows: Set<Row>)
-data class DataSet(val tables: Set<TTable>)
+data class DataSet(val tables: List<TTable>) {
+  fun orderedByDataSchema(tableOrder: List<String>): DataSet {
+    val tablesByName: Map<String, TTable> = tables.associateBy { it.name }
+    return DataSet(tableOrder.mapNotNull { tablesByName.getValue(it) })
+  }
+}
 
 class DataSetSerializer : JsonSerializer<DataSet>() {
   override fun serialize(value: DataSet?, gen: JsonGenerator?, serializers: SerializerProvider?) {

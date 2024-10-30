@@ -15,7 +15,6 @@ import org.testaco.datatypes.LongType
 import org.testaco.datatypes.StringType
 import org.testaco.util.MockResultSet
 import java.sql.DatabaseMetaData
-import java.sql.SQLType
 
 class SchemaVerifierTest {
   private val uut = SchemaVerifier

@@ -9,7 +9,7 @@ fun interface CResult {
 
 data class CDatasetResult(val tableResults: Set<CTableResult>): CResult {
   override fun equals(): Boolean {
-    return tableResults.all { table: CTableResult -> println("Table ${table}:${table.equals()}"); table.equals()}
+    return tableResults.all { table: CTableResult -> table.equals()}
   }
   fun errorMessage(): String {
     return tableResults.map { it.toString() }.joinToString("\n")

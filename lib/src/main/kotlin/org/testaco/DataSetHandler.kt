@@ -64,7 +64,7 @@ object DataSetHandler {
           tableData, referenceTable, tableNameFromSet, localPath
         )
       }
-    }.toSet())
+    }.toList())
   }
 
   private fun extractTable(tableData: JsonNode, referenceTable: Table, tableName: String, localPath: String): TTable {
@@ -89,7 +89,7 @@ object DataSetHandler {
       c.autoCommit = false
       try {
         val schema = TestacoExtension.referenceSchemas[dataSourceName] ?: throw IllegalStateException("Could not find schema for data source $dataSourceName")
-        schema.tables.forEach { table ->
+        schema.tables.reversed().forEach { table ->
           c.prepareStatement("DELETE FROM ${table.tableName}").execute()
         }
         c.commit()

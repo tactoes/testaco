@@ -22,6 +22,8 @@ data class TestacoSchema(val tables: List<TestacoTable>, @JsonIgnore val filenam
             null -> throw IllegalStateException("Table $table not found")
         }
     }
+
+    fun concreteTableNameOrder(): List<String> = tables.filter { it is Table }.map { it.tableName }
 }
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
