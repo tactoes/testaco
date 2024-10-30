@@ -6,6 +6,7 @@ import org.hamcrest.MatcherAssert
 import org.hamcrest.io.FileMatchers.anExistingFile
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.skyscreamer.jsonassert.JSONAssert
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
@@ -83,6 +84,13 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
       )
       val datasetDumped = File("target/testaco/datasource/missingcolumn_result.json")
       MatcherAssert.assertThat(datasetDumped, anExistingFile())
+
+      val dumpedFileContent = getFileContent("target/testaco/datasource/missingcolumn_result.json")
+      val referenceFileContent = getFileContent("src/test/resources/db/testaco/datasource/start.json")
+      JSONAssert.assertEquals(referenceFileContent, dumpedFileContent, true)
     }
   }
+
+  private fun getFileContent(filename: String): String =
+    File(filename).bufferedReader(Charsets.UTF_8).use { it.readText() }
 }

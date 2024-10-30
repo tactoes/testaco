@@ -54,6 +54,7 @@ dependencies {
     implementation "org.yaml:snakeyaml:2.0"
     implementation "io.arrow-kt:arrow-core:1.2.3"
     testImplementation "org.testcontainers:junit-jupiter:1.18.3"
+    testImplementation "org.skyscreamer:jsonassert:1.5.3"
 }
 
 tasks.withType(KotlinCompile).configureEach {

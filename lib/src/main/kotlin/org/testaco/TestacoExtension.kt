@@ -1,7 +1,6 @@
 package org.testaco
 
 import com.fasterxml.jackson.core.JsonFactory
-import com.fasterxml.jackson.core.StreamReadFeature
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -125,7 +124,6 @@ class TestacoExtension : BeforeAllCallback {
       writeDumpFile(dataSourceName, dataFile, databaseDataset)
       throw e
     }
-    println("Result: "+result.equals()+" : "+result)
     if (!result.equals()) {
       writeDumpFile(dataSourceName, dataFile, databaseDataset)
     }
@@ -135,9 +133,11 @@ class TestacoExtension : BeforeAllCallback {
   private fun writeDumpFile(dataSourceName: String, dataFile: String, databaseDataset: DataSet) {
     val resultFileName = getResultFileName(dataSourceName, dataFile)
     Files.createDirectories(Paths.get(resultFileName.split("/").dropLast(1).joinToString("/")))
-    println("resultFileName: $resultFileName")
     val writer = mapper.writerWithDefaultPrettyPrinter()
-    writer.writeValue(File(resultFileName), databaseDataset)
+
+    val referenceSchema = referenceSchemas[dataSourceName] ?: error("Could not find reference schema for $dataSourceName")
+
+    writer.writeValue(File(resultFileName), databaseDataset.orderedByDataSchema(referenceSchema.concreteTableNameOrder()))
   }
 
   public fun getResultFileName(dataSourceName: String, dataFile: String): String {
@@ -162,7 +162,7 @@ class TestacoExtension : BeforeAllCallback {
             is Table -> TTable(table.tableName, rows = exportRows(connection, referenceSchema.find(table.tableName) as Table))
             is IgnoredTable -> null
           }
-        }.toSet()
+        }
       )
       connection.commit()
       ds
@@ -211,7 +211,6 @@ class TestacoExtension : BeforeAllCallback {
             }
           }
           st.execute()
-          println("Inserted ${st.updateCount} rows")
         }
       }
       connection.commit()

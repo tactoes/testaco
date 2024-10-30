@@ -14,7 +14,7 @@ class DatasetComparator(val schema: TestacoSchema) {
   private fun compareDataSet(database: DataSet, reference: DataSet): CDatasetResult = CDatasetResult(compareTables(
     database.tables, reference.tables))
 
-  private fun compareTables(database: Set<TTable>, reference: Set<TTable>): Set<CTableResult> {
+  private fun compareTables(database: List<TTable>, reference: List<TTable>): Set<CTableResult> {
     val databaseTables = database.map { it.name }
     val referenceTables = reference.map { it.name }
     return databaseTables.minus(referenceTables).map { CTableMissingResult(it, "Table $it is missing in the reference data set") }
@@ -31,7 +31,6 @@ class DatasetComparator(val schema: TestacoSchema) {
     val missingres: List<CRowResult> = refPks.minus(dbPks).map { CRowMissingResult(tableName, it, "Row with primary key $it is missing in table ${databaseTable.name} in the database data set")}
     check(!(databaseTable.rows.size == 0 && reference.rows.size > 0)) { "Reference data set contains data, but database table is empty" }
     val compareResult: List<CRowResult> = dbPks.union(refPks).flatMap { key ->
-      databaseTable.rows.forEach { println("Row pk is ${it.pk()}") }
       val dbRow: Row = databaseTable.rows.find { it.pk().toString() == key } ?: throw IllegalStateException("Could not find db row for primary key $key, db rows are ${databaseTable.rows.map { it.pk().toString() }}")
       val refRow: Row = reference.rows.find { it.pk().toString() == key } ?: throw IllegalStateException("Could not find ref row for primary key $key, db rows are ${databaseTable.rows.map { it.pk().toString() }}")
       val results: List<CRowResult> = compareRows(tableName, dbRow, refRow)
@@ -72,7 +71,6 @@ class DatasetComparator(val schema: TestacoSchema) {
               CColumnResult(tableName, columnName, "Reference data set contains null value, but database contains ${dbCol.value} for primary key $dbPk and column $columnName in table $tableName")
             }
             !columnDefinition.compare(refCol.value.toString(), dbCol.value.toString()) -> {
-              println("Value check: ${refCol.value} and ${dbCol.value}, ${refCol.value.javaClass}, ${dbCol.value?.javaClass}")
               CColumnResult(tableName, columnName, "Database value ${dbCol.value} does not match reference value ${refCol.value} for primary key $dbPk and column $columnName in table $tableName")
             }
             else -> {
