@@ -15,6 +15,9 @@ import org.testaco.comparator.DatasetComparator
 import org.testaco.comparator.model.CDatasetResult
 import org.testaco.database.schema.SchemaVerifier
 import org.testaco.datatypes.TestacoType
+import org.testcontainers.containers.ExecConfig
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.utility.DockerImageName
 import java.io.File
 import java.nio.charset.Charset
 import java.nio.file.Files
@@ -44,7 +47,7 @@ class TestacoExtension : BeforeAllCallback {
       fail("No testaco configuration found")
     }
     testacoConfiguration!!.databases.forEach { tdb ->
-      val dataSource = (springContext!!.getBean(tdb.dataSource) as DataSource?)
+      val dataSource: DataSource = (springContext!!.getBean(tdb.dataSource) as DataSource?)
         ?: fail("datasource ${tdb.dataSource} fetched from spring must not be null")
       val schemaFileName = "${testacoConfiguration?.datadir}/${tdb.dataSource}_schema.json"
       val schemaResource = springContext!!.getResource(schemaFileName)
@@ -67,6 +70,7 @@ class TestacoExtension : BeforeAllCallback {
       }
       val databaseMetaData = dataSource.connection.metaData
       SchemaVerifier.verifySchema(databaseMetaData, referenceSchema)
+      dumpSqlSchema(tdb.dataSource, dataSource)
       referenceSchemas.put(tdb.dataSource, referenceSchema)
     }
     // TODO: Verify database schema against stored schema.
@@ -80,6 +84,18 @@ class TestacoExtension : BeforeAllCallback {
     testacoConfiguration = springContext?.getBean(TestacoConfiguration::class.java)
       ?: fail("No testaco configuration found in spring context, panic!")
   }
+
+  fun dumpSqlSchema(dataSourceName: String, dataSource: DataSource) {
+    val username = dataSource!!.connection.metaData.userName
+    val database = dataSource!!.connection.catalog
+    var result = postgres.execInContainer(
+      ExecConfig.builder()
+      .command(arrayOf("pg_dump", "-U", username, "--schema-only", database, "-f", "/tmp/foo.sql"))
+      .build())
+    check(result.exitCode == 0) { "Could not dump database schema, Stdout: " + result.stdout + "Stderr: " + result.stderr }
+    postgres.copyFileFromContainer("/tmp/foo.sql", "target/testaco/"+dataSourceName+"/"+database+"_schema.sql")
+  }
+
 
   /**
    * Load a data file. File is loaded from the classpath.
@@ -140,7 +156,7 @@ class TestacoExtension : BeforeAllCallback {
     writer.writeValue(File(resultFileName), databaseDataset.orderedByDataSchema(referenceSchema.concreteTableNameOrder()))
   }
 
-  public fun getResultFileName(dataSourceName: String, dataFile: String): String {
+  fun getResultFileName(dataSourceName: String, dataFile: String): String {
     val splitFileName: List<String> = dataFile.split(".")
     return "target/testaco/$dataSourceName/" +
         if (splitFileName.size > 1) {
@@ -238,5 +254,10 @@ class TestacoExtension : BeforeAllCallback {
     var springContext: ApplicationContext? = null
     var testacoConfiguration: TestacoConfiguration? = null
     val referenceSchemas: MutableMap<String, TestacoSchema> = mutableMapOf()
+
+    val POSTGRES_TEST_IMAGE = DockerImageName.parse("postgres:15.3")
+
+    @JvmField
+    val postgres = PostgreSQLContainer(POSTGRES_TEST_IMAGE).also { postgres -> postgres.start() }
   }
 }

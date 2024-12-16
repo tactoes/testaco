@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ContextConfiguration
+import org.testaco.TestacoExtension
 import org.testcontainers.junit.jupiter.Testcontainers
 import java.time.format.DateTimeParseException
 
@@ -56,7 +57,7 @@ class TimestampTest @Autowired constructor(val context: ApplicationContext) : Ab
     with (testaco) {
       loadDataSet("datasource", "start.json")
 
-      val c = postgres.createConnection("")
+      val c = TestacoExtension.postgres.createConnection("")
       c.autoCommit = false
       val statement = c.createStatement()
 

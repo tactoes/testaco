@@ -11,9 +11,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ContextConfiguration
+import org.testaco.TestacoExtension
 import org.testaco.TestacoExtension.Companion.referenceSchemas
+import org.testaco.TestacoExtension.Companion.springContext
 import org.testaco.datatypes.TestacoType
+import org.testcontainers.containers.ExecConfig
 import org.testcontainers.junit.jupiter.Testcontainers
+import javax.sql.DataSource
+
+private const val ALLOWED_TIMESTAMP_DIFF = "15"
 
 @Testcontainers
 @SpringBootTest
@@ -23,7 +29,7 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
 
   @Test
   fun `flyway applies schema updates`() {
-    val c = postgres.createConnection("")
+    val c = TestacoExtension.postgres.createConnection("")
     c.autoCommit = false
     val statement = c.createStatement()
 
@@ -39,21 +45,19 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
 
   @Test
   fun `timestamp allowed time diff is actually read from schema file`() {
-    with(testaco) {
-      val referenceSchema =
-        referenceSchemas["datasource"] ?: error("Could not find reference schema for 'datasource'")
-      val columnDefinition: TestacoType<*> = referenceSchema.findColumn("names", "created")
-      assert(
-        columnDefinition.localConfiguration()["allowedTimeDiffInSeconds"]!! == "15",
-        {
-          "Time diff was columnDefinition.localConfiguration().get(\"allowedTimeDiffInSeconds\"), should be 15"
-        },
-      )
-    }
+    val referenceSchema =
+      referenceSchemas["datasource"] ?: error("Could not find reference schema for 'datasource'")
+    val columnDefinition: TestacoType<*> = referenceSchema.findColumn("names", "created")
+    assert(
+      columnDefinition.localConfiguration()["allowedTimeDiffInSeconds"]!! == ALLOWED_TIMESTAMP_DIFF,
+      {
+        "Time diff was columnDefinition.localConfiguration().get(\"allowedTimeDiffInSeconds\"), should be $ALLOWED_TIMESTAMP_DIFF"
+      },
+    )
   }
 
   @Test
-  fun `can load a data set and then dump the database`() {
+  fun `can load a data set and then dump the database, comparison with loaded data set should not fail`() {
     with(testaco) {
       loadDataSet("datasource", "start.json")
       dumpDataSet("datasource", "dumpstart.json")
