@@ -1,6 +1,5 @@
 package org.testaco.pgtester
 
-import java.io.File
 import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
 import org.hamcrest.io.FileMatchers.anExistingFile
@@ -13,11 +12,9 @@ import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ContextConfiguration
 import org.testaco.TestacoExtension
 import org.testaco.TestacoExtension.Companion.referenceSchemas
-import org.testaco.TestacoExtension.Companion.springContext
 import org.testaco.datatypes.TestacoType
-import org.testcontainers.containers.ExecConfig
 import org.testcontainers.junit.jupiter.Testcontainers
-import javax.sql.DataSource
+import java.io.File
 
 private const val ALLOWED_TIMESTAMP_DIFF = "15"
 
@@ -49,7 +46,7 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
       referenceSchemas["datasource"] ?: error("Could not find reference schema for 'datasource'")
     val columnDefinition: TestacoType<*> = referenceSchema.findColumn("names", "created")
     assert(
-      columnDefinition.localConfiguration()["allowedTimeDiffInSeconds"]!! == ALLOWED_TIMESTAMP_DIFF,
+      columnDefinition.localConfiguration().getValue("allowedTimeDiffInSeconds") == ALLOWED_TIMESTAMP_DIFF,
       {
         "Time diff was columnDefinition.localConfiguration().get(\"allowedTimeDiffInSeconds\"), should be $ALLOWED_TIMESTAMP_DIFF"
       },
