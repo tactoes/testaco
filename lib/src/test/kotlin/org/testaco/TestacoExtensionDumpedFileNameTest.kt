@@ -2,9 +2,10 @@ package org.testaco
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.testaco.pgtester.AbstractEndToEndTest
 
 class TestacoExtensionDumpedFileNameTest {
- val uut = TestacoExtension()
+ val uut = TestacoExtension(AbstractEndToEndTest.postgres)
  @Test
  fun getResultFileName() {
   assertEquals("target/testaco/datasource/foo_result.json", uut.getResultFileName("datasource", "foo.json"))

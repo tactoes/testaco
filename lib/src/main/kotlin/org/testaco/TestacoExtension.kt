@@ -28,7 +28,7 @@ import java.sql.ResultSet
 import javax.sql.DataSource
 
 
-class TestacoExtension : BeforeAllCallback {
+class TestacoExtension(val postgres: PostgreSQLContainer<out PostgreSQLContainer<*>>) : BeforeAllCallback {
   val mapper = ObjectMapper(
     JsonFactory.builder()
       //.enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
@@ -86,8 +86,8 @@ class TestacoExtension : BeforeAllCallback {
   }
 
   fun dumpSqlSchema(dataSourceName: String, dataSource: DataSource) {
-    val username = dataSource!!.connection.metaData.userName
-    val database = dataSource!!.connection.catalog
+    val username = dataSource.connection.metaData.userName
+    val database = dataSource.connection.catalog
     var result = postgres.execInContainer(
       ExecConfig.builder()
       .command(arrayOf("pg_dump", "-U", username, "--schema-only", database, "-f", "/tmp/foo.sql"))
@@ -254,10 +254,5 @@ class TestacoExtension : BeforeAllCallback {
     var springContext: ApplicationContext? = null
     var testacoConfiguration: TestacoConfiguration? = null
     val referenceSchemas: MutableMap<String, TestacoSchema> = mutableMapOf()
-
-    val POSTGRES_TEST_IMAGE = DockerImageName.parse("postgres:15.3")
-
-    @JvmField
-    val postgres = PostgreSQLContainer(POSTGRES_TEST_IMAGE).also { postgres -> postgres.start() }
   }
 }

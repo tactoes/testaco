@@ -5,21 +5,28 @@ import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.testaco.TestacoExtension
+import org.testcontainers.containers.PostgreSQLContainer
+import org.testcontainers.utility.DockerImageName
 
 abstract class AbstractEndToEndTest {
 
     companion object {
+        val POSTGRES_TEST_IMAGE = DockerImageName.parse("postgres:15.3")
+
+        @JvmField
+        val postgres = PostgreSQLContainer(POSTGRES_TEST_IMAGE).also { postgres -> postgres.start() }
+
         @RegisterExtension
         @JvmStatic
-        var testaco = TestacoExtension()
+        var testaco = TestacoExtension(postgres)
     }
 
     class Initializer : ApplicationContextInitializer<ConfigurableApplicationContext> {
         override fun initialize(applicationContext: ConfigurableApplicationContext) {
             TestPropertyValues.of(
-                "spring.datasource.jdbc-url=" + TestacoExtension.postgres.jdbcUrl,
-                "spring.datasource.username=" + TestacoExtension.postgres.username,
-                "spring.datasource.password=" + TestacoExtension.postgres.password,
+                "spring.datasource.jdbc-url=" + postgres.jdbcUrl,
+                "spring.datasource.username=" + postgres.username,
+                "spring.datasource.password=" + postgres.password,
             )
                 .applyTo(applicationContext.environment)
         }

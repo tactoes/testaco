@@ -57,7 +57,7 @@ class TimestampTest @Autowired constructor(val context: ApplicationContext) : Ab
     with (testaco) {
       loadDataSet("datasource", "start.json")
 
-      val c = TestacoExtension.postgres.createConnection("")
+      val c = postgres.createConnection("")
       c.autoCommit = false
       val statement = c.createStatement()
 
