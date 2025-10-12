@@ -21,18 +21,18 @@ class TimestampTest @Autowired constructor(val context: ApplicationContext) : Ab
   @Test
   fun `default reference data file should equal itself`() {
     with (testaco) {
-      loadDataSet("datasource", "start.json")
-      compareDataSet("datasource", "start.json")
+      loadDataSet(dataSourceName(), "start.json")
+      compareDataSet(dataSourceName(), "start.json")
     }
   }
 
   @Test
   fun `default reference data file with wrong timestamp format should fail`() {
     with (testaco) {
-      loadDataSet("datasource", "start.json")
+      loadDataSet(dataSourceName(), "start.json")
       MatcherAssert.assertThat(
         assertThrows<DateTimeParseException> {
-          compareDataSet("datasource", "TimestampTest/brokentimestamp.json")
+          compareDataSet(dataSourceName(), "TimestampTest/brokentimestamp.json")
         }.message,
         CoreMatchers.containsString("Text '20-24-10-21T00:00:00' could not be parsed")
       )
@@ -42,10 +42,10 @@ class TimestampTest @Autowired constructor(val context: ApplicationContext) : Ab
   @Test
   fun `default reference data file with non-equal timestamp format should fail`() {
     with (testaco) {
-      loadDataSet("datasource", "start.json")
+      loadDataSet(dataSourceName(), "start.json")
       MatcherAssert.assertThat(
         assertThrows<IllegalArgumentException> {
-          compareDataSet("datasource", "TimestampTest/nonequaltimestamp.json")
+          compareDataSet(dataSourceName(), "TimestampTest/nonequaltimestamp.json")
         }.message,
         CoreMatchers.containsString("Database value \"2024-10-21T00:00:00\" does not match reference value")
       )
@@ -55,7 +55,7 @@ class TimestampTest @Autowired constructor(val context: ApplicationContext) : Ab
   @Test
   fun `it is possible to handle timestamps using the now keyword`() {
     with (testaco) {
-      loadDataSet("datasource", "start.json")
+      loadDataSet(dataSourceName(), "start.json")
 
       val c = postgres.createConnection("")
       c.autoCommit = false
@@ -65,7 +65,9 @@ class TimestampTest @Autowired constructor(val context: ApplicationContext) : Ab
       c.commit()
       c.close()
 
-      compareDataSet("datasource", "TimestampTest/timestampwithnow.json")
+      compareDataSet(dataSourceName(), "TimestampTest/timestampwithnow.json")
     }
   }
+
+  override fun dataSourceName(): String = "datasource"
 }

@@ -1,17 +1,30 @@
 package org.testaco.pgtester
 
+import com.zaxxer.hikari.HikariDataSource
+import org.junit.Before
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.springframework.boot.test.util.TestPropertyValues
 import org.springframework.context.ApplicationContextInitializer
 import org.springframework.context.ConfigurableApplicationContext
 import org.testaco.TestacoExtension
+import org.testaco.TestacoExtension.Companion.springContext
 import org.testcontainers.containers.PostgreSQLContainer
 import org.testcontainers.utility.DockerImageName
+import javax.sql.DataSource
 
 abstract class AbstractEndToEndTest {
 
+    abstract fun dataSourceName(): String
+
+    @BeforeEach
+    fun noInUseConnections() {
+        val dataSource: HikariDataSource = (springContext!!.getBean(dataSourceName()) as DataSource?) as HikariDataSource
+        assert (dataSource.hikariPoolMXBean.activeConnections == 0, {"Number of active connections was ${dataSource.hikariPoolMXBean.activeConnections} instead of 0"})
+    }
+
     companion object {
-        val POSTGRES_TEST_IMAGE = DockerImageName.parse("postgres:15.3")
+        val POSTGRES_TEST_IMAGE = DockerImageName.parse("postgres:latest")
 
         @JvmField
         val postgres = PostgreSQLContainer(POSTGRES_TEST_IMAGE).also { postgres -> postgres.start() }

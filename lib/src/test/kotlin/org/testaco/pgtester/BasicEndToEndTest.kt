@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.ContextConfiguration
-import org.testaco.TestacoExtension
 import org.testaco.TestacoExtension.Companion.referenceSchemas
 import org.testaco.datatypes.TestacoType
 import org.testcontainers.junit.jupiter.Testcontainers
@@ -43,7 +42,7 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
   @Test
   fun `timestamp allowed time diff is actually read from schema file`() {
     val referenceSchema =
-      referenceSchemas["datasource"] ?: error("Could not find reference schema for 'datasource'")
+      referenceSchemas[dataSourceName()] ?: error("Could not find reference schema for 'datasource'")
     val columnDefinition: TestacoType<*> = referenceSchema.findColumn("names", "created")
     assert(
       columnDefinition.localConfiguration().getValue("allowedTimeDiffInSeconds") == ALLOWED_TIMESTAMP_DIFF,
@@ -56,18 +55,18 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
   @Test
   fun `can load a data set and then dump the database, comparison with loaded data set should not fail`() {
     with(testaco) {
-      loadDataSet("datasource", "start.json")
-      dumpDataSet("datasource", "dumpstart.json")
-      compareDataSet("datasource", "start.json")
+      loadDataSet(dataSourceName(), "start.json")
+      dumpDataSet(dataSourceName(), "dumpstart.json")
+      compareDataSet(dataSourceName(), "start.json")
     }
   }
 
   @Test
   fun `fails on reference data set with extra column`() {
     with(testaco) {
-      loadDataSet("datasource", "start.json")
+      loadDataSet(dataSourceName(), "start.json")
       MatcherAssert.assertThat(
-        assertThrows<IllegalStateException> { compareDataSet("datasource", "extracolumn.json") }
+        assertThrows<IllegalStateException> { compareDataSet(dataSourceName(), "extracolumn.json") }
           .message,
         CoreMatchers.startsWith("Could not find column with name boguscolumn in db"),
       )
@@ -77,9 +76,9 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
   @Test
   fun `fails on reference data set with missing column and writes file to file system`() {
     with(testaco) {
-      loadDataSet("datasource", "start.json")
+      loadDataSet(dataSourceName(), "start.json")
       MatcherAssert.assertThat(
-        assertThrows<IllegalStateException> { compareDataSet("datasource", "missingcolumn.json") }
+        assertThrows<IllegalStateException> { compareDataSet(dataSourceName(), "missingcolumn.json") }
           .message,
         CoreMatchers.startsWith("Could not find column with name alias in ref"),
       )
@@ -91,6 +90,8 @@ class BasicEndToEndTest @Autowired constructor(val context: ApplicationContext) 
       JSONAssert.assertEquals(referenceFileContent, dumpedFileContent, true)
     }
   }
+
+  override fun dataSourceName(): String = "datasource"
 
   private fun getFileContent(filename: String): String =
     File(filename).bufferedReader(Charsets.UTF_8).use { it.readText() }

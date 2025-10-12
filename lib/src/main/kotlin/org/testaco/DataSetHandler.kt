@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonMappingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.zaxxer.hikari.HikariDataSource
 import org.junit.jupiter.api.fail
 import org.springframework.core.io.Resource
 import java.nio.charset.Charset
@@ -84,21 +85,21 @@ object DataSetHandler {
   }
 
   fun deleteData(dataSourceName: String, dataSource: DataSource) {
-    dataSource.connection.use { connection: Connection? ->
-      val c = connection ?: throw IllegalStateException("Could not get connection for data source $dataSourceName")
-      c.autoCommit = false
-      try {
-        val schema = TestacoExtension.referenceSchemas[dataSourceName] ?: throw IllegalStateException("Could not find schema for data source $dataSourceName")
-        schema.tables.reversed().forEach { table ->
-          c.prepareStatement("DELETE FROM ${table.tableName}").execute()
-        }
-        c.commit()
-      } catch (e: Exception) {
-        c.rollback()
-        throw e
-      } finally {
-        c.close()
+    val connection = dataSource.connection
+    connection.autoCommit = false
+    val c = connection ?: throw IllegalStateException("Could not get connection for data source $dataSourceName")
+    c.autoCommit = false
+    try {
+      val schema = TestacoExtension.referenceSchemas[dataSourceName] ?: throw IllegalStateException("Could not find schema for data source $dataSourceName")
+      schema.tables.reversed().forEach { table ->
+        c.prepareStatement("DELETE FROM ${table.tableName}").execute()
       }
+      c.commit()
+    } catch (e: Exception) {
+      c.rollback()
+      throw e
+    } finally {
+      c.close()
     }
   }
 

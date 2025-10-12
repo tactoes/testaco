@@ -20,10 +20,6 @@ import kotlin.reflect.full.declaredFunctions
 class PgtesterApplicationTests @Autowired constructor(val context: ApplicationContext) {
 
     @Test
-    fun contextLoads() {
-    }
-
-    @Test
     fun `all service methods are annotated for authorization`() {
         // verifies that spring-declared services have authorization in order to avoid OWASP A01:2021 and/or CWE-862
         val services = context.getBeansWithAnnotation(Service::class.java)

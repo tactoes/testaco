@@ -68,7 +68,7 @@ class TestacoExtension(val postgres: PostgreSQLContainer<out PostgreSQLContainer
       } catch (e: JsonMappingException) {
         fail("Could not parse file $schemaFileName, parser gives reason: ${e.message}", e)
       }
-      val databaseMetaData = dataSource.connection.metaData
+      val databaseMetaData = dataSource.connection.use { it.metaData }
       SchemaVerifier.verifySchema(databaseMetaData, referenceSchema)
       dumpSqlSchema(tdb.dataSource, dataSource)
       referenceSchemas.put(tdb.dataSource, referenceSchema)
@@ -86,8 +86,10 @@ class TestacoExtension(val postgres: PostgreSQLContainer<out PostgreSQLContainer
   }
 
   fun dumpSqlSchema(dataSourceName: String, dataSource: DataSource) {
-    val username = dataSource.connection.metaData.userName
-    val database = dataSource.connection.catalog
+    val connection = dataSource.connection
+    val username = connection.metaData.userName
+    val database = connection.catalog
+    connection.close()
     var result = postgres.execInContainer(
       ExecConfig.builder()
       .command(arrayOf("pg_dump", "-U", username, "--schema-only", database, "-f", "/tmp/foo.sql"))
@@ -185,6 +187,8 @@ class TestacoExtension(val postgres: PostgreSQLContainer<out PostgreSQLContainer
     } catch (e: Exception) {
       connection.rollback()
       throw e
+    } finally{
+      connection.close()
     }
     return ds
   }
