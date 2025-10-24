@@ -24,7 +24,7 @@ abstract class AbstractEndToEndTest {
     }
 
     companion object {
-        val POSTGRES_TEST_IMAGE = DockerImageName.parse("postgres:latest")
+        val POSTGRES_TEST_IMAGE = DockerImageName.parse("postgres:17.0-alpine")
 
         @JvmField
         val postgres = PostgreSQLContainer(POSTGRES_TEST_IMAGE).also { postgres -> postgres.start() }

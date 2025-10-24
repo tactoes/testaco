@@ -1,6 +1,6 @@
 package org.testaco.util
 
-class QualifiedTableName @JvmOverloads constructor(
+class QualifiedTableName constructor(
     tableName: String,
     defaultSchema: String?,
 ) {

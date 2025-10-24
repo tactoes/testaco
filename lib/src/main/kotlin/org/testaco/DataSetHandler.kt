@@ -51,7 +51,7 @@ object DataSetHandler {
     assert(
       missingtables.isEmpty(),
       { "Data set $localPath contains tables that do not exist in reference schema, aborting. Extraneous tables are $missingtables" })
-    return DataSet(dataset.fields().asSequence().map { tableFromSet: MutableMap.MutableEntry<String, JsonNode>? ->
+    return DataSet(dataset.properties().asSequence().map { tableFromSet: MutableMap.MutableEntry<String, JsonNode>? ->
       if (tableFromSet == null) {
         fail("How? What? This should not have been null?")
       }
@@ -76,7 +76,7 @@ object DataSetHandler {
           row.isObject,
           { "Table $tableName needs to contain an array which in turn contains objects representing a row in $localPath" })
         Row(
-          row.fields().asSequence().map { column: MutableMap.MutableEntry<String, JsonNode> ->
+          row.properties().asSequence().map { column: MutableMap.MutableEntry<String, JsonNode> ->
             Column(column.key, column.value)
           }.toSet()
         )

@@ -11,9 +11,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     // Apply the java-library plugin for API and implementation separation.
-    id 'java-library'
+    id 'java'
 
-    id 'org.springframework.boot' version '3.3.3'
+    id 'org.springframework.boot' version '3.5.7'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'org.jetbrains.kotlin.jvm' version '1.9.23'
     id 'org.jetbrains.kotlin.plugin.spring' version '1.9.23'
@@ -35,31 +35,27 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect"
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
-    implementation('com.google.guava:guava:32.0.0-jre')
-    implementation("org.postgresql:postgresql:42.7.7")
-    implementation("net.postgis:postgis-jdbc:2.1.7.2")
-    implementation("org.junit.jupiter:junit-jupiter:5.8.2")
-    testImplementation("org.hamcrest:hamcrest-library:2.1")
+    implementation('com.google.guava:guava:33.5.0-jre')
+    implementation("org.postgresql:postgresql:42.7.8")
+    implementation("org.junit.jupiter:junit-jupiter:6.0.0")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.hamcrest:hamcrest-library:3.0")
     implementation "org.testcontainers:postgresql:1.21.3"
     testImplementation "org.testcontainers:junit-jupiter:1.21.3"
 
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation "org.flywaydb:flyway-core:9.19.4"
+
+    implementation "org.flywaydb:flyway-core:" + "11.15.0"
+    implementation "org.flywaydb:flyway-database-postgresql"
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
     implementation 'org.postgresql:postgresql:42.7.8'
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation "org.yaml:snakeyaml:2.0"
-    implementation "io.arrow-kt:arrow-core:1.2.3"
+    implementation "org.yaml:snakeyaml:2.5"
+    implementation "io.arrow-kt:arrow-core:2.1.2"
     testImplementation "org.skyscreamer:jsonassert:1.5.3"
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        jvmTarget = "21"
-    }
 }
 
 sourceCompatibility = JavaVersion.VERSION_21

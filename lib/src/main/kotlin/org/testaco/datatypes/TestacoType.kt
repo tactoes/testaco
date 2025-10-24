@@ -43,7 +43,6 @@ object TestacoConverter {
         "uuid" -> UuidType(columnName, sqlType, sqlTypeName)
         "interval" -> IntervalType(columnName, sqlType, sqlTypeName)
         "inet" -> InetType(columnName, sqlType, sqlTypeName)
-        "geometry" -> GeometryType(columnName, sqlType, sqlTypeName)
         "citext" -> CitextType(columnName, sqlType, sqlTypeName)
         else ->
           throw RuntimeException("Testaco does not support user data types out of the box.")
