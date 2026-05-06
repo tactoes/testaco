@@ -36,7 +36,7 @@ dependencies {
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation('com.google.guava:guava:32.0.0-jre')
-    implementation("org.postgresql:postgresql:42.7.7")
+    implementation("org.postgresql:postgresql:42.7.11")
     implementation("net.postgis:postgis-jdbc:2.1.7.2")
     implementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("org.hamcrest:hamcrest-library:2.1")
@@ -47,7 +47,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation "org.flywaydb:flyway-core:9.19.4"
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
-    implementation 'org.postgresql:postgresql:42.7.7'
+    implementation 'org.postgresql:postgresql:42.7.11'
     implementation 'org.jetbrains.kotlin:kotlin-reflect'
     implementation 'org.springframework.boot:spring-boot-starter-test'
     implementation "org.testcontainers:postgresql:1.20.1"
