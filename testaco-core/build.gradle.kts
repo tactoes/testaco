@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.21.3")
 
     compileOnly("org.postgresql:postgresql:42.7.5")
 
