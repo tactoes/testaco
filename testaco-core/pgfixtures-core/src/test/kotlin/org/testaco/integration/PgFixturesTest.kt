@@ -37,20 +37,20 @@ class TestacoTest : FunSpec({
     }
 
     test("load and assertMatches round-trip") {
-        val db = PgFixtures(dataSource = ds(), schemaResourcePath = "test-schemas/valid-schema.json")
+        val db = Testaco(dataSource = ds(), schemaResourcePath = "test-schemas/valid-schema.json")
         db.load("test-datasets/public-users", "test-datasets/public-orders")
         db.assertMatches("test-datasets/expected-after-load")
     }
 
     test("dump returns in-memory dataset") {
-        val db = PgFixtures(dataSource = ds(), schemaResourcePath = "test-schemas/valid-schema.json")
+        val db = Testaco(dataSource = ds(), schemaResourcePath = "test-schemas/valid-schema.json")
         db.load("test-datasets/public-users")
         val result = db.dump()
         result shouldContainKey "public.users"
     }
 
     test("assertMatches throws on mismatch") {
-        val db = PgFixtures(dataSource = ds(), schemaResourcePath = "test-schemas/valid-schema.json")
+        val db = Testaco(dataSource = ds(), schemaResourcePath = "test-schemas/valid-schema.json")
         db.load("test-datasets/public-users")
         shouldThrow<DataSetMismatchException> {
             db.assertMatches("test-datasets/expected-mismatch")
