@@ -1,6 +1,27 @@
 # PgFixtures
 
-PgFixtures is a Kotlin reimplementation of DbUnit for Kotest, designed for modern test workflows. It uses JSON datasets for test data management and focuses exclusively on PostgreSQL, providing bidirectional schema validation, composable datasets, and powerful assertion matchers.
+PgFixtures is a Kotlin reimplementation of DbUnit for Kotest, designed for modern test workflows. It uses JSON datasets for test 
+data management and focuses exclusively on PostgreSQL, providing bidirectional schema validation, composable datasets, and powerful assertion matchers.
+
+## Why?
+
+Tests have a regrettable side effect, and that is a kind of stiffening of the boundaries that are used for testing. A project that only uses unit tests
+will have a harder time making refactoring changes across existing unit boundaries because the tests will not be as useful for refactoring
+(See "refactoring", Fowler).
+
+There are however interfaces that are more flexible in a typical application. The database layer has well-defined ways of mutating the
+database schema (["Database refactoring", Ambler et al](https://databaserefactoring.com/)). Well-designed applications are the sole
+user of its database, which cuts down on the need for versioning, and tools like [Flyway](https://github.com/flyway/flyway) handles
+evolution of database schemas well. I prefer having at least some tests that pull up the whole application, interacting directly with
+the database.
+
+Tests do need to load, dump and compare the data in the database, and this is where Testaco comes in. There are scripts within Testaco
+that allows evolving database data sets automatically from the command line or an AI tool.
+
+Testaco is written to be as test-library agnostic as possible, although I personally use kotest and testcontainers in the projects I am currently
+working on.
+
+Give it a spin, and tell me how it worked out for you?
 
 ## Features
 

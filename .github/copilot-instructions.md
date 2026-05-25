@@ -6,9 +6,9 @@ Purpose
 Build, test, and run
 - Build everything: ./gradlew build
 - Run all tests: ./gradlew test
-- Run a single module tests: ./gradlew :pgfixtures-core:test or ./gradlew :pgfixtures-gradle-plugin:test
-- Run a single test class (pattern): ./gradlew :pgfixtures-core:test --tests "*OrderServiceTest"
-- Run a single test method (fully-qualified): ./gradlew :pgfixtures-core:test --tests "com.example.OrderServiceTest.createOrder"
+- Run a single module tests: ./gradlew :testaco-core:test or ./gradlew :testaco-gradle-plugin:test
+- Run a single test class (pattern): ./gradlew :testaco-core:test --tests "*OrderServiceTest"
+- Run a single test method (fully-qualified): ./gradlew :testaco-core:test --tests "com.example.OrderServiceTest.createOrder"
 - Gradle args: add --no-parallel if you need sequential test execution.
 
 Notes about linting/formatting
@@ -16,13 +16,13 @@ Notes about linting/formatting
 - Kotlin style: kotlin.code.style=official (see gradle.properties)
 
 High-level architecture
-- Multi-module Gradle project (root: pgfixtures)
-  - pgfixtures-core: the Kotlin library providing PgFixtures API, dataset matchers, validation and dump/assert logic.
-  - pgfixtures-gradle-plugin: Gradle plugin that provides schema/dataset management tasks (pgfixturesAddColumn, pgfixturesRemoveColumn, pgfixturesAddTable, pgfixturesRemoveTable).
+- Multi-module Gradle project (root: testaco)
+  - testaco-core: the Kotlin library providing PgFixtures API, dataset matchers, validation and dump/assert logic.
+  - testaco-gradle-plugin: Gradle plugin that provides schema/dataset management tasks (pgfixturesAddColumn, pgfixturesRemoveColumn, pgfixturesAddTable, pgfixturesRemoveTable).
 - Tests use Kotest on JUnit platform and connect to PostgreSQL via PGSimpleDataSource.
 - Test datasets and schema live under src/test/resources.
-  - Schema: src/test/resources/pgfixtures-schema.json (default)
-  - Optional config: src/test/resources/pgfixtures-config.json
+  - Schema: src/test/resources/testaco-schema.json (default)
+  - Optional config: src/test/resources/testaco-config.json
   - Datasets: organized by test class/method, e.g. src/test/resources/com/example/OrderServiceTest/creates_order/{setup.json,expected.json}
 - On PgFixtures instantiation the library validates schema ↔ live database bidirectionally.
 
@@ -33,11 +33,11 @@ Key conventions (repo-specific)
   - ~now, ~now±PT10S for timestamps
   - ~ignore to skip columns
   - ~regex:<pattern> for pattern matching
-- Default schema path: src/test/resources/pgfixtures-schema.json unless overridden via PgFixtures constructor.
+- Default schema path: src/test/resources/testaco-schema.json unless overridden via PgFixtures constructor.
 - Use provided Gradle tasks to change schema and update datasets (they modify schema + dataset JSONs consistently).
 - Quote PostgreSQL types containing spaces (e.g., "timestamp with time zone") when passing via CLI.
 - When adding/removing schema elements: commit schema and dataset changes together.
-- Debugging failing assertions: inspect build/test-results/pgfixtures/<test-path>/actual.json (auto-dumped) and use diff against expected JSON.
+- Debugging failing assertions: inspect build/test-results/testaco/<test-path>/actual.json (auto-dumped) and use diff against expected JSON.
 
 Environment & toolchain
 - Kotlin: declared plugin kotlin("jvm") 2.1.20
