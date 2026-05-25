@@ -30,4 +30,76 @@ subprojects {
     }
 }
 
-\n// License: Apache-2.0 (Copyright 2026 Geir Hedemark)
+// License: Apache-2.0 (Copyright 2026 Geir Hedemark)
+
+// Publishing sample (add to root build.gradle.kts or include as needed)
+plugins {
+    `maven-publish`
+    signing
+}
+
+// Tasks for sources and javadoc
+val javadocJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("javadoc")
+}
+
+val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from((project.extensions.findByName("sourceSets") as? org.gradle.api.tasks.SourceSetContainer)?.named("main")?.get()?.allSource)
+}
+
+publishing {
+    publications {
+        create<org.gradle.api.publish.maven.MavenPublication>("mavenJava") {
+            // for Java/Kotlin projects with 'java' or 'kotlin' components
+            from(components.getByName("java"))
+            artifact(sourcesJar.get())
+            artifact(javadocJar.get())
+
+            pom {
+                name.set("testaco")
+                description.set("Testaco library")
+                url.set("https://testaco.org")
+                licenses {
+                    license {
+                        name.set("The Apache License, Version 2.0")
+                        url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+                scm {
+                    connection.set("scm:git:git@github.com:tactoes/testaco.git")
+                    developerConnection.set("scm:git:git@github.com:tactoes/testaco.git")
+                    url.set("https://github.com/tactoes/testaco")
+                }
+                developers {
+                    developer {
+                        id.set("geirhe")
+                        name.set("Geir Hedemark")
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
+            credentials {
+                username = findProperty("ossrhUsername") as String? ?: System.getenv("OSSRH_USERNAME")
+                password = findProperty("ossrhPassword") as String? ?: System.getenv("OSSRH_PASSWORD")
+            }
+        }
+    }
+}
+
+signing {
+    val signingKey = findProperty("signing.key") as String? ?: System.getenv("GPG_PRIVATE_KEY")
+    val signingPassword = findProperty("signing.password") as String? ?: System.getenv("GPG_PASSPHRASE")
+    if (!signingKey.isNullOrBlank()) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    }
+    sign(publishing.publications["mavenJava"])
+}
+
+// End publishing sample
