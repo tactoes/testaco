@@ -458,3 +458,10 @@ If you get a "schema file not found" error:
    ```kotlin
    val db = Testaco(dataSource, schemaResourcePath = "custom-schema.json")
    ```
+
+---
+License
+
+Copyright (c) 2026 Geir Hedemark
+
+Licensed under the Apache License, Version 2.0. See LICENSE for details.

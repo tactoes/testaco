@@ -51,3 +51,10 @@ Where to look next for context
 If you want edits
 - Suggest any additional commands or repository-specific notes to include (CI targets, IDE tasks, or non-standard workflows).
 
+
+---
+License
+
+Copyright (c) 2026 Geir Hedemark
+
+Licensed under the Apache License, Version 2.0. See LICENSE for details.

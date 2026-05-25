@@ -476,3 +476,10 @@ Ensure you use valid PostgreSQL types:
 - etc.
 
 See [PostgreSQL Data Types](https://www.postgresql.org/docs/current/datatype.html) for the full list.
+
+---
+License
+
+Copyright (c) 2026 Geir Hedemark
+
+Licensed under the Apache License, Version 2.0. See LICENSE for details.

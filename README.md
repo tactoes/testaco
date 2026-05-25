@@ -219,3 +219,10 @@ fun dump(): Map<String, List<Map<String, Any?>>>
 ## Contributing
 
 [Add contributing guidelines here]
+
+---
+License
+
+Copyright (c) 2026 Geir Hedemark
+
+Licensed under the Apache License, Version 2.0. See LICENSE for details.

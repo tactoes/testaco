@@ -608,3 +608,10 @@ test("debugging test") {
     db.dump("debug/actual-state")
 }
 ```
+
+---
+License
+
+Copyright (c) 2026 Geir Hedemark
+
+Licensed under the Apache License, Version 2.0. See LICENSE for details.

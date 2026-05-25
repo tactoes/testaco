@@ -266,3 +266,10 @@ For more complex debugging, dump to memory and inspect programmatically:
 - **Use `~regex:` for pattern matching.** For values that follow a pattern but aren't exact (e.g., `"~regex:ORD-\\d+"`).
 - **Check your setup data.** Many assertion failures are caused by the setup data being wrong, not the code under test. Review `setup.json` alongside `expected.json`.
 - **Each failing test gets its own dump file.** The dump path is derived from the resource path, so multiple failing tests don't overwrite each other. After a test run, check `build/test-results/testaco/` to see all failures.
+
+---
+License
+
+Copyright (c) 2026 Geir Hedemark
+
+Licensed under the Apache License, Version 2.0. See LICENSE for details.

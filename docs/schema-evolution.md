@@ -287,3 +287,10 @@ So when you add a column like `updated_at`:
 - **Use composable datasets for shared reference data.** When a new table is needed by many tests, create a shared dataset file and load it with `db.load("shared/reference-data", "test-specific/setup")`.
 - **Use ignored columns for audit fields.** Don't clutter every dataset file with `created_at` and `updated_at`.
 - **Run your tests after schema changes.** The Gradle tasks update files mechanically. If a test's logic depends on the changed column, the test may need manual attention beyond what the task provides.
+
+---
+License
+
+Copyright (c) 2026 Geir Hedemark
+
+Licensed under the Apache License, Version 2.0. See LICENSE for details.
