@@ -1,0 +1,6 @@
+{
+  "public.users": [
+    { "id": 1, "name": "WRONG_NAME", "email": "alice@example.com" },
+    { "id": 2, "name": "Bob", "email": null }
+  ]
+}

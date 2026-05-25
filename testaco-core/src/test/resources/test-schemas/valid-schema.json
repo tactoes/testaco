@@ -1,0 +1,24 @@
+{
+  "schemas": ["public"],
+  "tables": {
+    "public.users": {
+      "columns": {
+        "id": { "type": "bigint", "nullable": false },
+        "name": { "type": "text", "nullable": false },
+        "email": { "type": "text", "nullable": true }
+      },
+      "primaryKey": ["id"]
+    },
+    "public.orders": {
+      "columns": {
+        "id": { "type": "bigint", "nullable": false },
+        "user_id": { "type": "bigint", "nullable": false },
+        "amount": { "type": "numeric", "nullable": false }
+      },
+      "primaryKey": ["id"],
+      "foreignKeys": [
+        { "columns": ["user_id"], "references": "public.users", "referencedColumns": ["id"] }
+      ]
+    }
+  }
+}
