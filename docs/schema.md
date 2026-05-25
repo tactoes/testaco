@@ -1,6 +1,6 @@
 # Schema Reference
 
-This guide covers the Testaco schema file format, validation behavior, and error handling.
+This guide covers the PgFixtures schema file format, validation behavior, and error handling.
 
 ## Table of Contents
 
@@ -52,7 +52,7 @@ The schema file is a JSON file that defines the structure of your database table
 
 ### Supported PostgreSQL Types
 
-Testaco supports all PostgreSQL types. Common types include:
+PgFixtures supports all PostgreSQL types. Common types include:
 
 | Type | Description | Example Values |
 |------|-------------|----------------|
@@ -76,7 +76,7 @@ See [PostgreSQL Data Types](https://www.postgresql.org/docs/current/datatype.htm
 
 ### Multi-Schema Support
 
-By default, Testaco uses the `public` schema. To work with multiple schemas, configure them in `testaco-config.json`:
+By default, PgFixtures uses the `public` schema. To work with multiple schemas, configure them in `testaco-config.json`:
 
 ```json
 {
@@ -100,21 +100,21 @@ Then reference tables in the schema file with or without the schema prefix:
 }
 ```
 
-If no schema prefix is specified, Testaco will search for the table in all configured schemas.
+If no schema prefix is specified, PgFixtures will search for the table in all configured schemas.
 
 ## Validation Behavior
 
-Testaco performs **bidirectional validation** at construction time:
+PgFixtures performs **bidirectional validation** at construction time:
 
 1. **Schema file → Live database:** Verifies that all tables and columns in the schema file exist in the database with matching types
 2. **Live database → Schema file:** Verifies that all tables and columns in the database (for configured schemas) exist in the schema file
 
 ### When Validation Occurs
 
-Validation happens when you create a `Testaco` instance:
+Validation happens when you create a `PgFixtures` instance:
 
 ```kotlin
-val db = Testaco(dataSource) // Validation happens here
+val db = PgFixtures(dataSource) // Validation happens here
 ```
 
 ### What Gets Validated
@@ -144,7 +144,7 @@ Datasets are validated against the schema file on `load()` and `assertMatches()`
 
 ## Error Messages
 
-Testaco provides detailed error messages with "did you mean?" suggestions for typos.
+PgFixtures provides detailed error messages with "did you mean?" suggestions for typos.
 
 ### Schema Validation Errors
 
@@ -216,7 +216,7 @@ Dataset validation failed: Column 'id' in table 'users' in dataset 'setup.json' 
 
 ### Assertion Errors
 
-When `assertMatches()` fails, Testaco:
+When `assertMatches()` fails, PgFixtures:
 
 1. Prints a detailed diff showing:
    - Missing rows (in expected but not actual)
@@ -251,7 +251,7 @@ If you have an existing database and want to create a schema file, you can use t
 Create a Kotlin script or test to dump the schema:
 
 ```kotlin
-import org.testaco.Testaco
+import org.testaco.PgFixtures
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import org.postgresql.ds.PGSimpleDataSource
 import java.io.File
@@ -266,7 +266,7 @@ fun main() {
 
     // This will fail with a schema validation error, but will print the database schema
     try {
-        val db = Testaco(dataSource, schemaResourcePath = "empty-schema.json")
+        val db = PgFixtures(dataSource, schemaResourcePath = "empty-schema.json")
     } catch (e: Exception) {
         println("Expected error (no schema file yet):")
         println(e.message)
@@ -335,10 +335,10 @@ Then construct the JSON manually:
 
 ### Step 3: Verify Schema
 
-Create a `Testaco` instance to verify the schema:
+Create a `PgFixtures` instance to verify the schema:
 
 ```kotlin
-val db = Testaco(dataSource)
+val db = PgFixtures(dataSource)
 // If no exception is thrown, schema is valid
 ```
 
@@ -374,11 +374,11 @@ Use the provided Gradle tasks to ensure schema and dataset files stay in sync:
 
 ### 3. Validate Schema Early
 
-Create the `Testaco` instance early in your test to catch schema mismatches before running test logic:
+Create the `PgFixtures` instance early in your test to catch schema mismatches before running test logic:
 
 ```kotlin
 class UserServiceTest : FunSpec({
-    val db = Testaco(dataSource) // Validates schema immediately
+    val db = PgFixtures(dataSource) // Validates schema immediately
     
     test("creates user") {
         db.load("setup")
@@ -418,7 +418,7 @@ And reference tables with schema prefixes if needed:
 
 ### Validation Fails on Startup
 
-If validation fails when creating a `Testaco` instance:
+If validation fails when creating a `PgFixtures` instance:
 
 1. Read the error message carefully (it shows exactly what's wrong)
 2. Check if you have a typo (use the "did you mean?" suggestions)
@@ -441,7 +441,7 @@ If you get type mismatch errors:
 
 If the database has tables/columns not in the schema file:
 
-1. Add them to the schema file if they should be managed by Testaco
+1. Add them to the schema file if they should be managed by PgFixtures
 2. Exclude the schema if the tables shouldn't be managed:
    ```json
    {
@@ -456,5 +456,5 @@ If you get a "schema file not found" error:
 1. Ensure the file exists at `src/test/resources/testaco-schema.json`
 2. If using a custom path, pass it to the constructor:
    ```kotlin
-   val db = Testaco(dataSource, schemaResourcePath = "custom-schema.json")
+   val db = PgFixtures(dataSource, schemaResourcePath = "custom-schema.json")
    ```

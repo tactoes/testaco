@@ -1,12 +1,12 @@
 # Schema Evolution Guide
 
-When your database schema changes, your test datasets must change with it. Testaco provides Gradle tasks that automate this — updating both the schema file and every dataset file in one step.
+When your database schema changes, your test datasets must change with it. PgFixtures provides Gradle tasks that automate this — updating both the schema file and every dataset file in one step.
 
 This guide walks through the common scenarios: adding tables, removing tables, adding columns, and removing columns.
 
 ## How It Works
 
-Testaco validates your schema file (`testaco-schema.json`) against the live database at startup. If they don't match, your tests fail immediately with a clear diff:
+PgFixtures validates your schema file (`testaco-schema.json`) against the live database at startup. If they don't match, your tests fail immediately with a clear diff:
 
 ```
 SchemaValidationException: Database schema does not match testaco-schema.json

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: org.testcontainers:database-commons:1.20.6" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="org.testcontainers" artifactId="database-commons" version="1.20.6" baseVersion="1.20.6" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.testcontainers/database-commons/1.20.6/a1068aeff75867682decc0b5a6ee60f8676c6936/database-commons-1.20.6.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.testcontainers/database-commons/1.20.6/5369f078b0834633e70404b7093aa203d4cdfb4a/database-commons-1.20.6-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

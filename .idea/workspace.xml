@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="22db35f9-3077-4702-a201-eec223e79882" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/debugging.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/debugging.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/gradle-tasks.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/gradle-tasks.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/schema-evolution.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/schema-evolution.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/schema.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/schema.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docs/usage.md" beforeDir="false" afterPath="$PROJECT_DIR$/docs/usage.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/build.gradle.kts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/PgFixtures.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/assertion/ColumnMatcher.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/assertion/ComparisonResult.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/config/PgFixturesConfig.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/dataset/DataSet.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/dataset/DataSetReader.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/dataset/DataSetWriter.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/operation/CompareOperation.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/operation/DumpOperation.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/operation/LoadOperation.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/schema/Schema.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/schema/SchemaReader.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/schema/SchemaValidator.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/util/ForeignKeyResolver.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/main/kotlin/com/pgfixtures/util/PostgresIntrospector.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/kotlin/com/pgfixtures/assertion/ColumnMatcherTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/kotlin/com/pgfixtures/dataset/DataSetReaderTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/kotlin/com/pgfixtures/dataset/DataSetWriterTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/kotlin/com/pgfixtures/integration/CompareOperationTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/kotlin/com/pgfixtures/integration/DumpOperationTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/kotlin/com/pgfixtures/integration/LoadOperationTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/kotlin/com/pgfixtures/integration/PgFixturesTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/kotlin/com/pgfixtures/integration/PostgresIntrospectorTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/kotlin/com/pgfixtures/schema/SchemaReaderTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/kotlin/com/pgfixtures/schema/SchemaValidatorTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/kotlin/com/pgfixtures/util/ForeignKeyResolverTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/resources/test-datasets/expected-after-load.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/resources/test-datasets/expected-mismatch.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/resources/test-datasets/more-users.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/resources/test-datasets/orders.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/resources/test-datasets/public-orders.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/resources/test-datasets/public-users.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/resources/test-datasets/users.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-core/src/test/resources/test-schemas/valid-schema.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-gradle-plugin/build.gradle.kts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-gradle-plugin/src/main/kotlin/com/pgfixtures/gradle/AddColumnTask.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-gradle-plugin/src/main/kotlin/com/pgfixtures/gradle/AddTableTask.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-gradle-plugin/src/main/kotlin/com/pgfixtures/gradle/PgFixturesPlugin.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-gradle-plugin/src/main/kotlin/com/pgfixtures/gradle/RemoveColumnTask.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-gradle-plugin/src/main/kotlin/com/pgfixtures/gradle/RemoveTableTask.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-gradle-plugin/src/test/kotlin/com/pgfixtures/gradle/functional/AddColumnTaskTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-gradle-plugin/src/test/kotlin/com/pgfixtures/gradle/functional/AddTableTaskTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-gradle-plugin/src/test/kotlin/com/pgfixtures/gradle/functional/RemoveColumnTaskTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-gradle-plugin/src/test/kotlin/com/pgfixtures/gradle/functional/RemoveTableTaskTest.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pgfixtures-gradle-plugin/src/test/kotlin/com/pgfixtures/gradle/functional/TestHelpers.kt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.0000156428136269" />
+      <entry key="MS500" value="1.173135053262171" />
+      <entry key="S2" value="2.0786855537785693" />
+      <entry key="S5" value="2.563919298302549" />
+      <entry key="S10" value="3.018241804512985" />
+      <entry key="S30" value="11.561875426927473" />
+      <entry key="S60" value="31.380909606033743" />
+      <entry key="M2" value="69.55781097117377" />
+      <entry key="M5" value="140.6282016855484" />
+      <entry key="M10" value="188.39979450566335" />
+      <entry key="M15" value="209.22572212627753" />
+      <entry key="M30" value="233.23636507630218" />
+      <entry key="H1" value="246.60950031921396" />
+      <entry key="H2" value="253.67224457386487" />
+      <entry key="H4" value="257.3023029142967" />
+      <entry key="D1" value="260.3789599428429" />
+      <entry key="W1" value="260.9111626967672" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="0.0" />
+      <entry key="MS500" value="0.0" />
+      <entry key="S2" value="0.0" />
+      <entry key="S5" value="0.0" />
+      <entry key="S10" value="0.0" />
+      <entry key="S30" value="0.0" />
+      <entry key="S60" value="0.0" />
+      <entry key="M2" value="0.0" />
+      <entry key="M5" value="0.0" />
+      <entry key="M10" value="0.0" />
+      <entry key="M15" value="0.0" />
+      <entry key="M30" value="0.0" />
+      <entry key="H1" value="0.0" />
+      <entry key="H2" value="0.0" />
+      <entry key="H4" value="0.0" />
+      <entry key="D1" value="0.0" />
+      <entry key="W1" value="0.0" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="0.9726696219283121" />
+      <entry key="MS500" value="1.1590852158789404" />
+      <entry key="S2" value="2.0604600557417276" />
+      <entry key="S5" value="2.553147527587281" />
+      <entry key="S10" value="3.0109490870643416" />
+      <entry key="S30" value="11.54804975816608" />
+      <entry key="S60" value="31.362932541295354" />
+      <entry key="M2" value="69.53996913361217" />
+      <entry key="M5" value="140.61555151587328" />
+      <entry key="M10" value="188.39178357012042" />
+      <entry key="M15" value="209.21990683839675" />
+      <entry key="M30" value="233.23318806429367" />
+      <entry key="H1" value="246.60783763673234" />
+      <entry key="H2" value="253.67139375273567" />
+      <entry key="H4" value="257.3018725112706" />
+      <entry key="D1" value="260.3788875049434" />
+      <entry key="W1" value="260.9111523311128" />
+    </decayedShown>
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="2" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 1
+}]]></component>
+  <component name="ProjectId" id="3EDLgAECJljGkQD9vcDeDLnnRTG" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="compactDirectories" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+    <option name="sortByType" value="true" />
+    <option name="sortKey" value="BY_TYPE" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.MCP Project settings loaded": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "/Users/geirhedemark/source/testaco",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RunManager">
+    <configuration default="true" type="JetRunConfigurationType">
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.24374.151" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.24374.151" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="22db35f9-3077-4702-a201-eec223e79882" name="Changes" comment="" />
+      <created>1779708301664</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1779708301664</updated>
+      <workItem from="1779708303344" duration="2528000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

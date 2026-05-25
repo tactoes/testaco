@@ -1,6 +1,6 @@
 # Gradle Tasks Reference
 
-Testaco provides four Gradle tasks for managing schema and dataset files. These tasks modify your schema file and optionally update all dataset files to maintain consistency.
+PgFixtures provides four Gradle tasks for managing schema and dataset files. These tasks modify your schema file and optionally update all dataset files to maintain consistency.
 
 ## Table of Contents
 
@@ -453,7 +453,7 @@ The tasks expect the schema file at `src/test/resources/testaco-schema.json`. If
 
 ### Dataset Files Not Updated
 
-Ensure dataset files are valid JSON and follow the Testaco format:
+Ensure dataset files are valid JSON and follow the PgFixtures format:
 
 ```json
 {
