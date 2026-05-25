@@ -1,6 +1,6 @@
-# PgFixtures
+# Testaco
 
-PgFixtures is a Kotlin reimplementation of DbUnit for Kotest, designed for modern test workflows. It uses JSON datasets for test 
+Testaco is a Kotlin reimplementation of DbUnit for Kotest, designed for modern test workflows. It uses JSON datasets for test 
 data management and focuses exclusively on PostgreSQL, providing bidirectional schema validation, composable datasets, and powerful assertion matchers.
 
 ## Why?
@@ -71,8 +71,8 @@ Create `src/test/resources/testaco-schema.json`:
 ### 3. Write Your First Test
 
 ```kotlin
-import org.testaco.PgFixtures
-import org.testaco.PgFixturesConfig
+import org.testaco.Testaco
+import org.testaco.TestacoConfig
 import io.kotest.core.spec.style.FunSpec
 import org.postgresql.ds.PGSimpleDataSource
 
@@ -84,7 +84,7 @@ class OrderServiceTest : FunSpec({
         password = "test_pass"
     }
 
-    val db = PgFixtures(dataSource)
+    val db = Testaco(dataSource)
 
     test("creates order successfully") {
         db.load("com/example/OrderServiceTest/creates_order/setup")
@@ -149,12 +149,12 @@ Create an optional `src/test/resources/testaco-config.json`:
 
 ## API Reference
 
-### PgFixtures
+### Testaco
 
 ```kotlin
-class PgFixtures(
+class Testaco(
     dataSource: DataSource,
-    config: PgFixturesConfig? = null,
+    config: TestacoConfig? = null,
     schemaResourcePath: String = "testaco-schema.json"
 )
 

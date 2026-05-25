@@ -1,4 +1,4 @@
-# Copilot instructions for PgFixtures repository
+# Copilot instructions for Testaco repository
 
 Purpose
 - Help future Copilot sessions understand build, test, and repository-specific conventions for testaco.
@@ -17,14 +17,14 @@ Notes about linting/formatting
 
 High-level architecture
 - Multi-module Gradle project (root: testaco)
-  - testaco-core: the Kotlin library providing PgFixtures API, dataset matchers, validation and dump/assert logic.
+  - testaco-core: the Kotlin library providing Testaco API, dataset matchers, validation and dump/assert logic.
   - testaco-gradle-plugin: Gradle plugin that provides schema/dataset management tasks (testacoAddColumn, testacoRemoveColumn, testacoAddTable, testacoRemoveTable).
 - Tests use Kotest on JUnit platform and connect to PostgreSQL via PGSimpleDataSource.
 - Test datasets and schema live under src/test/resources.
   - Schema: src/test/resources/testaco-schema.json (default)
   - Optional config: src/test/resources/testaco-config.json
   - Datasets: organized by test class/method, e.g. src/test/resources/com/example/OrderServiceTest/creates_order/{setup.json,expected.json}
-- On PgFixtures instantiation the library validates schema ↔ live database bidirectionally.
+- On Testaco instantiation the library validates schema ↔ live database bidirectionally.
 
 Key conventions (repo-specific)
 - Dataset layout: group datasets under src/test/resources by test class and test case name.
@@ -33,7 +33,7 @@ Key conventions (repo-specific)
   - ~now, ~now±PT10S for timestamps
   - ~ignore to skip columns
   - ~regex:<pattern> for pattern matching
-- Default schema path: src/test/resources/testaco-schema.json unless overridden via PgFixtures constructor.
+- Default schema path: src/test/resources/testaco-schema.json unless overridden via Testaco constructor.
 - Use provided Gradle tasks to change schema and update datasets (they modify schema + dataset JSONs consistently).
 - Quote PostgreSQL types containing spaces (e.g., "timestamp with time zone") when passing via CLI.
 - When adding/removing schema elements: commit schema and dataset changes together.

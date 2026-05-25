@@ -1,6 +1,6 @@
 # Usage Guide
 
-This guide covers the complete PgFixtures workflow with detailed examples.
+This guide covers the complete Testaco workflow with detailed examples.
 
 ## Table of Contents
 
@@ -18,7 +18,7 @@ This guide covers the complete PgFixtures workflow with detailed examples.
 ### Basic Initialization
 
 ```kotlin
-import org.testaco.PgFixtures
+import org.testaco.Testaco
 import org.postgresql.ds.PGSimpleDataSource
 
 val dataSource = PGSimpleDataSource().apply {
@@ -28,18 +28,18 @@ val dataSource = PGSimpleDataSource().apply {
     password = "test_pass"
 }
 
-val db = PgFixtures(dataSource)
+val db = Testaco(dataSource)
 ```
 
 ### With Configuration
 
 ```kotlin
-import org.testaco.PgFixtures
-import org.testaco.PgFixturesConfig
+import org.testaco.Testaco
+import org.testaco.TestacoConfig
 import org.testaco.LoadStrategy
 import java.time.Duration
 
-val config = PgFixturesConfig(
+val config = TestacoConfig(
     schemas = listOf("public", "audit"),
     ignoredColumns = mapOf(
         "*" to listOf("updated_at", "version"),
@@ -49,13 +49,13 @@ val config = PgFixturesConfig(
     loadStrategy = LoadStrategy.CLEAN_INSERT
 )
 
-val db = PgFixtures(dataSource, config)
+val db = Testaco(dataSource, config)
 ```
 
 ### Custom Schema Path
 
 ```kotlin
-val db = PgFixtures(
+val db = Testaco(
     dataSource = dataSource,
     config = config,
     schemaResourcePath = "custom-schema.json"
@@ -132,7 +132,7 @@ db.load("additional-data", strategy = LoadStrategy.INSERT)
 db.assertMatches("com/example/OrderServiceTest/expected")
 ```
 
-Compares the current database state against the expected dataset. If there's a mismatch, PgFixtures:
+Compares the current database state against the expected dataset. If there's a mismatch, Testaco:
 1. Fails the test with a detailed diff
 2. Dumps the actual database state to `build/test-results/testaco/<test-path>/actual.json`
 
@@ -168,7 +168,7 @@ Useful for debugging or programmatic assertions.
 
 ## Special Matchers
 
-PgFixtures provides special matchers for flexible assertions in expected datasets.
+Testaco provides special matchers for flexible assertions in expected datasets.
 
 ### ~now
 
@@ -241,7 +241,7 @@ Matches the value against a regex pattern:
 Ignore specific columns for specific tables:
 
 ```kotlin
-val config = PgFixturesConfig(
+val config = TestacoConfig(
     ignoredColumns = mapOf(
         "users" to listOf("password_hash", "last_login"),
         "orders" to listOf("updated_at")
@@ -265,7 +265,7 @@ Or in `testaco-config.json`:
 Ignore columns across all tables:
 
 ```kotlin
-val config = PgFixturesConfig(
+val config = TestacoConfig(
     ignoredColumns = mapOf(
         "*" to listOf("updated_at", "version")
     )
@@ -340,7 +340,7 @@ db.load("test-specific/extra-data", strategy = LoadStrategy.INSERT)
 ### Example 1: Basic CRUD Test
 
 ```kotlin
-import org.testaco.PgFixtures
+import org.testaco.Testaco
 import io.kotest.core.spec.style.FunSpec
 import org.postgresql.ds.PGSimpleDataSource
 
@@ -352,7 +352,7 @@ class UserServiceTest : FunSpec({
         password = "test_pass"
     }
 
-    val db = PgFixtures(dataSource)
+    val db = Testaco(dataSource)
 
     test("creates user successfully") {
         db.load("com/example/UserServiceTest/creates_user/setup")
@@ -403,7 +403,7 @@ class UserServiceTest : FunSpec({
 
 ```kotlin
 class OrderServiceTest : FunSpec({
-    val db = PgFixtures(dataSource)
+    val db = Testaco(dataSource)
 
     test("processes order with multiple items") {
         db.load(
@@ -424,7 +424,7 @@ class OrderServiceTest : FunSpec({
 
 ```kotlin
 class NotificationServiceTest : FunSpec({
-    val db = PgFixtures(dataSource)
+    val db = Testaco(dataSource)
 
     test("sends notification") {
         db.load("NotificationServiceTest/setup")
@@ -457,13 +457,13 @@ class NotificationServiceTest : FunSpec({
 
 ```kotlin
 class AuditServiceTest : FunSpec({
-    val config = PgFixturesConfig(
+    val config = TestacoConfig(
         ignoredColumns = mapOf(
             "*" to listOf("updated_at"),
             "users" to listOf("last_login")
         )
     )
-    val db = PgFixtures(dataSource, config)
+    val db = Testaco(dataSource, config)
 
     test("updates user profile") {
         db.load("AuditServiceTest/setup")
@@ -494,7 +494,7 @@ Note: `updated_at` and `last_login` are automatically ignored due to configurati
 
 ### Example 5: Dump on Failure
 
-When an assertion fails, PgFixtures automatically dumps the actual database state:
+When an assertion fails, Testaco automatically dumps the actual database state:
 
 ```kotlin
 test("creates order") {
@@ -520,7 +520,7 @@ diff src/test/resources/OrderServiceTest/expected.json \
 
 ```kotlin
 class EventLogTest : FunSpec({
-    val db = PgFixtures(dataSource)
+    val db = Testaco(dataSource)
 
     test("appends event log entries") {
         // Load initial events with CLEAN_INSERT

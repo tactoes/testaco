@@ -1,10 +1,10 @@
 # Debugging Failing Tests
 
-When `assertMatches` fails, PgFixtures gives you two things: a structured error message in the test output, and an auto-dumped JSON file with the actual database state. This guide explains how to use both to diagnose and fix the problem.
+When `assertMatches` fails, Testaco gives you two things: a structured error message in the test output, and an auto-dumped JSON file with the actual database state. This guide explains how to use both to diagnose and fix the problem.
 
 ## What Happens When a Test Fails
 
-When `db.assertMatches("com/example/OrderServiceTest/creates_order/expected")` fails, PgFixtures:
+When `db.assertMatches("com/example/OrderServiceTest/creates_order/expected")` fails, Testaco:
 
 1. **Prints a structured error message** showing exactly what's different
 2. **Dumps the actual database state** to `build/test-results/testaco/<test-path>/actual.json`
@@ -203,7 +203,7 @@ Row (PK: {id=1}):
   amount: expected 100, got 100.00
 ```
 
-PgFixtures handles numeric comparisons via `BigDecimal`, so `100` and `100.00` are considered equal. If you see this kind of error, the types may be fundamentally different (string vs number). Check that your JSON dataset uses the right JSON type:
+Testaco handles numeric comparisons via `BigDecimal`, so `100` and `100.00` are considered equal. If you see this kind of error, the types may be fundamentally different (string vs number). Check that your JSON dataset uses the right JSON type:
 
 ```json
 // Wrong — amount is a string
