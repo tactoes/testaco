@@ -5,7 +5,7 @@ plugins {
 
 dependencies {
     implementation(project(":testaco-core"))
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.21.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
 
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
