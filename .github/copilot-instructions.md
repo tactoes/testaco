@@ -1,7 +1,7 @@
 # Copilot instructions for PgFixtures repository
 
 Purpose
-- Help future Copilot sessions understand build, test, and repository-specific conventions for pgfixtures.
+- Help future Copilot sessions understand build, test, and repository-specific conventions for testaco.
 
 Build, test, and run
 - Build everything: ./gradlew build
@@ -18,7 +18,7 @@ Notes about linting/formatting
 High-level architecture
 - Multi-module Gradle project (root: testaco)
   - testaco-core: the Kotlin library providing PgFixtures API, dataset matchers, validation and dump/assert logic.
-  - testaco-gradle-plugin: Gradle plugin that provides schema/dataset management tasks (pgfixturesAddColumn, pgfixturesRemoveColumn, pgfixturesAddTable, pgfixturesRemoveTable).
+  - testaco-gradle-plugin: Gradle plugin that provides schema/dataset management tasks (testacoAddColumn, testacoRemoveColumn, testacoAddTable, testacoRemoveTable).
 - Tests use Kotest on JUnit platform and connect to PostgreSQL via PGSimpleDataSource.
 - Test datasets and schema live under src/test/resources.
   - Schema: src/test/resources/testaco-schema.json (default)
