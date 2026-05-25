@@ -1,6 +1,6 @@
 package org.testaco.integration
 
-import org.testaco.PgFixtures
+import org.testaco.Testaco
 import org.testaco.assertion.DataSetMismatchException
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -9,7 +9,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import org.testcontainers.containers.PostgreSQLContainer
 import org.postgresql.ds.PGSimpleDataSource
 
-class PgFixturesTest : FunSpec({
+class TestacoTest : FunSpec({
 
     val postgres = PostgreSQLContainer("postgres:16-alpine")
 

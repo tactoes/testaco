@@ -1,6 +1,6 @@
 package org.testaco.schema
 
-import org.testaco.config.PgFixturesConfig
+import org.testaco.config.TestacoConfig
 import org.testaco.dataset.DataSet
 
 class SchemaValidationException(message: String) : RuntimeException(message)
@@ -8,7 +8,7 @@ class DataSetValidationException(message: String) : RuntimeException(message)
 
 object SchemaValidator {
 
-    fun validateSchemaMatch(expected: Schema, live: Schema, config: PgFixturesConfig) {
+    fun validateSchemaMatch(expected: Schema, live: Schema, config: TestacoConfig) {
         val errors = mutableListOf<String>()
         val expectedTables = expected.tables.keys
         val liveTables = live.tables.keys
@@ -42,7 +42,7 @@ object SchemaValidator {
             throw SchemaValidationException("Database schema does not match testaco-schema.json\n\n  ${errors.joinToString("\n  ")}")
     }
 
-    fun validateDataSetAgainstSchema(dataSet: DataSet, schema: Schema, config: PgFixturesConfig) {
+    fun validateDataSetAgainstSchema(dataSet: DataSet, schema: Schema, config: TestacoConfig) {
         val errors = mutableListOf<String>()
         for ((tableName, rows) in dataSet.tables) {
             val tableDef = schema.tables[tableName]

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.time.Duration
 
-data class PgFixturesConfig(
+data class TestacoConfig(
     val schemas: List<String> = listOf("public"),
     val ignoredColumns: Map<String, List<String>> = emptyMap(),
     val defaultTimestampTolerance: Duration = Duration.ofSeconds(5),
@@ -20,13 +20,13 @@ data class PgFixturesConfig(
     companion object {
         private val mapper = ObjectMapper().registerKotlinModule()
 
-        fun fromClasspath(resourcePath: String = "testaco-config.json"): PgFixturesConfig {
+        fun fromClasspath(resourcePath: String = "testaco-config.json"): TestacoConfig {
             val stream = Thread.currentThread().contextClassLoader.getResourceAsStream(resourcePath)
-                ?: return PgFixturesConfig()
+                ?: return TestacoConfig()
             return fromJson(mapper.readTree(stream))
         }
 
-        fun fromJson(node: JsonNode): PgFixturesConfig {
+        fun fromJson(node: JsonNode): TestacoConfig {
             val schemas = node["schemas"]?.map { it.asText() } ?: listOf("public")
             val ignoredColumns = mutableMapOf<String, List<String>>()
             node["ignoredColumns"]?.fields()?.forEach { (table, cols) ->
@@ -39,7 +39,7 @@ data class PgFixturesConfig(
                 LoadStrategy.valueOf(it)
             } ?: LoadStrategy.CLEAN_INSERT
 
-            return PgFixturesConfig(
+            return TestacoConfig(
                 schemas = schemas,
                 ignoredColumns = ignoredColumns,
                 defaultTimestampTolerance = tolerance,

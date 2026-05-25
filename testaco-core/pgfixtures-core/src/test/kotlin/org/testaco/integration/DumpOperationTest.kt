@@ -1,6 +1,6 @@
 package org.testaco.integration
 
-import org.testaco.config.PgFixturesConfig
+import org.testaco.config.TestacoConfig
 import org.testaco.operation.DumpOperation
 import org.testaco.schema.*
 import io.kotest.core.spec.style.FunSpec
@@ -33,7 +33,7 @@ class DumpOperationTest : FunSpec({
 
     test("dumps database to in-memory dataset") {
         DriverManager.getConnection(postgres.jdbcUrl, postgres.username, postgres.password).use { conn ->
-            val result = DumpOperation.toDataSet(conn, schema, PgFixturesConfig())
+            val result = DumpOperation.toDataSet(conn, schema, TestacoConfig())
             result.tables shouldContainKey "public.users"
             result.tables["public.users"]!!.size shouldBe 2
         }

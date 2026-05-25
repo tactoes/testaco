@@ -17,7 +17,7 @@ gradlePlugin {
     plugins {
         create("testaco") {
             id = "org.testaco"
-            implementationClass = "org.testaco.gradle.PgFixturesPlugin"
+            implementationClass = "org.testaco.gradle.TestacoPlugin"
         }
     }
 }

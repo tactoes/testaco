@@ -1,7 +1,7 @@
 package org.testaco
 
 import org.testaco.assertion.DataSetMismatchException
-import org.testaco.config.PgFixturesConfig
+import org.testaco.config.TestacoConfig
 import org.testaco.config.LoadStrategy
 import org.testaco.dataset.DataSetReader
 import org.testaco.operation.CompareOperation
@@ -14,12 +14,12 @@ import org.testaco.util.PostgresIntrospector
 import java.nio.file.Path
 import javax.sql.DataSource
 
-class PgFixtures(
+class Testaco(
     private val dataSource: DataSource,
-    config: PgFixturesConfig? = null,
+    config: TestacoConfig? = null,
     schemaResourcePath: String = "testaco-schema.json"
 ) {
-    private val config: PgFixturesConfig = config ?: PgFixturesConfig.fromClasspath()
+    private val config: TestacoConfig = config ?: TestacoConfig.fromClasspath()
     private val schema = SchemaReader.fromClasspath(schemaResourcePath)
     private val fkResolver = ForeignKeyResolver(schema)
 

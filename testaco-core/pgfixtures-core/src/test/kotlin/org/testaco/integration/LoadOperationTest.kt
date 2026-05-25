@@ -1,6 +1,6 @@
 package org.testaco.integration
 
-import org.testaco.config.PgFixturesConfig
+import org.testaco.config.TestacoConfig
 import org.testaco.config.LoadStrategy
 import org.testaco.dataset.DataSet
 import org.testaco.operation.LoadOperation
@@ -48,7 +48,7 @@ class LoadOperationTest : FunSpec({
                 "public.users" to listOf(mapOf("id" to 1L, "name" to "Alice", "email" to "alice@example.com")),
                 "public.orders" to listOf(mapOf("id" to 10L, "user_id" to 1L, "amount" to 99.99))
             ))
-            LoadOperation.execute(conn, dataset, schema, ForeignKeyResolver(schema), PgFixturesConfig(), LoadStrategy.CLEAN_INSERT)
+            LoadOperation.execute(conn, dataset, schema, ForeignKeyResolver(schema), TestacoConfig(), LoadStrategy.CLEAN_INSERT)
 
             val rs = conn.createStatement().executeQuery("SELECT count(*) FROM users")
             rs.next(); rs.getInt(1) shouldBe 1
@@ -60,7 +60,7 @@ class LoadOperationTest : FunSpec({
             conn.createStatement().execute("TRUNCATE orders, users CASCADE")
             conn.createStatement().execute("INSERT INTO users (id, name) VALUES (50, 'Existing')")
             val dataset = DataSet(mapOf("public.users" to listOf(mapOf("id" to 1L, "name" to "Alice"))))
-            LoadOperation.execute(conn, dataset, schema, ForeignKeyResolver(schema), PgFixturesConfig(), LoadStrategy.INSERT)
+            LoadOperation.execute(conn, dataset, schema, ForeignKeyResolver(schema), TestacoConfig(), LoadStrategy.INSERT)
 
             val rs = conn.createStatement().executeQuery("SELECT count(*) FROM users")
             rs.next(); rs.getInt(1) shouldBe 2

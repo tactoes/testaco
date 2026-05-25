@@ -1,6 +1,6 @@
 package org.testaco.operation
 
-import org.testaco.config.PgFixturesConfig
+import org.testaco.config.TestacoConfig
 import org.testaco.config.LoadStrategy
 import org.testaco.dataset.DataSet
 import org.testaco.schema.Schema
@@ -11,7 +11,7 @@ object LoadOperation {
 
     fun execute(
         connection: Connection, dataSet: DataSet, schema: Schema,
-        fkResolver: ForeignKeyResolver, config: PgFixturesConfig, strategy: LoadStrategy
+        fkResolver: ForeignKeyResolver, config: TestacoConfig, strategy: LoadStrategy
     ) {
         val tables = dataSet.tables.keys.toList()
         val hasCycles = fkResolver.hasCycles(tables)

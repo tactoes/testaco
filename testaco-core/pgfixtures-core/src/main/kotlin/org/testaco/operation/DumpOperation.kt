@@ -1,6 +1,6 @@
 package org.testaco.operation
 
-import org.testaco.config.PgFixturesConfig
+import org.testaco.config.TestacoConfig
 import org.testaco.dataset.DataSet
 import org.testaco.dataset.DataSetWriter
 import org.testaco.schema.Schema
@@ -9,7 +9,7 @@ import java.sql.Connection
 
 object DumpOperation {
 
-    fun toDataSet(connection: Connection, schema: Schema, config: PgFixturesConfig): DataSet {
+    fun toDataSet(connection: Connection, schema: Schema, config: TestacoConfig): DataSet {
         val tables = mutableMapOf<String, List<Map<String, Any?>>>()
 
         for ((tableName, tableDef) in schema.tables) {
@@ -36,7 +36,7 @@ object DumpOperation {
         return DataSet(tables)
     }
 
-    fun toFile(connection: Connection, schema: Schema, config: PgFixturesConfig, path: Path) {
+    fun toFile(connection: Connection, schema: Schema, config: TestacoConfig, path: Path) {
         DataSetWriter.toFile(toDataSet(connection, schema, config), path)
     }
 }

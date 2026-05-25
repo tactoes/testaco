@@ -1,6 +1,6 @@
 package org.testaco.integration
 
-import org.testaco.config.PgFixturesConfig
+import org.testaco.config.TestacoConfig
 import org.testaco.dataset.DataSet
 import org.testaco.operation.CompareOperation
 import org.testaco.schema.*
@@ -37,7 +37,7 @@ class CompareOperationTest : FunSpec({
                 mapOf("id" to 1L, "name" to "Alice", "email" to "alice@example.com"),
                 mapOf("id" to 2L, "name" to "Bob", "email" to null)
             )))
-            CompareOperation.execute(conn, expected, schema, PgFixturesConfig()).matches shouldBe true
+            CompareOperation.execute(conn, expected, schema, TestacoConfig()).matches shouldBe true
         }
     }
 
@@ -47,7 +47,7 @@ class CompareOperationTest : FunSpec({
                 mapOf("id" to 1L, "name" to "WRONG", "email" to "alice@example.com"),
                 mapOf("id" to 2L, "name" to "Bob", "email" to null)
             )))
-            val result = CompareOperation.execute(conn, expected, schema, PgFixturesConfig())
+            val result = CompareOperation.execute(conn, expected, schema, TestacoConfig())
             result.matches shouldBe false
             result.tableDiffs["public.users"]!!.columnDiffs.isNotEmpty() shouldBe true
         }
@@ -59,7 +59,7 @@ class CompareOperationTest : FunSpec({
                 mapOf("id" to 1L, "name" to "Alice", "email" to "~ignore"),
                 mapOf("id" to 2L, "name" to "Bob", "email" to "~ignore")
             )))
-            CompareOperation.execute(conn, expected, schema, PgFixturesConfig()).matches shouldBe true
+            CompareOperation.execute(conn, expected, schema, TestacoConfig()).matches shouldBe true
         }
     }
 })

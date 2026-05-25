@@ -1,14 +1,14 @@
 package org.testaco.operation
 
 import org.testaco.assertion.*
-import org.testaco.config.PgFixturesConfig
+import org.testaco.config.TestacoConfig
 import org.testaco.dataset.DataSet
 import org.testaco.schema.Schema
 import java.sql.Connection
 
 object CompareOperation {
 
-    fun execute(connection: Connection, expected: DataSet, schema: Schema, config: PgFixturesConfig): ComparisonResult {
+    fun execute(connection: Connection, expected: DataSet, schema: Schema, config: TestacoConfig): ComparisonResult {
         val tableDiffs = mutableMapOf<String, TableDiff>()
         var allMatch = true
 
@@ -43,7 +43,7 @@ object CompareOperation {
     }
 
     private fun compareRows(expected: List<Map<String, Any?>>, actual: List<Map<String, Any?>>,
-                            pk: List<String>, config: PgFixturesConfig): TableDiff? {
+                            pk: List<String>, config: TestacoConfig): TableDiff? {
         val missing = mutableListOf<Map<String, Any?>>()
         val extra = mutableListOf<Map<String, Any?>>()
         val diffs = mutableListOf<RowDiff>()
@@ -79,7 +79,7 @@ object CompareOperation {
     }
 
     private fun compareRow(expected: Map<String, Any?>, actual: Map<String, Any?>,
-                           pk: List<String>, config: PgFixturesConfig): RowDiff? {
+                           pk: List<String>, config: TestacoConfig): RowDiff? {
         val mismatches = mutableMapOf<String, ColumnMismatch>()
         for ((col, expVal) in expected) {
             val matcher = ColumnMatcher.forExpected(expVal, config.defaultTimestampTolerance)

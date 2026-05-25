@@ -1,6 +1,6 @@
 package org.testaco.schema
 
-import org.testaco.config.PgFixturesConfig
+import org.testaco.config.TestacoConfig
 import org.testaco.dataset.DataSet
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -22,7 +22,7 @@ class SchemaValidatorTest : FunSpec({
             )
         )
     )
-    val config = PgFixturesConfig()
+    val config = TestacoConfig()
 
     test("identical schemas pass validation") {
         SchemaValidator.validateSchemaMatch(schema, schema.copy(), config)
@@ -73,7 +73,7 @@ class SchemaValidatorTest : FunSpec({
     }
 
     test("ignored columns are excluded from validation") {
-        val configWithIgnored = PgFixturesConfig(ignoredColumns = mapOf("public.users" to listOf("email")))
+        val configWithIgnored = TestacoConfig(ignoredColumns = mapOf("public.users" to listOf("email")))
         val liveSchema = Schema(
             schemas = listOf("public"),
             tables = mapOf(
