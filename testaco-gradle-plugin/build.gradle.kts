@@ -3,16 +3,13 @@ plugins {
     `java-gradle-plugin`
 }
 
-val jacksonVersion: String by rootProject.extra
-val kotestVersion: String by rootProject.extra
-
 dependencies {
     implementation(project(":testaco-core"))
-    implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
+    implementation(libs.jacksonDatabind)
+    implementation(libs.jacksonModuleKotlin)
 
-    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
+    testImplementation(libs.kotestRunner)
+    testImplementation(libs.kotestAssertions)
     testImplementation(gradleTestKit())
 }
 
