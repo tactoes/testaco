@@ -8,7 +8,7 @@ plugins {
 extra["jacksonVersion"] = "2.21.3"
 extra["postgresqlDriverVersion"] = "42.7.11"
 extra["testcontainersVersion"] = "1.21.4"
-extra["kotestVersion"] = "5.9.1"
+extra["kotestVersion"] = "6.1.11"
 
 allprojects {
     group = "org.testaco"
