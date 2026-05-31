@@ -1,27 +1,37 @@
 # Testaco
 
-Testaco is a Kotlin reimplementation of DbUnit for Kotest, designed for modern test workflows. It uses JSON datasets for test 
+Testaco is a Kotlin reimplementation of DbUnit and an old DbUnit wrapper I made in 2008-ish, designed for modern test workflows. It uses JSON datasets for test 
 data management and focuses exclusively on PostgreSQL, providing bidirectional schema validation, composable datasets, and powerful assertion matchers.
+
+The  project started as a trial to see how far I could push AI to reimplement old code. The end result looks Ok, although I have not gotten
+around to use it in a professional project or read through all the code yet.
 
 ## Why?
 
 Tests have a regrettable side effect, and that is a kind of stiffening of the boundaries that are used for testing. A project that only uses unit tests
 will have a harder time making refactoring changes across existing unit boundaries because the tests will not be as useful for refactoring
-(See "refactoring", Fowler).
+(See "refactoring", Fowler). The boundaries they are written against will change, which will reduce or remove the utility of the tests
+for refactoring.
 
-There are however interfaces that are more flexible in a typical application. The database layer has well-defined ways of mutating the
+There are pre-existing interfaces that are more flexible in a typical application. The database layer has well-defined ways of mutating the
 database schema (["Database refactoring", Ambler et al](https://databaserefactoring.com/)). Well-designed applications are the sole
 user of its database, which cuts down on the need for versioning, and tools like [Flyway](https://github.com/flyway/flyway) handles
 evolution of database schemas well. I prefer having at least some tests that pull up the whole application, interacting directly with
-the database.
+the database, and a nice side-effect of these kinds of tests is that refactoring becomes a test-supported activity.
 
 Tests do need to load, dump and compare the data in the database, and this is where Testaco comes in. There are scripts within Testaco
-that allows evolving database data sets automatically from the command line or an AI tool.
+that allows evolving database data sets automatically from the command line or an AI tool. The workflow would be
+- create Flyway-based mutation of database schema
+- migrate database data sets using Testaco.
+- run tests. If you have a clean design and have followed the database refactoring rulebook you will have no failing tests.
 
-Testaco is written to be as test-library agnostic as possible, although I personally use kotest and testcontainers in the projects I am currently
-working on.
+Testaco is written to be as test-library agnostic as possible, although I personally use kotest and testcontainers in the 
+projects I am currently working on. The library is meant to be used as a lockdown of functionality, causing tests to fail 
+when something changes. It is up to the developer to use tools like "diff" to figure out what changed, and approve the 
+changes by updating the reference files, or fixing the bug.
 
-Give it a spin, and tell me how it worked out for you?
+Give it a spin, and tell me how it worked out for you? Positive feedback is also welcome through the "praise" github issues
+label?
 
 ## Features
 
@@ -31,7 +41,6 @@ Give it a spin, and tell me how it worked out for you?
 - **Powerful matchers** — `~now`, `~now±PT10S`, `~ignore`, `~regex:pattern` for flexible assertions
 - **Gradle tasks** — Add/remove tables and columns from schema and dataset files
 - **Auto-dump on failure** — Automatically dumps actual DB state to `build/test-results/testaco/<test-path>/actual.json` on assertion mismatch
-- **Smart error messages** — Levenshtein "did you mean?" suggestions for typos
 
 ## Quick Start
 
@@ -211,10 +220,6 @@ fun dump(): Map<String, List<Map<String, Any?>>>
 - PostgreSQL 12+
 - Kotest 5+
 - Java 23+
-
-## License
-
-[Add your license here]
 
 ## Contributing
 
