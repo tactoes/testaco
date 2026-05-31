@@ -1,0 +1,44 @@
+name: Dependabot auto-merge when tests pass
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+jobs:
+  auto-merge:
+    if: github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - id: wait
+        name: Wait for status checks to succeed
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const sha = pr.head.sha;
+            const maxAttempts = 40; // ~10 minutes (40 * 15s)
+            const delay = 15000;
+            for (let i = 0; i < maxAttempts; i++) {
+              const resp = await github.repos.getCombinedStatusForRef({ owner, repo, ref: sha });
+              const state = resp.data.state;
+              if (state === 'success') { core.setOutput('ready', 'true'); return; }
+              if (state === 'failure' || state === 'error') { core.setOutput('ready', 'false'); return; }
+              await new Promise(r => setTimeout(r, delay));
+            }
+            core.setOutput('ready', 'false');
+      - name: Merge PR
+        if: steps.wait.outputs.ready == 'true'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            await github.pulls.merge({ owner, repo, pull_number: pr.number, merge_method: 'squash' });
