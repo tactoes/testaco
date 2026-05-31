@@ -33,10 +33,8 @@ subprojects {
 // License: Apache-2.0 (Copyright 2026 Geir Hedemark)
 
 // Publishing sample (add to root build.gradle.kts or include as needed)
-plugins {
-    `maven-publish`
-    signing
-}
+apply(plugin = "maven-publish")
+apply(plugin = "signing")
 
 // Tasks for sources and javadoc
 val javadocJar by tasks.registering(Jar::class) {
