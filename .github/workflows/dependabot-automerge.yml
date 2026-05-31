@@ -16,7 +16,7 @@ jobs:
     steps:
       - id: wait
         name: Wait for status checks to succeed
-        uses: actions/github-script@v6
+        uses: actions/github-script@v9
         with:
           script: |
             const pr = context.payload.pull_request;
@@ -35,7 +35,7 @@ jobs:
             core.setOutput('ready', 'false');
       - name: Merge PR
         if: steps.wait.outputs.ready == 'true'
-        uses: actions/github-script@v6
+        uses: actions/github-script@v9
         with:
           script: |
             const pr = context.payload.pull_request;
