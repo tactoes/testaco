@@ -8,8 +8,8 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.18.3")
 
-    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
-    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
+    testImplementation("io.kotest:kotest-runner-junit5:6.1.11")
+    testImplementation("io.kotest:kotest-assertions-core:6.1.11")
     testImplementation(gradleTestKit())
 }
 
