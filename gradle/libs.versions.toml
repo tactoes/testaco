@@ -2,7 +2,7 @@
 jackson = "2.21.3"
 postgresql = "42.7.11"
 testcontainers = "1.21.4"
-kotest = "5.9.1"
+kotest = "6.2.1"
 
 [libraries]
 jacksonDatabind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
