@@ -1,5 +1,5 @@
 plugins {
-    kotlin("jvm") version "2.1.20" apply false
+    kotlin("jvm") version "2.4.0" apply false
     id("maven-publish")
     id("signing")
 }
@@ -19,12 +19,12 @@ subprojects {
     configure<org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension> {
         jvmToolchain(25)
         compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_23)
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_25)
         }
     }
 
     tasks.withType<JavaCompile> {
-        targetCompatibility = "23"
+        targetCompatibility = "25"
     }
 
     tasks.withType<Test> {
