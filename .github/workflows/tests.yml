@@ -9,10 +9,10 @@ on:
 permissions:
   contents: read
   checks: write
+  pull-requests: write
 
 jobs:
-  test:
-    name: Run tests
+  tests:
     runs-on: ubuntu-latest
 
     services:
@@ -21,7 +21,7 @@ jobs:
         env:
           POSTGRES_DB: testaco_test
           POSTGRES_USER: testaco
-          POSTGRES_PASSWORD: testaco_pass
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD || 'testaco_pass' }}
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -57,3 +57,4 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: build/test-results/**/*.xml
+          github_token: ${{ secrets.GITHUB_TOKEN }}
