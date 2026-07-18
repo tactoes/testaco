@@ -6,9 +6,8 @@ permissions:
   contents: read
 
 jobs:
-  check:
+  license-check:
     runs-on: ubuntu-latest
-    name: License check
     steps:
       - uses: actions/checkout@v4
       - name: Check Kotlin files for Apache header
