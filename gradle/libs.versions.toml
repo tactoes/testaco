@@ -1,5 +1,5 @@
 [versions]
-jackson = "2.21.3"
+jackson = "2.22.1"
 postgresql = "42.7.12"
 testcontainers = "1.21.4"
 kotest = "6.2.1"
