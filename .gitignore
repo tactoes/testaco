@@ -1,0 +1,8 @@
+.gradle/
+build/
+.kotlin/
+*.log
+docs/superpowers/**
+.idea/**
+.vscode/
+

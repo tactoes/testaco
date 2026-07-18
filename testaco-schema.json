@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Testaco Database Schema",
+  "description": "Defines database tables, columns, and relationships for Testaco database testing",
+  "type": "object",
+  "properties": {
+    "schemas": {
+      "type": "array",
+      "description": "List of database schemas (e.g., 'public', 'app_schema')",
+      "items": {
+        "type": "string"
+      },
+      "default": ["public"]
+    },
+    "tables": {
+      "type": "object",
+      "description": "Map of table names to table definitions",
+      "additionalProperties": {
+        "$ref": "#/definitions/table"
+      }
+    }
+  },
+  "required": ["tables"],
+  "additionalProperties": false,
+  "definitions": {
+    "table": {
+      "type": "object",
+      "description": "Definition of a single database table",
+      "properties": {
+        "columns": {
+          "type": "object",
+          "description": "Map of column names to column definitions",
+          "additionalProperties": {
+            "$ref": "#/definitions/column"
+          }
+        },
+        "primaryKey": {
+          "type": "array",
+          "description": "List of column names that form the primary key",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "foreignKeys": {
+          "type": "array",
+          "description": "List of foreign key constraints",
+          "items": {
+            "$ref": "#/definitions/foreignKey"
+          },
+          "default": []
+        },
+        "uniqueConstraints": {
+          "type": "array",
+          "description": "List of unique constraints",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "default": []
+        }
+      },
+      "required": ["columns"],
+      "additionalProperties": false
+    },
+    "column": {
+      "type": "object",
+      "description": "Definition of a database column",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "SQL data type (e.g., 'bigint', 'text', 'numeric', 'timestamp with time zone')",
+          "examples": [
+            "bigint",
+            "integer",
+            "smallint",
+            "text",
+            "varchar",
+            "numeric",
+            "float",
+            "boolean",
+            "date",
+            "timestamp",
+            "timestamp with time zone",
+            "uuid",
+            "json",
+            "jsonb",
+            "bytea"
+          ]
+        },
+        "nullable": {
+          "type": "boolean",
+          "description": "Whether the column allows NULL values",
+          "default": true
+        }
+      },
+      "required": ["type"],
+      "additionalProperties": false
+    },
+    "foreignKey": {
+      "type": "object",
+      "description": "Definition of a foreign key constraint",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "description": "Column names in this table",
+          "items": {
+            "type": "string"
+          }
+        },
+        "references": {
+          "type": "string",
+          "description": "Fully qualified name of the referenced table (e.g., 'public.users')"
+        },
+        "referencedColumns": {
+          "type": "array",
+          "description": "Column names in the referenced table",
+          "items": {
+            "type": "string"
+          }
+        },
+        "onDelete": {
+          "type": "string",
+          "description": "ON DELETE action",
+          "enum": ["CASCADE", "RESTRICT", "SET NULL", "SET DEFAULT", "NO ACTION"],
+          "default": "RESTRICT"
+        },
+        "onUpdate": {
+          "type": "string",
+          "description": "ON UPDATE action",
+          "enum": ["CASCADE", "RESTRICT", "SET NULL", "SET DEFAULT", "NO ACTION"],
+          "default": "RESTRICT"
+        }
+      },
+      "required": ["columns", "references", "referencedColumns"],
+      "additionalProperties": false
+    }
+  }
+}

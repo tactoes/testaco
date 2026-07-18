@@ -1,0 +1,27 @@
+name: License check
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+<<<<<<< HEAD
+      - uses: actions/checkout@v4
+      - name: Check Kotlin files for Apache header
+        run: |
+          set -e
+          missing=""
+          for f in $(git ls-files '*.kt'); do
+            if ! grep -q "Licensed under the Apache License" "$f"; then
+              missing="$missing\n$f"
+            fi
+          done
+          if [ -n "$missing" ]; then
+            echo "❌ Missing Apache License header in:$missing"
+            exit 1
+          fi
+          echo "✅ All Kotlin files have Apache License header"
