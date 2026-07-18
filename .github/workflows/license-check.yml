@@ -9,7 +9,7 @@ jobs:
   license-check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3a9c3cb6018206deb72da68a0fd7b2be5a49f8f8 # v4
       - name: Check Kotlin files for Apache header
         run: |
           set -e

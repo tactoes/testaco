@@ -31,10 +31,10 @@ jobs:
           - 5432:5432
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3a9c3cb6018206deb72da68a0fd7b2be5a49f8f8 # v4
       
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v4
         with:
           distribution: 'temurin'
           java-version: '23'
@@ -50,11 +50,11 @@ jobs:
           TESTACO_DB_PORT: 5432
           TESTACO_DB_NAME: testaco_test
           TESTACO_DB_USER: testaco
-          TESTACO_DB_PASSWORD: testaco_pass
+          TESTACO_DB_PASSWORD: ${{ secrets.TEST_DB_PASSWORD || 'testaco_pass' }}
 
       - name: Publish test results
         if: always()
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: EnricoMi/publish-unit-test-result-action@4ad00735144221adec31370e845b02a338cab920 # v2
         with:
           files: build/test-results/**/*.xml
           github_token: ${{ secrets.GITHUB_TOKEN }}
