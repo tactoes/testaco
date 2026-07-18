@@ -62,7 +62,7 @@ jobs:
         run: |
           set -e
           # Import GPG key if not already imported in previous step
-          if [ -n "${GPG_PASSPHRASE}" ] && ! gpg --list-secret-keys | grep -q "$GPG_KEY_ID"; then
+          if [ -n "${GPG_PASSPHRASE}" ] && ! gpg --list-secret-keys | grep -qF "$GPG_KEY_ID"; then
             echo "GPG key missing locally; ensure GPG_PRIVATE_KEY secret is set."
           fi
           # Publish using Gradle - project must be configured with maven-publish and nexus publishing

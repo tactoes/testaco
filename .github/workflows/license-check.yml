@@ -9,7 +9,6 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-<<<<<<< HEAD
       - uses: actions/checkout@v4
       - name: Check Kotlin files for Apache header
         run: |

@@ -26,6 +26,15 @@ import java.sql.Connection
 object CompareOperation {
     private val logger = LoggerFactory.getLogger(CompareOperation::class.java)
 
+    private fun validateAndQuoteColumnNames(columnNames: List<String>): String {
+        // Validate that column names only contain safe characters (alphanumeric, underscore)
+        // This prevents SQL injection when building ORDER BY clauses
+        require(columnNames.all { it.matches(Regex("[a-zA-Z0-9_]+")) }) {
+            "Column names must be alphanumeric with underscores only"
+        }
+        return if (columnNames.isEmpty()) "1" else columnNames.joinToString(", ") { "\"$it\"" }
+    }
+
     fun execute(connection: Connection, expected: DataSet, schema: Schema, config: TestacoConfig): ComparisonResult {
         logger.debug("Starting comparison of {} tables", expected.tables.size)
         val tableDiffs = mutableMapOf<String, TableDiff>()
@@ -37,7 +46,7 @@ object CompareOperation {
             val (s, t) = tableName.split(".", limit = 2)
             logger.debug("Comparing table {} ({} expected rows)", tableName, expectedRows.size)
 
-            val orderBy = if (pk.isNotEmpty()) pk.joinToString(", ") { "\"$it\"" } else "1"
+            val orderBy = validateAndQuoteColumnNames(pk)
 
             val actualRows = mutableListOf<Map<String, Any?>>()
             connection.createStatement().use { stmt ->
