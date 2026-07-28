@@ -24,14 +24,17 @@ import java.nio.file.Path
 import java.sql.Connection
 
 object DumpOperation {
+    private val identifierRegex = Regex("[a-zA-Z0-9_]+")
+
+    private fun validateAndQuoteIdentifier(identifier: String): String {
+        require(identifier.matches(identifierRegex)) {
+            "Identifiers must be alphanumeric with underscores only"
+        }
+        return "\"$identifier\""
+    }
 
     private fun validateAndQuoteColumnNames(columnNames: List<String>): String {
-        // Validate that column names only contain safe characters (alphanumeric, underscore)
-        // This prevents SQL injection when building ORDER BY clauses
-        require(columnNames.all { it.matches(Regex("[a-zA-Z0-9_]+")) }) {
-            "Column names must be alphanumeric with underscores only"
-        }
-        return if (columnNames.isEmpty()) "1" else columnNames.joinToString(", ") { "\"$it\"" }
+        return if (columnNames.isEmpty()) "1" else columnNames.joinToString(", ") { validateAndQuoteIdentifier(it) }
     }
 
     fun toDataSet(connection: Connection, schema: Schema, config: TestacoConfig): DataSet {
@@ -39,12 +42,14 @@ object DumpOperation {
 
         for ((tableName, tableDef) in schema.tables) {
             val (s, t) = tableName.split(".", limit = 2)
+            val quotedSchema = validateAndQuoteIdentifier(s)
+            val quotedTable = validateAndQuoteIdentifier(t)
             val pk = tableDef.primaryKey
             val orderBy = validateAndQuoteColumnNames(pk)
 
             val rows = mutableListOf<Map<String, Any?>>()
             connection.createStatement().use { stmt ->
-                stmt.executeQuery("SELECT * FROM \"$s\".\"$t\" ORDER BY $orderBy").use { rs ->
+                stmt.executeQuery("SELECT * FROM $quotedSchema.$quotedTable ORDER BY $orderBy").use { rs ->
                     val meta = rs.metaData
                     while (rs.next()) {
                         val row = mutableMapOf<String, Any?>()
