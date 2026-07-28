@@ -22,7 +22,14 @@ import org.testaco.config.LoadStrategy
 import org.testaco.dataset.DataSet
 import org.testaco.schema.Schema
 import org.testaco.util.ForeignKeyResolver
+import java.math.BigDecimal
+import java.math.BigInteger
 import java.sql.Connection
+import java.sql.PreparedStatement
+import java.sql.Timestamp
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 object LoadOperation {
     private val logger = LoggerFactory.getLogger(LoadOperation::class.java)
@@ -69,7 +76,7 @@ object LoadOperation {
                     connection.prepareStatement(sql).use { stmt ->
                         cols.forEachIndexed { i, col ->
                             val v = filtered[col]
-                            if (v == null) stmt.setNull(i + 1, java.sql.Types.NULL) else stmt.setObject(i + 1, v)
+                            bindParameter(stmt, i + 1, v)
                         }
                         stmt.executeUpdate()
                     }
@@ -82,6 +89,29 @@ object LoadOperation {
             connection.rollback(); throw e
         } finally {
             connection.autoCommit = true
+        }
+    }
+
+    private fun bindParameter(stmt: PreparedStatement, index: Int, value: Any?) {
+        when (value) {
+            null -> stmt.setNull(index, java.sql.Types.NULL)
+            is String -> stmt.setString(index, value)
+            is Long -> stmt.setLong(index, value)
+            is Int -> stmt.setInt(index, value)
+            is Short -> stmt.setShort(index, value)
+            is Byte -> stmt.setByte(index, value)
+            is Boolean -> stmt.setBoolean(index, value)
+            is Double -> stmt.setDouble(index, value)
+            is Float -> stmt.setFloat(index, value)
+            is BigDecimal -> stmt.setBigDecimal(index, value)
+            is BigInteger -> stmt.setBigDecimal(index, value.toBigDecimal())
+            is java.sql.Date -> stmt.setDate(index, value)
+            is java.sql.Time -> stmt.setTime(index, value)
+            is Timestamp -> stmt.setTimestamp(index, value)
+            is LocalDate -> stmt.setDate(index, java.sql.Date.valueOf(value))
+            is LocalDateTime -> stmt.setTimestamp(index, Timestamp.valueOf(value))
+            is Instant -> stmt.setTimestamp(index, Timestamp.from(value))
+            else -> stmt.setObject(index, value)
         }
     }
 }
